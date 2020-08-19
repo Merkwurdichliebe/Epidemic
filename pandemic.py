@@ -44,7 +44,7 @@ CARDS = [
     ('Kinshasa', 1, Color.YELLOW),
     ('Khartoum', 1, Color.YELLOW),
     ('Johannesbourg', 2, Color.BLUE),
-    ('Saint-Pétersbourg', 1, Color.BLUE'),
+    ('Saint-Pétersbourg', 1, Color.BLUE),
     ('Santiago', 1, Color.YELLOW),
     ('[ Hommes creux ]', 4, Color.GREEN)
 ]
