@@ -53,8 +53,6 @@ CARDS = [
 ]
 
 
-
-
 class Card:
     '''Class to define a card with city name and color.'''
     def __init__(self, city, color):
