@@ -1,3 +1,4 @@
+# highlightbackground=card.color, 
 # draw card to zone de fin de partie pour villes abandonnées
 # réorganiser 8 cartes
 # draw 2, 3, 4 et 5 par épidémie
@@ -5,7 +6,6 @@
 # undo
 # affichage probabilités
 # gérer erreur frappe
-# select abandoned cities
 # refresh dropdown after epidemic
 # colors (remove colorama)
 
@@ -23,33 +23,33 @@ class Color(Enum):
 
 
 CARDS = [
-    ('Jacksonville', 3, Color.YELLOW),
-    ('Lagos', 3, Color.YELLOW),
-    ('Le Caire', 3, Color.BLACK),
-    ('Londres', 3, Color.BLUE),
-    ('New York', 3, Color.BLUE),
-    ('Sao Paolo', 3, Color.YELLOW),
-    ('Washington', 3, Color.BLUE),
-    ('Bogota', 2, Color.YELLOW),
-    ('Buenos Aires', 2, Color.YELLOW),
-    ('Paris', 2, Color.BLUE),
-    ('Francfort', 2, Color.BLUE),
-    ('Atlanta', 1, Color.BLUE),
-    ('Lima', 1, Color.YELLOW),
-    ('Moscou', 1, Color.BLACK),
-    ('Los Angeles', 1, Color.YELLOW),
-    ('San Francisco', 2, Color.BLUE),
-    ('Denver', 2, Color.BLUE),
-    ('Baghdad', 2, Color.BLACK),
-    ('Kinshasa', 1, Color.YELLOW),
-    ('Khartoum', 1, Color.YELLOW),
-    ('Johannesbourg', 2, Color.BLUE),
-    ('Saint-Pétersbourg', 1, Color.BLUE),
-    ('Santiago', 1, Color.YELLOW),
-    ('Mexico', 1, Color.YELLOW),
-    ('Tripoli', 3, Color.BLACK),
-    ('Chicago', 2, Color.BLUE),
-    ('[ Hommes creux ]', 4, Color.GREEN)
+    ('Jacksonville', 3, 'yellow'),
+    ('Lagos', 3, 'yellow'),
+    ('Le Caire', 3, 'black'),
+    ('Londres', 3, 'blue'),
+    ('New York', 3, 'blue'),
+    ('Sao Paolo', 3, 'yellow'),
+    ('Washington', 3, 'blue'),
+    ('Bogota', 2, 'yellow'),
+    ('Buenos Aires', 2, 'yellow'),
+    ('Paris', 2, 'blue'),
+    ('Francfort', 2, 'blue'),
+    ('Atlanta', 1, 'blue'),
+    ('Lima', 1, 'yellow'),
+    ('Moscou', 1, 'black'),
+    ('Los Angeles', 1, 'yellow'),
+    ('San Francisco', 2, 'blue'),
+    ('Denver', 2, 'blue'),
+    ('Baghdad', 2, 'black'),
+    ('Kinshasa', 1, 'yellow'),
+    ('Khartoum', 1, 'yellow'),
+    ('Johannesbourg', 2, 'blue'),
+    ('Saint-Pétersbourg', 1, 'blue'),
+    ('Santiago', 1, 'yellow'),
+    ('Mexico', 1, 'yellow'),
+    ('Tripoli', 3, 'black'),
+    ('Chicago', 2, 'blue'),
+    ('[ Hommes creux ]', 4, 'green')
 ]
 
 
@@ -71,6 +71,11 @@ root = tk.Tk()
 root.title('Pandemic Deck Tracker')
 root.configure(padx=20, pady=10)
 
+ttk.Style().configure('green.TButton', foreground='green', background='black')
+ttk.Style().configure('blue.TButton', foreground='blue', background='black')
+ttk.Style().configure('yellow.TButton', foreground='orange', background='red')
+ttk.Style().configure('black.TButton', foreground='black', background='black')
+
 # Top 5 labels above the main interface
 
 label_top_1 = tk.Label(root, pady=10, text='POSSIBLE CARDS')
@@ -89,13 +94,10 @@ label_top_5 = tk.Label(root, pady=10, text='ABANDONED or EXILED')
 label_top_5.grid(row=0, column=4, sticky=tk.N)
 
 # Two textboxes containing the dynamically built lists
-# for the discard deck and the draw deck
+# for the exile deck and the draw deck
 
 textbox_draw_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
 textbox_draw_deck.grid(row=3, column=0, rowspan=200, sticky=tk.N)
-
-textbox_discard_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
-textbox_discard_deck.grid(row=3, column=3, rowspan=200, sticky=tk.N)
 
 textbox_exile_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
 textbox_exile_deck.grid(row=3, column=4, rowspan=200, sticky=tk.N)
@@ -180,7 +182,7 @@ def update_gui():
     # Discard
 
     for index, card in enumerate(sorted(discard, key=lambda x: x.city)):
-        button = ttk.Button(root, width=15, text=card.city, command=quit)
+        button = ttk.Button(root, style=card.color+'.TButton', width=15, text=card.city, command=quit)
         button.configure(command=lambda b=button: discard_card_button_cb(b))
         button.grid(row=3 + index, column=3)
         discard_card_buttons[button] = index
@@ -197,7 +199,7 @@ def update_gui():
 
     for index, card_list in enumerate(reversed(draw[-16:])):
         button_text = f'{len(card_list)}'
-        button = ttk.Button(root, width=15, text=button_text, command=quit)
+        button = ttk.Button(root, width=15, text=button_text)
         button.configure(command=lambda b=button: draw_deck_button_cb(b))
         button.grid(row=3 + index, column=1)
         draw_options_buttons[button] = index
@@ -205,7 +207,7 @@ def update_gui():
     # Draw deck
 
     for index, card in enumerate(sorted(set(draw[-1]), key=lambda x: x.city)):
-        button = ttk.Button(root, width=15, text=card.city, command=quit)
+        button = ttk.Button(root, style=card.color+'.TButton', width=15, text=card.city)
         button.configure(command=lambda b=button: draw_card_button_cb(b))
         button.grid(row=3 + index, column=2)
         draw_card_buttons[button] = index
