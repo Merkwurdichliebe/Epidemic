@@ -68,7 +68,6 @@ class Card:
 
 
 # Initialize Tkinter window
-
 root = tk.Tk()
 root.title('Pandemic Deck Tracker')
 root.configure(padx=20, pady=10)
