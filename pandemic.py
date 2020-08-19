@@ -46,12 +46,13 @@ CARDS = [
     ('Johannesbourg', 2, Color.BLUE),
     ('Saint-Pétersbourg', 1, Color.BLUE),
     ('Santiago', 1, Color.YELLOW),
+    ('Mexico', 1, Color.YELLOW),
+    ('Tripoli', 3, Color.BLACK),
+    ('Chicago', 2, Color.BLUE),
     ('[ Hommes creux ]', 4, Color.GREEN)
 ]
 
-# ('Mexico', 1, Color.YELLOW),
-# ('Tripoli', 3, Color.BLACK),
-# ('Chicago', 2, Color.BLUE),
+
 
 
 class Card:
@@ -86,14 +87,31 @@ label_top_3.grid(row=0, column=2, sticky=tk.N)
 label_top_4 = tk.Label(root, pady=10, text='DISCARD DECK')
 label_top_4.grid(row=0, column=3, sticky=tk.N)
 
+label_top_5 = tk.Label(root, pady=10, text='ABANDONED or EXILED')
+label_top_5.grid(row=0, column=4, sticky=tk.N)
+
 # Two textboxes containing the dynamically built lists
 # for the discard deck and the draw deck
 
-textbox_discard_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
-textbox_discard_deck.grid(row=1, column=3, rowspan=200, sticky=tk.N)
-
 textbox_draw_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
-textbox_draw_deck.grid(row=1, column=0, rowspan=200, sticky=tk.N)
+textbox_draw_deck.grid(row=3, column=0, rowspan=200, sticky=tk.N)
+
+textbox_discard_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
+textbox_discard_deck.grid(row=3, column=3, rowspan=200, sticky=tk.N)
+
+textbox_exile_deck = tk.Text(root, width=20, height=50, font=("Helvetica", 14))
+textbox_exile_deck.grid(row=3, column=4, rowspan=200, sticky=tk.N)
+
+# Radio buttons
+
+radio_button_draw_destination = tk.StringVar()
+radio_button_draw_destination.set('exile')
+
+radio_button_draw_to_discard = tk.Radiobutton(root, text='Discard', variable=radio_button_draw_destination, value='discard')
+radio_button_draw_to_exile = tk.Radiobutton(root, text='Exile', variable=radio_button_draw_destination, value='exile')
+
+radio_button_draw_to_discard.grid(row=1, column=2, sticky=tk.W)
+radio_button_draw_to_exile.grid(row=2, column=2, sticky=tk.W)
 
 # Dropdown menu for selecting city in epidemic
 
@@ -106,6 +124,7 @@ dropdown_epidemic = ttk.Combobox(root, width=15)
 
 draw_options_buttons = {}
 draw_card_buttons = {}
+discard_card_buttons = {}
 
 
 def get_card_by_name(cards, name):
@@ -115,63 +134,90 @@ def get_card_by_name(cards, name):
     return None
 
 
-def draw_card(card):
-    discard.append(card)
-    draw[-1].remove(card)
-    draw.pop()
-    update_gui()
+def draw_card(card, from_deck, to_deck):
+    to_deck.append(card)
+    from_deck.remove(card)
 
 
 def draw_deck_button_cb(button):
-	button_index = draw_options_buttons[button]
-	list_draw_options(button_index)
+    button_index = draw_options_buttons[button]
+    list_draw_options(button_index)
 
 
 def list_draw_options(index):
-	textbox_draw_deck.configure(state=tk.NORMAL)
-	textbox_draw_deck.delete(1.0, tk.END)
-	for card in sorted(draw[-1-index], key=lambda x: x.city):
-		textbox_draw_deck.insert(tk.END, card.city + '\n')
-	textbox_draw_deck.configure(state=tk.DISABLED)
+    textbox_draw_deck.configure(state=tk.NORMAL)
+    textbox_draw_deck.delete(1.0, tk.END)
+    for card in sorted(draw[-1-index], key=lambda x: x.city):
+        textbox_draw_deck.insert(tk.END, card.city + '\n')
+    textbox_draw_deck.configure(state=tk.DISABLED)
 
 
 def draw_card_button_cb(button):
-	button_index = draw_card_buttons[button]
-	draw_card(sorted(set(draw[-1]), key=lambda x: x.city)[button_index])
-	list_draw_options(0)
+    button_index = draw_card_buttons[button]
+    if radio_button_draw_destination.get() == 'exile':
+        destination = exile
+    elif radio_button_draw_destination.get() == 'discard':
+        destination = discard
 
+    draw_card(sorted(set(draw[-1]), key=lambda x: x.city)[button_index], draw[-1], destination)
+    draw.pop()
+    update_gui()
+    list_draw_options(0)
+
+def discard_card_button_cb(button):
+    button_index = discard_card_buttons[button]
+    draw_card(sorted(discard, key=lambda x: x.city)[button_index], discard, exile)
+    update_gui()
 
 def update_gui():
-	for k in draw_card_buttons.keys():
-		k.destroy()
+    for k in draw_card_buttons.keys():
+        k.destroy()
 
-	for k in draw_options_buttons.keys():
-		k.destroy()
+    for k in draw_options_buttons.keys():
+        k.destroy()
 
-	textbox_discard_deck.configure(state=tk.NORMAL)
-	textbox_discard_deck.delete(1.0, tk.END)
-	for card in sorted(discard, key=lambda x: x.city):
-		textbox_discard_deck.insert(tk.END, card.city + '\n')
-	textbox_discard_deck.configure(state=tk.DISABLED)
+    for k in discard_card_buttons.keys():
+        k.destroy()
 
-	for index, card_list in enumerate(reversed(draw[-16:])):
-		button_text = f'{len(card_list)}'
-		button = ttk.Button(root, width=15, text=button_text, command=quit)
-		button.configure(command=lambda b=button: draw_deck_button_cb(b))
-		button.grid(row=1 + index, column=1)
-		draw_options_buttons[button] = index
+    # Discard
 
-	for index, card in enumerate(sorted(set(draw[-1]), key=lambda x: x.city)):
-		button = ttk.Button(root, width=15, text=card.city, command=quit)
-		button.configure(command=lambda b=button: draw_card_button_cb(b))
-		button.grid(row=1 + index, column=2)
-		draw_card_buttons[button] = index
+    for index, card in enumerate(sorted(discard, key=lambda x: x.city)):
+        button = ttk.Button(root, width=15, text=card.city, command=quit)
+        button.configure(command=lambda b=button: discard_card_button_cb(b))
+        button.grid(row=3 + index, column=3)
+        discard_card_buttons[button] = index
 
-	unique_cards = sorted([card.city for card in list(set(draw[0]))])
+    # Exile
 
-	dropdown_epidemic.configure(values=unique_cards)
-	dropdown_epidemic.bind('<<ComboboxSelected>>', lambda e: print(dropdown_epidemic.get()))
-	dropdown_epidemic.grid(column=4, row=1)
+    textbox_exile_deck.configure(state=tk.NORMAL)
+    textbox_exile_deck.delete(1.0, tk.END)
+    for card in sorted(exile, key=lambda x: x.city):
+        textbox_exile_deck.insert(tk.END, card.city + '\n')
+    textbox_exile_deck.configure(state=tk.DISABLED)
+
+    # Draw options
+
+    for index, card_list in enumerate(reversed(draw[-16:])):
+        button_text = f'{len(card_list)}'
+        button = ttk.Button(root, width=15, text=button_text, command=quit)
+        button.configure(command=lambda b=button: draw_deck_button_cb(b))
+        button.grid(row=3 + index, column=1)
+        draw_options_buttons[button] = index
+
+    # Draw deck
+
+    for index, card in enumerate(sorted(set(draw[-1]), key=lambda x: x.city)):
+        button = ttk.Button(root, width=15, text=card.city, command=quit)
+        button.configure(command=lambda b=button: draw_card_button_cb(b))
+        button.grid(row=3 + index, column=2)
+        draw_card_buttons[button] = index
+
+    # Epidemic
+
+    unique_cards = sorted([card.city for card in list(set(draw[0]))])
+    dropdown_epidemic.configure(values=unique_cards)
+    dropdown_epidemic.bind('<<ComboboxSelected>>', lambda e: print(dropdown_epidemic.get()))
+    dropdown_epidemic.grid(column=5, row=1)
 
 
 def new_pool(cards):
@@ -190,28 +236,29 @@ def initialize_deck():
 
 
 def do_epidemic():
-	# Select card from bottom of draw pile
-	
-	new_card = get_card_by_name(draw[0], dropdown_epidemic.get())
-	draw[0].remove(new_card)
-	draw.pop(0)
+    # Select card from bottom of draw pile
+    
+    new_card = get_card_by_name(draw[0], dropdown_epidemic.get())
+    draw[0].remove(new_card)
+    draw.pop(0)
 
-	# Add card to discard pile
-	discard.append(new_card)
+    # Add card to discard pile
+    discard.append(new_card)
 
-	# Create new card pool
-	# We use copy in order to reset the discard pile
-	# without affecting the newly pooled cards
-	new_pool(discard.copy())
+    # Create new card pool
+    # We use copy in order to reset the discard pile
+    # without affecting the newly pooled cards
+    new_pool(discard.copy())
 
-	# Clear the discard pile
-	discard.clear()
+    # Clear the discard pile
+    discard.clear()
 
-	update_gui()
+    update_gui()
 
 
-discard = []
 draw = []
+discard = []
+exile = []
 pools = []
 
 
@@ -220,14 +267,14 @@ new_pool(initialize_deck())
 for i in range(4):
     card = get_card_by_name(draw[-1], '[ Hommes creux ]')
     if card is not None:
-    	draw_card(card)
+        draw_card(card, draw[-1], discard)
 
 update_gui()
 
 b_Quit = ttk.Button(root, text='Quit', width=15, command=quit)
 b_Epidemic = ttk.Button(root, text='Epidemic', width=15, command=do_epidemic)
 
-b_Epidemic.grid(column=4, row=2)
-b_Quit.grid(column=4, row=3)
+b_Epidemic.grid(column=5, row=2)
+b_Quit.grid(column=5, row=3)
 
 root.mainloop()
