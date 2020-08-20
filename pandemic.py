@@ -93,6 +93,9 @@ label_top_4.grid(row=0, column=3, sticky=tk.N)
 label_top_5 = tk.Label(root, pady=10, text='ABANDONED or EXILED')
 label_top_5.grid(row=0, column=4, sticky=tk.N)
 
+label_top_6 = tk.Label(root, pady=10, text='Card destination')
+label_top_6.grid(row=0, column=5, sticky=tk.N)
+
 # Two textboxes containing the dynamically built lists
 # for the exile deck and the draw deck
 
@@ -109,13 +112,17 @@ radio_button_draw_destination.set('exile')
 
 radio_button_draw_to_discard = tk.Radiobutton(root, text='Discard', variable=radio_button_draw_destination, value='discard')
 radio_button_draw_to_exile = tk.Radiobutton(root, text='Exile', variable=radio_button_draw_destination, value='exile')
+radio_button_draw_to_draw = tk.Radiobutton(root, text='Draw', variable=radio_button_draw_destination, value='draw')
 
-radio_button_draw_to_discard.grid(row=1, column=2, sticky=tk.W)
-radio_button_draw_to_exile.grid(row=2, column=2, sticky=tk.W)
+radio_button_draw_to_discard.grid(row=3, column=5, sticky=tk.W)
+radio_button_draw_to_exile.grid(row=4, column=5, sticky=tk.W)
+radio_button_draw_to_draw.grid(row=5, column=5, sticky=tk.W)
+
 
 # Dropdown menu for selecting city in epidemic
 
 dropdown_epidemic = ttk.Combobox(root, width=15)
+dropdown_epidemic.grid(column=5, row=7)
 
 # Dictionaries to hold dynamically-built buttons
 # Format is {Tk Button Object : Index}
@@ -135,8 +142,12 @@ def get_card_by_name(cards, name):
 
 
 def draw_card(card, from_deck, to_deck):
-    to_deck.append(card)
     from_deck.remove(card)
+    if to_deck == draw:
+        item = [card]
+    else:
+        item = card
+    to_deck.append(item)
 
 
 def draw_deck_button_cb(button):
@@ -166,7 +177,11 @@ def draw_card_button_cb(button):
 
 def discard_card_button_cb(button):
     button_index = discard_card_buttons[button]
-    draw_card(sorted(discard, key=lambda x: x.city)[button_index], discard, exile)
+    if radio_button_draw_destination.get() == 'exile':
+        destination = exile
+    elif radio_button_draw_destination.get() == 'draw':
+        destination = draw
+    draw_card(sorted(discard, key=lambda x: x.city)[button_index], discard, destination)
     update_gui()
 
 def update_gui():
@@ -198,7 +213,10 @@ def update_gui():
     # Draw options
 
     for index, card_list in enumerate(reversed(draw[-16:])):
-        button_text = f'{len(card_list)}'
+        if len(card_list) == 1:
+            button_text = card_list[0].city
+        else:
+            button_text = f'{len(card_list)}'
         button = ttk.Button(root, width=15, text=button_text)
         button.configure(command=lambda b=button: draw_deck_button_cb(b))
         button.grid(row=3 + index, column=1)
@@ -217,7 +235,6 @@ def update_gui():
     unique_cards = sorted([card.city for card in list(set(draw[0]))])
     dropdown_epidemic.configure(values=unique_cards)
     dropdown_epidemic.bind('<<ComboboxSelected>>', lambda e: print(dropdown_epidemic.get()))
-    dropdown_epidemic.grid(column=5, row=1)
 
 
 def new_pool(cards):
@@ -274,7 +291,7 @@ update_gui()
 b_Quit = ttk.Button(root, text='Quit', width=15, command=quit)
 b_Epidemic = ttk.Button(root, text='Epidemic', width=15, command=do_epidemic)
 
-b_Epidemic.grid(column=5, row=2)
-b_Quit.grid(column=5, row=3)
+b_Epidemic.grid(column=5, row=8)
+b_Quit.grid(column=5, row=9)
 
 root.mainloop()
