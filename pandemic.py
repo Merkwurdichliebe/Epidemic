@@ -12,7 +12,7 @@ import tkinter as tk
 from tkinter import ttk
 
 
-CARDS = [
+available_cards = [
     ('Jacksonville', 3, 'yellow'),
     ('Lagos', 3, 'yellow'),
     ('Le Caire', 3, 'black'),
@@ -52,12 +52,13 @@ class Card:
     # Used in an earlier console version, this makes 'print(card)'
     # return the colored name of the city instead of the card object.
     def __repr__(self):
-        s = self.color.value + ' ' + self.city + ' ' + Style.RESET_ALL
+        s = self.city
         return s
 
 
 class Deck:
-    '''Class to define a deck of Card objects.'''
+    '''Basic class to define a deck of Card objects,
+    which are held in a simple list.'''
     def __init__(self, name):
         self.name = name
         self.cards = []
@@ -66,29 +67,67 @@ class Deck:
         self.cards.append(card)
 
     def remove(self, card):
-        pass
+        self.cards.remove(card)
 
-def initialize_deck(cards):
-    deck = []
-    for card in cards:
-        c = Card(card[0], card[2])
-        for i in range(card[1]):
-            deck.append(c)
-    return deck
+    def populate(self, cards):
+        for card in cards:
+            c = Card(card[0], card[2])
+            for i in range(card[1]):
+                self.add(c)
+        return self
 
-pools = []
-draw = []
+    def get_card_by_name(self, name):
+        for card in self.cards:
+            if card.city == name:
+                return card
+        return None
 
-def new_pool(cards):
-    pools.append(cards)
-    for i in range(len(cards)):
-        draw.append(pools[len(pools) - 1])
+    def __repr__(self):
+        text = f'DECK NAME: {self.name}\n'
+        text += '--------------------\n'
+        for card in self.cards:
+            text += card.city + '\n'
+        return text
+
+
+class DrawDeck(Deck):
+    '''Subclass of Deck used for the Draw Deck only,
+    which holds a list of lists.'''
+    def __init__(self, name):
+        Deck.__init__(self, name)
+
+    def add(self, cardpool):
+        for i in range(len(cardpool)):
+            self.cards.append(cardpool)
+
+    def remove(self, card):
+        self.cards[-1].remove(card)
+
+    def __repr__(self):
+        text = f'DRAW DECK NAME: {self.name}\n'
+        text += '--------------------\n'
+        for cardpool in self.cards:
+            text += f'({len(cardpool)})'
+        return text
 
 
 
 # Initialize the start deck
-new_pool(initialize_deck(CARDS))
+starter_deck = Deck('starter').populate(available_cards)
 
+draw_deck = DrawDeck('draw')
+draw_deck.add(starter_deck.cards)
+
+print(draw_deck)
+
+
+
+# for i in range(4):
+#     card = get_card_by_name(draw[-1], '[ Hommes creux ]')
+#     if card is not None:
+#         draw_card(card, draw[-1], discard)
+
+"""
 # Initialize Tkinter window
 root = tk.Tk()
 root.title('Pandemic Deck Tracker')
@@ -341,10 +380,7 @@ exile = []
 
 
 
-for i in range(4):
-    card = get_card_by_name(draw[-1], '[ Hommes creux ]')
-    if card is not None:
-        draw_card(card, draw[-1], discard)
+
 
 update_gui()
 
@@ -355,3 +391,4 @@ b_Epidemic.pack()
 b_Quit.pack()
 
 root.mainloop()
+"""
