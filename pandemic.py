@@ -150,22 +150,22 @@ def gui_build():
     # Frames
 
     frame_cardpool = tk.Frame(root, name='frame_cardpool', padx=10)
-    frame_cardpool.grid(row=0, column=0, sticky='n')
+    frame_cardpool.pack(side=tk.LEFT, anchor=tk.N)
 
     frame_draw_deck = tk.Frame(root, name='frame_draw_deck', padx=10)
-    frame_draw_deck.grid(row=0, column=1, sticky='n')
+    frame_draw_deck.pack(side=tk.LEFT, anchor=tk.N)
 
     frame_draw_card = tk.Frame(root, name='frame_draw_card', padx=10)
-    frame_draw_card.grid(row=0, column=2, sticky='n')
+    frame_draw_card.pack(side=tk.LEFT, anchor=tk.N)
 
     frame_discard = tk.Frame(root, name='frame_discard', padx=10)
-    frame_discard.grid(row=0, column=3, sticky='n')
+    frame_discard.pack(side=tk.LEFT, anchor=tk.N)
 
     frame_exile = tk.Frame(root, name='frame_exile', padx=10)
-    frame_exile.grid(row=0, column=4, sticky='n')
+    frame_exile.pack(side=tk.LEFT, anchor=tk.N)
 
     frame_menu = tk.Frame(root, name='frame_menu', padx=10)
-    frame_menu.grid(row=0, column=5, sticky='n')
+    frame_menu.pack(side=tk.LEFT, anchor=tk.N)
 
     # Top 5 labels above the main interface
 
