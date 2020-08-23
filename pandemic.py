@@ -1,16 +1,25 @@
-# draw card to zone de fin de partie pour villes abandonnées
-# réorganiser 8 cartes
+#!/usr/bin/env python
 
-# draw 2, 3, 4 et 5 par épidémie
-# gérer cartes HC
-# undo
-# affichage probabilités
-# gérer erreur frappe
-# refresh dropdown after epidemic
+"""
+PANDEMIC TRACKER is designed to assist in evaluating card draw probabilities in the board game Pandemic.
+It is my first attempt at a working project using Tkinter for the GUI.
+"""
+
+__author__ = "Tal Zana"
+__copyright__ = "Copyright 2020"
+__license__ = "GPL"
+__version__ = "0.1"
+
+# TODO réorganiser 8 cartes
+# TODO draw 2, 3, 4 et 5 par épidémie
+# TODO undo
+# TODO affichage probabilités
 
 import tkinter as tk
 from tkinter import ttk
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 
 available_cards = [
     ('Jacksonville', 3, 'yellow'),
@@ -42,22 +51,19 @@ available_cards = [
     ('[ Hommes creux ]', 4, 'green')
 ]
 
+
 class Card:
-    '''Class to define a card with city name and color.'''
+    """Class to define a card with city name and color."""
+
     def __init__(self, city, color):
         self.city = city
         self.color = color
 
-    # Used in an earlier console version, this makes 'print(card)'
-    # return the colored name of the city instead of the card object.
-    def __repr__(self):
-        s = self.city
-        return s
-
 
 class Deck:
-    '''Basic class to define a deck of Card objects,
-    which are held in a simple list.'''
+    """Basic class to define a deck of Card objects,
+    which are held in a simple list."""
+
     def __init__(self, name):
         self.name = name
         self.cards = []
@@ -68,7 +74,7 @@ class Deck:
     def remove(self, card):
         self.cards.remove(card)
 
-    def draw(self, card, to_deck):
+    def move(self, card, to_deck):
         self.remove(card)
         to_deck.add(card)
 
@@ -85,365 +91,384 @@ class Deck:
                 return card
         return None
 
-    def __repr__(self):
-        text = f'\n\nDECK NAME: {self.name}\n'
-        text += '--------------------\n'
-        for card in self.cards:
-            text += card.city + '\n'
-        text += '\n\n'
-        return text
+    def clear(self):
+        self.cards = []
 
 
 class DrawDeck(Deck):
-    '''Subclass of Deck used for the Draw Deck only,
-    which holds a list of decks, as potential cards for each draw.'''
+    """Subclass of Deck used for the Draw Deck only,
+    which holds a list of decks, as potential cards for each draw."""
+
     def __init__(self, name):
         Deck.__init__(self, name)
 
-
-    def add(self, cardpool):
-        for i in range(len(cardpool)):
-            self.cards.append(cardpool)
-
+    def add(self, item):
+        if isinstance(item, Deck):
+            for i in item.cards:
+                self.cards.append(item)
+        else:
+            newpool = Deck(item.city)
+            newpool.add(item)
+            self.cards.append(newpool)
 
     # Override the Deck.remove method so that the card is removed
     # from the list at the top of the deck,
     # i.e. the last element in the list.
-    def remove(self, card):
-        self.cards[-1].remove(card)
+    def remove(self, item):
+        if isinstance(item, Deck):
+            logging.info(f'{item} is a Deck. Removing.')
+            self.remove(item)
+        else:
+            logging.info(f'{item} is a Card. Removing.')
+            self.cards[-1].remove(item)
+            self.cards.pop()
 
+    def move(self, card, to_deck):
+        self.remove(card)
+        to_deck.add(card)
 
-    # Remove a card from the bottom of the draw deck,
-    # i.e. from list position 0,
-    # then remove the list entirely because the card was drawn.
     def remove_from_bottom(self, card):
+        """
+        Remove a card from the bottom of the draw deck,
+        i.e. from list position 0,
+        then remove the list item entirely because the card was drawn.
+        """
+        logging.info(f'REMOVE_FROM_BOTTOM : Removing card from bottom : {card}.')
         self.cards[0].remove(card)
-        self.cards.pop[0]
-
+        self.cards.pop(0)
 
     def get_card_by_name(self, name):
-        for card in self.cards[-1]:
+        for card in self.cards[0].cards:
             if card.city == name:
                 return card
         return None
 
-
     def __repr__(self):
         text = f'DRAW DECK NAME: {self.name}\n'
         text += '--------------------\n'
-        for cardpool in self.cards:
-            text += f'({len(cardpool)})'
+        for deck in self.cards:
+            text += f'({len(deck.cards)})'
         return text
 
 
-def gui_build():
-    # Initialize Tkinter window
-    root = tk.Tk()
-    root.title('Pandemic Deck Tracker')
-    root.configure(padx=20, pady=10)
+class App:
+    def __init__(self, root, decks):
 
-    ttk.Style().configure('green.TButton', foreground='green', background='black')
-    ttk.Style().configure('blue.TButton', foreground='blue', background='black')
-    ttk.Style().configure('yellow.TButton', foreground='orange', background='red')
-    ttk.Style().configure('black.TButton', foreground='black', background='black')
+        # Main window
 
-    # Frames
+        self.root = root
+        self.root.title('Pandemic Deck Tracker')
+        self.root.configure(padx=20, pady=10)
+        self.root.resizable(False, False)
 
-    frame_cardpool = tk.Frame(root, name='frame_cardpool', padx=10)
-    frame_cardpool.pack(side=tk.LEFT, anchor=tk.N)
+        # Build the deck dictionary
 
-    frame_draw_deck = tk.Frame(root, name='frame_draw_deck', padx=10)
-    frame_draw_deck.pack(side=tk.LEFT, anchor=tk.N)
+        self.deck = {}
+        for deck in decks:
+            self.deck[deck.name] = deck
 
-    frame_draw_card = tk.Frame(root, name='frame_draw_card', padx=10)
-    frame_draw_card.pack(side=tk.LEFT, anchor=tk.N)
+        # GUI variables
 
-    frame_discard = tk.Frame(root, name='frame_discard', padx=10)
-    frame_discard.pack(side=tk.LEFT, anchor=tk.N)
+        self.destination = tk.StringVar()
+        self.destination.set('exile')
 
-    frame_exile = tk.Frame(root, name='frame_exile', padx=10)
-    frame_exile.pack(side=tk.LEFT, anchor=tk.N)
+        # Index of the cardpool to display when a Draw Deck item is clicked
 
-    frame_menu = tk.Frame(root, name='frame_menu', padx=10)
-    frame_menu.pack(side=tk.LEFT, anchor=tk.N)
+        self.cardpool_index = 0
 
-    # Top 5 labels above the main interface
+        # Keep track of added buttons so we can destroy and redraw them later
 
-    font_heading = ('Helvetica', 14, 'bold')
+        self.cardpool_buttons = []
+        self.draw_buttons = []
+        self.discard_buttons = []
 
-    label_top_1 = tk.Label(frame_cardpool, pady=10, text='POSSIBLE CARDS', font=font_heading)
-    label_top_1.pack()
+        # Styles
 
-    label_top_2 = tk.Label(frame_draw_deck, pady=10, text='DRAW DECK', font=font_heading)
-    label_top_2.pack()
+        FONT_H0 = ('Helvetica', 28, 'bold')
+        FONT_H1 = ('Helvetica', 14, 'bold')
+        FONT_TEXT = ('Helvetica', 14)
 
-    label_top_3 = tk.Label(frame_draw_card, pady=10, text='DRAW CARD', font=font_heading)
-    label_top_3.pack()
+        ttk.Style().configure('green.TButton', foreground='green', background='black')
+        ttk.Style().configure('blue.TButton', foreground='blue', background='black')
+        ttk.Style().configure('yellow.TButton', foreground='orange', background='red')
+        ttk.Style().configure('black.TButton', foreground='black', background='black')
 
-    label_top_4 = tk.Label(frame_discard, pady=10, text='DISCARD DECK', font=font_heading)
-    label_top_4.pack()
+        # Window header
 
-    label_top_5 = tk.Label(frame_exile, pady=10, text='ABANDONED or EXILED', font=font_heading)
-    label_top_5.pack()
+        self.frm_header = tk.Frame(root, bg='red')
+        self.frm_header.pack(fill=tk.BOTH, expand=tk.TRUE)
 
-    label_top_6 = tk.Label(frame_menu, pady=10, text='Card destination', font=font_heading)
-    label_top_6.pack()
+        self.frm_header_title = tk.Frame(self.frm_header)
+        self.frm_header_title.pack(fill=tk.BOTH, expand=1)
 
-    # Two textboxes containing the dynamically built lists
-    # for the exile deck and the cardpool deck
+        self.label_title = tk.Label(self.frm_header_title, text='PANDEMIC TRACKER', font=FONT_H0)
+        self.label_title.pack(side=tk.LEFT)
 
-    textbox_cardpool = tk.Text(frame_cardpool, name='textbox_cardpool', width=20, height=50, font=("Helvetica", 14))
-    textbox_cardpool.pack()
+        self.frm_header_line = tk.Frame(self.frm_header)
+        self.frm_header_line.pack(fill=tk.X)
 
-    textbox_exile = tk.Text(frame_exile, name='textbox_exile', width=20, height=50, font=("Helvetica", 14))
-    textbox_exile.pack()
+        self.canvas = tk.Canvas(self.frm_header_line, height=10)
+        self.canvas.create_line(10, 10, 2000, 10)
+        self.canvas.pack(fill=tk.X)
 
-    # Radio buttons
+        # Main GUI frames
 
-    radio_button_draw_destination = tk.StringVar()
-    radio_button_draw_destination.set('exile')
+        self.frm_cardpool = tk.Frame(root, name='frm_cardpool', padx=10)
+        self.frm_cardpool.pack(side=tk.LEFT, anchor=tk.N)
 
-    radio_button_draw_to_discard = tk.Radiobutton(
-        frame_menu,
-        indicatoron = 0,
-        width=15,
-        text='Discard',
-        variable=radio_button_draw_destination,
-        value='discard',
+        self.frm_draw_deck = tk.Frame(root, name='frm_draw_deck', padx=10)
+        self.frm_draw_deck.pack(side=tk.LEFT, anchor=tk.N)
+
+        self.frm_draw_card = tk.Frame(root, name='frm_draw_card', padx=10)
+        self.frm_draw_card.pack(side=tk.LEFT, anchor=tk.N)
+
+        self.frm_discard = tk.Frame(root, name='frm_discard', padx=10)
+        self.frm_discard.pack(side=tk.LEFT, anchor=tk.N)
+
+        self.frm_exile = tk.Frame(root, name='frm_exile', padx=10)
+        self.frm_exile.pack(side=tk.LEFT, anchor=tk.N)
+
+        self.frm_menu = tk.Frame(root, name='frm_menu', padx=10)
+        self.frm_menu.pack(side=tk.LEFT, anchor=tk.N)
+
+        # Top labels above the main interface
+
+        self.lbl1 = tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', font=FONT_H1)
+        self.lbl1.pack()
+
+        self.lbl2 = tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', font=FONT_H1)
+        self.lbl2.pack()
+
+        self.lbl3 = tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', font=FONT_H1)
+        self.lbl3.pack()
+
+        self.lbl4 = tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', font=FONT_H1)
+        self.lbl4.pack()
+
+        self.lbl5 = tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', font=FONT_H1)
+        self.lbl5.pack()
+
+        self.lbl6 = tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1)
+        self.lbl6.pack()
+
+        # Two textboxes containing the dynamically built lists
+        # for the exile deck and the cardpool deck
+
+        # TODO Disable on start
+
+        self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=FONT_TEXT)
+        self.txt_cardpool.pack()
+
+        self.txt_exile = tk.Text(self.frm_exile, name='txt_exile', width=20, height=50, font=FONT_TEXT)
+        self.txt_exile.pack()
+
+        # Radio buttons
+
+        radio_draw_to_discard = tk.Radiobutton(
+            self.frm_menu,
+            indicatoron=0,
+            width=15,
+            text='Discard',
+            variable=self.destination,
+            value='discard',
 
         )
-    radio_button_draw_to_exile = tk.Radiobutton(
-        frame_menu,
-        indicatoron = 0,
-        width=15,
-        text='Exile',
-        variable=radio_button_draw_destination,
-        value='exile'
+        radio_draw_to_exile = tk.Radiobutton(
+            self.frm_menu,
+            indicatoron=0,
+            width=15,
+            text='Exile',
+            variable=self.destination,
+            value='exile'
         )
-    radio_button_draw_to_draw = tk.Radiobutton(
-        frame_menu,
-        indicatoron = 0,
-        width=15,
-        text='Draw',
-        variable=radio_button_draw_destination,
-        value='draw'
+        radio_draw_to_draw = tk.Radiobutton(
+            self.frm_menu,
+            indicatoron=0,
+            width=15,
+            text='Draw',
+            variable=self.destination,
+            value='draw'
         )
 
-    radio_button_draw_to_discard.pack(anchor='w')
-    radio_button_draw_to_exile.pack(anchor='w')
-    radio_button_draw_to_draw.pack(anchor='w')
+        radio_draw_to_discard.pack(anchor=tk.W)
+        radio_draw_to_exile.pack(anchor=tk.W)
+        radio_draw_to_draw.pack(anchor=tk.W)
 
+        # Dropdown menu for selecting city in epidemic
 
-    # Dropdown menu for selecting city in epidemic
+        self.dropdown_epidemic = ttk.Combobox(self.frm_menu, width=15)
+        self.dropdown_epidemic.pack()
 
-    dropdown_epidemic = ttk.Combobox(frame_menu, width=15)
-    dropdown_epidemic.pack()
+        # Buttons
 
-    return root
+        btn_epidemic = ttk.Button(self.frm_menu, text='Epidemic', width=15, command=self.cb_epidemic)
+        btn_epidemic.pack()
 
+        btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
+        btn_quit.pack()
 
-# Dictionaries to hold dynamically-built buttons
-# Format is {Tk Button Object : Index}
-# We need them because buttons can't be dynamically assigned parameters
-# to send to the callback function, so we send the button itself instead
+        # Update initial GUI
 
-draw_options_buttons = {}
-draw_card_buttons = {}
-discard_card_buttons = {}
+        self.update_gui(self.deck['exile'])
+        self.update_gui(self.deck['cardpool'])
+        self.update_gui(self.deck['draw'])
+        self.update_gui(self.deck['discard'])
 
+    def update_gui(self, deck):
 
-def draw_deck_button_cb(button):
-    window = button.winfo_toplevel()
-    button_index = draw_options_buttons[button]
-    update_gui(window, deck)
+        logging.info(f'GUI upate : size of Deck "{deck.name}" is {len(deck.cards)}')
 
+        if deck.name == 'exile':
+            self.update_textbox(self.txt_exile, self.deck['exile'])
 
-def draw_card_button_cb(button):
-    pass
-    # button_index = draw_card_buttons[button]
-    # if radio_button_draw_destination.get() == 'exile':
-    #     destination = table['exile']
-    # elif radio_button_draw_destination.get() == 'discard':
-    #     destination = table['discard']
+        if deck.name == 'cardpool':
+            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
-    # destination = table['discard']
-    # deck = table['draw']
-    # deck.draw(sorted(set(draw.cards[-1]), key=lambda x: x.city)[button_index], destination)
-    # # draw.cards.pop()
-    # update_gui()
+        if deck.name == 'draw':
+            for button in self.draw_buttons:
+                button.destroy()
 
-def discard_card_button_cb(button):
-    button_index = discard_card_buttons[button]
-    if radio_button_draw_destination.get() == 'exile':
-        destination = exile
-    elif radio_button_draw_destination.get() == 'draw':
-        destination = draw
-    draw_card(sorted(discard, key=lambda x: x.city)[button_index], discard, destination)
-    update_gui()
+            for button in self.cardpool_buttons:
+                button.destroy()
 
-def button_cb(button):
-    pass
+            for index, card_list in enumerate(reversed(deck.cards[-16:])):
+                if len(card_list.cards) == 1:
+                    button_text = card_list.cards[0].city
+                    color = card_list.cards[0].color + '.TButton'
+                else:
+                    button_text = f'{len(card_list.cards)}'
+                    color = 'black.TButton'
+                button = ttk.Button(
+                    self.frm_draw_deck,
+                    style=color,
+                    width=15,
+                    text=button_text
+                )
+                button.configure(command=lambda x=index: self.cb_view_cardpool(x))
+                button.pack()
+                self.cardpool_buttons.append(button)
 
-def update_gui(window, deck):
+            for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.city)):
+                button = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.city)
+                button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
+                button.pack()
+                self.draw_buttons.append(button)
 
-    def update_textbox(textbox, list):
+            self.update_dropdown(deck)
 
+        if deck.name == 'discard':
+            for button in self.discard_buttons:
+                button.destroy()
+
+            for index, card in enumerate(sorted(deck.cards, key=lambda x: x.city)):
+                button = ttk.Button(
+                    self.frm_discard,
+                    style=card.color + '.TButton',
+                    width=15,
+                    text=card.city
+                )
+                button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
+                button.pack()
+                self.discard_buttons.append(button)
+
+    @staticmethod
+    def update_textbox(textbox, deck):
         textbox.configure(state=tk.NORMAL)
         textbox.delete(1.0, tk.END)
-        for card in sorted(list, key=lambda x: x.city):
+        for card in sorted(deck.cards, key=lambda x: x.city):
             textbox.insert(tk.END, card.city + '\n')
         textbox.configure(state=tk.DISABLED)
 
-    # dest = window.nametowidget('frame_discard')
-    # destination = radio_button_draw_destination.get()
-    
-    # Update discard deck
-    if deck.name == 'discard':
+    def update_dropdown(self, deck):
+        unique_cards = sorted([card.city for card in list(set(deck.cards[0].cards))])
+        self.dropdown_epidemic.configure(values=unique_cards)
+        self.dropdown_epidemic.current(0)
+        self.dropdown_epidemic.bind('<<ComboboxSelected>>',
+                                    lambda e: print(f'UPDATE_DROPDOWN : {self.dropdown_epidemic.get()}'))
 
-        frame = window.nametowidget('frame_discard')
+    def cb_view_cardpool(self, index):
+        logging.info(f'CB_VIEW_CARDPOOL : index = {index}')
+        self.cardpool_index = index
+        self.update_gui(self.deck['cardpool'])
 
-        for k in discard_card_buttons.keys():
-            k.destroy()
+    def cb_draw_card(self, deck, card):
+        # Draw a card from a deck to the destination set by the radio buttons
+        # Ignore drawing from a deck onto itself
+        if not deck == self.deck[self.destination.get()]:
+            deck.move(card, self.deck[self.destination.get()])
+            self.cardpool_index = 0
+            self.update_gui(self.deck['draw'])
+            self.update_gui(self.deck['discard'])
+            self.update_gui(self.deck['exile'])
+            self.update_gui(self.deck['cardpool'])
 
-        for index, card in enumerate(sorted(deck.cards, key=lambda x: x.city)):
-            button = ttk.Button(
-                frame,
-                style=card.color+'.TButton',
-                width=15,
-                text=card.city
-                )
-            button.configure(command=lambda b=button: discard_card_button_cb(b))
-            button.pack()
-            discard_card_buttons[button] = index
+    def cb_epidemic(self):
 
+        # Select card from bottom of draw pile
+        new_card = self.deck['draw'].get_card_by_name(self.dropdown_epidemic.get())
+        self.deck['draw'].remove_from_bottom(new_card)
 
-    # Update exile deck
-    if deck.name == 'exile':
-        textbox = window.nametowidget('frame_exile').nametowidget('textbox_exile')
-        update_textbox(textbox, deck.cards)
+        # Add card to discard pile
+        self.deck['discard'].add(new_card)
 
+        # Create new card pool
+        # We use copy in order to reset the discard pile
+        # without affecting the newly pooled cards
+        new_pool = Deck('pool')
+        for card in self.deck['discard'].cards.copy():
+            new_pool.add(card)
 
-    # Update draw deck
-    if deck.name == 'draw':
+        self.deck['draw'].add(new_pool)
 
-        frame = window.nametowidget('frame_draw_deck')
+        # Clear the discard pile
+        self.deck['discard'].clear()
 
-        for k in draw_card_buttons.keys():
-            k.destroy()
+        self.cardpool_index = 0
+        self.update_gui(self.deck['draw'])
+        self.update_gui(self.deck['discard'])
+        self.update_gui(self.deck['cardpool'])
 
-        for k in draw_options_buttons.keys():
-            k.destroy()
-        for index, card_list in enumerate(reversed(deck.cards[-16:])):
-            if len(card_list) == 1:
-                button_text = card_list[0].city
-            else:
-                button_text = f'{len(card_list)}'
-            button = ttk.Button(
-                frame,
-                width=15,
-                text=button_text
-                )
-            button.configure(command=lambda b=button: draw_deck_button_cb(b))
-            button.pack()
-            draw_options_buttons[button] = index
-
-        # Update draw card button list
-
-        frame = window.nametowidget('frame_draw_card')
-
-        for index, card in enumerate(sorted(set(deck.cards[-1]), key=lambda x: x.city)):
-            button = ttk.Button(frame, style=card.color+'.TButton', width=15, text=card.city)
-            button.configure(command=lambda x=card: draw_card_button_cb(x))
-            button.pack()
-            draw_card_buttons[button] = index
-
-        # Update cardpool
-
-        textbox = window.nametowidget('frame_cardpool').nametowidget('textbox_cardpool')
-        update_textbox(textbox, deck.cards[-1-index])
-
-    # Epidemic
-
-    # unique_cards = sorted([card.city for card in list(set(deck.cards[0]))])
-    # dropdown_epidemic.configure(values=unique_cards)
-    # dropdown_epidemic.bind('<<ComboboxSelected>>', lambda e: print(dropdown_epidemic.get()))
-
-
-def do_epidemic():
-    # Select card from bottom of draw pile
-    
-    new_card = get_card_by_name(draw.cards[0], dropdown_epidemic.get())
-    draw.cards[0].remove(new_card)
-    draw.cards.pop(0)
-
-    # Add card to discard pile
-    discard.append(new_card)
-
-    # Create new card pool
-    # We use copy in order to reset the discard pile
-    # without affecting the newly pooled cards
-    new_pool(discard.copy())
-
-    # Clear the discard pile
-    discard.clear()
-
-    update_gui()
+    def cb_quit(self):
+        self.root.destroy()
 
 
 def initialize():
-    '''Prepare the initial states for all the decks.
-    This is run once at the start of the game.'''
+    """Prepare the initial states for all the decks.
+    This is run once at the start of the game."""
+    logging.info('Initiazing.')
 
     # Initialize the starter deck from the available cards list
     starter_deck = Deck('starter').populate(available_cards)
 
     # Initialize the draw deck
     draw = DrawDeck('draw')
-    draw.add(starter_deck.cards)
+    draw.add(starter_deck)
+    logging.info('Draw Deck done.')
 
     # Initialize the discard and exile decks
     discard = Deck('discard')
     exile = Deck('exile')
+    cardpool = Deck('cardpool')
+    logging.info('Other decks done.')
 
     # Draw the 4 "Hollow Men" cards from the draw deck
     # onto the discard pile
     for i in range(4):
-        draw.draw(draw.get_card_by_name('[ Hommes creux ]'), discard)
+        draw.move(draw.get_card_by_name('[ Hommes creux ]'), discard)
+    logging.info('Hollow men drawn.')
 
+    logging.info('Initialize done.')
     # Return the prepared decks
-    return draw, discard, exile
+    return [draw, discard, exile, cardpool]
 
 
 def main():
-    '''Main program entry point.'''
-
-    # Initialize the decks and update the GUI with each one of them
+    """Main program entry point."""
     decks = initialize()
-
-    window = gui_build()
-
-    for deck in decks:
-        update_gui(window, deck)
-
-    # Run the GUI main loop
-    window.mainloop()
+    root = tk.Tk()
+    App(root, decks)
+    root.mainloop()
 
 
 if __name__ == '__main__':
     main()
-
-
-# b_Quit = ttk.Button(frame_menu, text='Quit', width=15, command=quit)
-# b_Epidemic = ttk.Button(frame_menu, text='Epidemic', width=15, command=do_epidemic)
-
-# b_Epidemic.pack()
-# b_Quit.pack()
-
-
-
-
-
-
-
-
-
