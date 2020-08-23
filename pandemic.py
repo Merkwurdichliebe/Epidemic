@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 """
-PANDEMIC TRACKER is designed to assist in evaluating card draw probabilities in the board game Pandemic.
-It is my first attempt at a working project using Tkinter for the GUI.
+PANDEMIC TRACKER is designed to assist in evaluating card draw probabilities
+in the board game Pandemic. It is my first attempt at a working project
+using Tkinter for the GUI.
 """
 
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.1"
+__version__ = "0.2"
 
 # TODO réorganiser 8 cartes
 # TODO draw 2, 3, 4 et 5 par épidémie
@@ -20,6 +21,12 @@ from tkinter import ttk
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+
+# A list of all the cards available in the deck, including exiled ones
+# but excluding permanently destroyed cards.
+# The city name is followed by the number of copies of that card,
+# and its family color.
+# "Hollow Men" are green for no particular reason.
 
 available_cards = [
     ('Jacksonville', 3, 'yellow'),
@@ -53,7 +60,8 @@ available_cards = [
 
 
 class Card:
-    """Class to define a card with city name and color."""
+    """Basic class to represent a card with a city name and color.
+    Cards are contained in Decks."""
 
     def __init__(self, city, color):
         self.city = city
@@ -61,8 +69,11 @@ class Card:
 
 
 class Deck:
-    """Basic class to define a deck of Card objects,
-    which are held in a simple list."""
+    """Basic class to define a deck of Card objects, which are held in a simple list.
+    There are three main decks in the game:
+    - Draw Deck
+    - Discard Deck
+    - Exile Deck"""
 
     def __init__(self, name):
         self.name = name
@@ -96,25 +107,26 @@ class Deck:
 
 
 class DrawDeck(Deck):
-    """Subclass of Deck used for the Draw Deck only,
-    which holds a list of decks, as potential cards for each draw."""
+    """Subclass of Deck used for the Draw Deck only.
+    The Draw Deck doesn't hold Card objects, but a list of Decks objects,
+    which represent the potential cards for each draw."""
 
     def __init__(self, name):
         Deck.__init__(self, name)
 
     def add(self, item):
+        # Add a card to the Draw Deck.If we're adding a single card to the Draw Deck
+        # we need to make a Deck out of it, containing a single card.
         if isinstance(item, Deck):
             for i in item.cards:
                 self.cards.append(item)
         else:
-            newpool = Deck(item.city)
-            newpool.add(item)
-            self.cards.append(newpool)
+            self.cards.append(Deck(item.city).add(item))
 
-    # Override the Deck.remove method so that the card is removed
-    # from the list at the top of the deck,
-    # i.e. the last element in the list.
     def remove(self, item):
+        # Override the Deck.remove method so that the card is removed
+        # from the list at the top of the deck,
+        # i.e. the last element in the list."""
         if isinstance(item, Deck):
             logging.info(f'{item} is a Deck. Removing.')
             self.remove(item)
@@ -128,11 +140,9 @@ class DrawDeck(Deck):
         to_deck.add(card)
 
     def remove_from_bottom(self, card):
-        """
-        Remove a card from the bottom of the draw deck,
-        i.e. from list position 0,
-        then remove the list item entirely because the card was drawn.
-        """
+        # Remove a card from the bottom of the draw deck,
+        # i.e. from list position 0,
+        # then remove the list item entirely because the card was drawn.
         logging.info(f'REMOVE_FROM_BOTTOM : Removing card from bottom : {card}.')
         self.cards[0].remove(card)
         self.cards.pop(0)
@@ -143,18 +153,14 @@ class DrawDeck(Deck):
                 return card
         return None
 
-    def __repr__(self):
-        text = f'DRAW DECK NAME: {self.name}\n'
-        text += '--------------------\n'
-        for deck in self.cards:
-            text += f'({len(deck.cards)})'
-        return text
-
 
 class App:
     def __init__(self, root, decks):
+        """Main application designed as class in order to allow easier communication
+        between interface elements. cf. http://thinkingtkinter.sourceforge.net
+        """
 
-        # Main window
+        # Main Tk window
 
         self.root = root
         self.root.title('Pandemic Deck Tracker')
@@ -233,19 +239,19 @@ class App:
 
         # Top labels above the main interface
 
-        self.lbl1 = tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', font=FONT_H1)
+        self.lbl1 = tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', width=20, font=FONT_H1)
         self.lbl1.pack()
 
-        self.lbl2 = tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', font=FONT_H1)
+        self.lbl2 = tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=FONT_H1)
         self.lbl2.pack()
 
-        self.lbl3 = tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', font=FONT_H1)
+        self.lbl3 = tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=FONT_H1)
         self.lbl3.pack()
 
-        self.lbl4 = tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', font=FONT_H1)
+        self.lbl4 = tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=FONT_H1)
         self.lbl4.pack()
 
-        self.lbl5 = tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', font=FONT_H1)
+        self.lbl5 = tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=FONT_H1)
         self.lbl5.pack()
 
         self.lbl6 = tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1)
@@ -253,8 +259,6 @@ class App:
 
         # Two textboxes containing the dynamically built lists
         # for the exile deck and the cardpool deck
-
-        # TODO Disable on start
 
         self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=FONT_TEXT)
         self.txt_cardpool.pack()
@@ -266,28 +270,32 @@ class App:
 
         radio_draw_to_discard = tk.Radiobutton(
             self.frm_menu,
-            indicatoron=0,
             width=15,
             text='Discard',
             variable=self.destination,
             value='discard',
+            anchor=tk.W,
+            padx=10
 
         )
         radio_draw_to_exile = tk.Radiobutton(
             self.frm_menu,
-            indicatoron=0,
             width=15,
             text='Exile',
             variable=self.destination,
-            value='exile'
+            value='exile',
+            anchor=tk.W,
+            padx=10
+
         )
         radio_draw_to_draw = tk.Radiobutton(
             self.frm_menu,
-            indicatoron=0,
             width=15,
             text='Draw',
             variable=self.destination,
-            value='draw'
+            value='draw',
+            anchor=tk.W,
+            padx=10
         )
 
         radio_draw_to_discard.pack(anchor=tk.W)
@@ -317,6 +325,9 @@ class App:
     def update_gui(self, deck):
 
         logging.info(f'GUI upate : size of Deck "{deck.name}" is {len(deck.cards)}')
+
+        # We only update the GUI elements that need updating
+        # based on the deck that is passed to the method.
 
         if deck.name == 'exile':
             self.update_textbox(self.txt_exile, self.deck['exile'])
@@ -373,6 +384,8 @@ class App:
 
     @staticmethod
     def update_textbox(textbox, deck):
+        # Method is static because it doesn't need the self keyword,
+        # it only updates the contents of the Tk textbox which is passed to it.
         textbox.configure(state=tk.NORMAL)
         textbox.delete(1.0, tk.END)
         for card in sorted(deck.cards, key=lambda x: x.city):
@@ -380,6 +393,7 @@ class App:
         textbox.configure(state=tk.DISABLED)
 
     def update_dropdown(self, deck):
+        # Update the epidemic dropdown list based on the available cards in the Draw Deck.
         unique_cards = sorted([card.city for card in list(set(deck.cards[0].cards))])
         self.dropdown_epidemic.configure(values=unique_cards)
         self.dropdown_epidemic.current(0)
@@ -387,12 +401,14 @@ class App:
                                     lambda e: print(f'UPDATE_DROPDOWN : {self.dropdown_epidemic.get()}'))
 
     def cb_view_cardpool(self, index):
+        # Callback from the buttons used to display the possible choices in the Draw Deck.
+        # Outputs the possible cards in each potential draw.
         logging.info(f'CB_VIEW_CARDPOOL : index = {index}')
         self.cardpool_index = index
         self.update_gui(self.deck['cardpool'])
 
     def cb_draw_card(self, deck, card):
-        # Draw a card from a deck to the destination set by the radio buttons
+        # Draw a card from a deck to the destination deck set by the radio buttons
         # Ignore drawing from a deck onto itself
         if not deck == self.deck[self.destination.get()]:
             deck.move(card, self.deck[self.destination.get()])
@@ -403,12 +419,11 @@ class App:
             self.update_gui(self.deck['cardpool'])
 
     def cb_epidemic(self):
-
-        # Select card from bottom of draw pile
+        # Select card from bottom of draw pile based on the dropdown list
         new_card = self.deck['draw'].get_card_by_name(self.dropdown_epidemic.get())
         self.deck['draw'].remove_from_bottom(new_card)
 
-        # Add card to discard pile
+        # Add the card to the discard pile
         self.deck['discard'].add(new_card)
 
         # Create new card pool
@@ -423,7 +438,11 @@ class App:
         # Clear the discard pile
         self.deck['discard'].clear()
 
+        # We reset the index to 0 so that the card pool textbox displays
+        # the top item in the Draw Deck.
         self.cardpool_index = 0
+
+        # Update the GUI.
         self.update_gui(self.deck['draw'])
         self.update_gui(self.deck['discard'])
         self.update_gui(self.deck['cardpool'])

@@ -124,3 +124,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
+.idea/dictionaries/tz.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/Pandemic-Tracker.iml
+.idea/vcs.xml
+tk.py
