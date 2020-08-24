@@ -162,7 +162,7 @@ class App:
         for deck in decks:
             self.deck[deck.name] = deck
 
-        # GUI variables
+        # Define GUI variables and set defaults
 
         self.destination = tk.StringVar()
         self.destination.set('exile')
@@ -180,7 +180,7 @@ class App:
 
         # Styles
 
-        FONT_H0 = ('Helvetica', 28, 'bold')
+        FONT_H0 = ('Helvetica', 30, 'bold')
         FONT_H1 = ('Helvetica', 14, 'bold')
         FONT_TEXT = ('Helvetica', 14)
 
@@ -191,13 +191,21 @@ class App:
 
         # Window header
 
-        self.frm_header = tk.Frame(root, bg='red')
+        self.frm_header = tk.Frame(root)
         self.frm_header.pack(fill=tk.BOTH, expand=tk.TRUE)
 
         self.frm_header_title = tk.Frame(self.frm_header)
         self.frm_header_title.pack(fill=tk.BOTH, expand=1)
 
-        self.label_title = tk.Label(self.frm_header_title, text='PANDEMIC TRACKER', font=FONT_H0)
+        # Logo
+
+        self.img_logo = tk.PhotoImage(file='pandemic-logo.png')
+        self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
+        self.lbl_logo.pack(side=tk.LEFT)
+
+        # Title
+
+        self.label_title = tk.Label(self.frm_header_title, text='CARD TRACKER', padx=10, font=FONT_H0)
         self.label_title.pack(side=tk.LEFT)
 
         self.frm_header_line = tk.Frame(self.frm_header)
@@ -406,9 +414,6 @@ class App:
                 button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
                 button.pack()
                 self.discard_buttons.append(button)
-
-        self.root.update_idletasks()
-        self.root.update()
 
     @staticmethod
     def update_textbox(textbox, deck):
