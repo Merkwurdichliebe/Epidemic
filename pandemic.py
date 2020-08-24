@@ -89,15 +89,12 @@ class Deck:
         self.remove(card)
         to_deck.add(card)
 
-    def populate(self, cards):
-        for card in cards:
-            c = Card(card[0], card[2])
-            for i in range(card[1]):
-                self.add(c)
-        return self
-
     def get_card_by_name(self, name):
-        for card in self.cards:
+        if isinstance(self, DrawDeck):
+            list = self.cards[0].cards
+        else:
+            list = self.cards
+        for card in list:
             if card.city == name:
                 return card
         return None
@@ -121,7 +118,9 @@ class DrawDeck(Deck):
             for i in item.cards:
                 self.cards.append(item)
         else:
-            self.cards.append(Deck(item.city).add(item))
+            new_deck = Deck(item.city)
+            new_deck.add(item)
+            self.cards.append(new_deck)
 
     def remove(self, item):
         # Override the Deck.remove method so that the card is removed
@@ -135,10 +134,6 @@ class DrawDeck(Deck):
             self.cards[-1].remove(item)
             self.cards.pop()
 
-    def move(self, card, to_deck):
-        self.remove(card)
-        to_deck.add(card)
-
     def remove_from_bottom(self, card):
         # Remove a card from the bottom of the draw deck,
         # i.e. from list position 0,
@@ -146,12 +141,6 @@ class DrawDeck(Deck):
         logging.info(f'REMOVE_FROM_BOTTOM : Removing card from bottom : {card}.')
         self.cards[0].remove(card)
         self.cards.pop(0)
-
-    def get_card_by_name(self, name):
-        for card in self.cards[0].cards:
-            if card.city == name:
-                return card
-        return None
 
 
 class App:
@@ -219,23 +208,29 @@ class App:
 
         # Main GUI frames
 
-        self.frm_cardpool = tk.Frame(root, name='frm_cardpool', padx=10)
+        self.frm_main = tk.Frame(root)
+        self.frm_main.pack()
+
+        self.frm_cardpool = tk.Frame(self.frm_main, padx=10)
         self.frm_cardpool.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_draw_deck = tk.Frame(root, name='frm_draw_deck', padx=10)
+        self.frm_draw_deck = tk.Frame(self.frm_main, padx=10)
         self.frm_draw_deck.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_draw_card = tk.Frame(root, name='frm_draw_card', padx=10)
+        self.frm_draw_card = tk.Frame(self.frm_main, padx=10)
         self.frm_draw_card.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_discard = tk.Frame(root, name='frm_discard', padx=10)
+        self.frm_discard = tk.Frame(self.frm_main, padx=10)
         self.frm_discard.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_exile = tk.Frame(root, name='frm_exile', padx=10)
+        self.frm_exile = tk.Frame(self.frm_main, padx=10)
         self.frm_exile.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_menu = tk.Frame(root, name='frm_menu', padx=10)
+        self.frm_menu = tk.Frame(self.frm_main, padx=10)
         self.frm_menu.pack(side=tk.LEFT, anchor=tk.N)
+
+        self.frm_bottom = tk.Frame(root, pady=20)
+        self.frm_bottom.pack(side=tk.LEFT)
 
         # Top labels above the main interface
 
@@ -257,6 +252,11 @@ class App:
         self.lbl6 = tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1)
         self.lbl6.pack()
 
+        # Bottom Text
+
+        self.lbl7 = tk.Label(self.frm_bottom, pady=10, text='Some Text', font=FONT_H1)
+        self.lbl7.pack()
+
         # Two textboxes containing the dynamically built lists
         # for the exile deck and the cardpool deck
 
@@ -268,8 +268,11 @@ class App:
 
         # Radio buttons
 
+        self.frm_radio = tk.Frame(self.frm_menu, pady=10)
+        self.frm_radio.pack()
+
         radio_draw_to_discard = tk.Radiobutton(
-            self.frm_menu,
+            self.frm_radio,
             width=15,
             text='Discard',
             variable=self.destination,
@@ -279,7 +282,7 @@ class App:
 
         )
         radio_draw_to_exile = tk.Radiobutton(
-            self.frm_menu,
+            self.frm_radio,
             width=15,
             text='Exile',
             variable=self.destination,
@@ -289,7 +292,7 @@ class App:
 
         )
         radio_draw_to_draw = tk.Radiobutton(
-            self.frm_menu,
+            self.frm_radio,
             width=15,
             text='Draw',
             variable=self.destination,
@@ -304,13 +307,28 @@ class App:
 
         # Dropdown menu for selecting city in epidemic
 
+        self.frm_epidemic = tk.Frame(self.frm_menu)
+        self.frm_epidemic.pack()
+
+        self.lbl_epidemic = tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1)
+        self.lbl_epidemic.pack()
+
         self.dropdown_epidemic = ttk.Combobox(self.frm_menu, width=15)
         self.dropdown_epidemic.pack()
 
-        # Buttons
-
         btn_epidemic = ttk.Button(self.frm_menu, text='Epidemic', width=15, command=self.cb_epidemic)
         btn_epidemic.pack()
+
+        # Stats
+
+        self.frm_stats = tk.Frame(self.frm_menu, pady=10)
+        self.frm_stats.pack()
+
+        self.lbl_stats = tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1)
+        self.lbl_stats.pack()
+
+        self.txt_stats = tk.Text(self.frm_stats, width=20)
+        self.txt_stats.pack()
 
         btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
         btn_quit.pack()
@@ -325,6 +343,12 @@ class App:
     def update_gui(self, deck):
 
         logging.info(f'GUI upate : size of Deck "{deck.name}" is {len(deck.cards)}')
+
+        self.txt_stats.configure(state=tk.NORMAL)
+        self.txt_stats.delete(1.0, tk.END)
+        self.txt_stats.insert(tk.END, 'Total cards: \n')
+        self.txt_stats.insert(tk.END, f'In discard pile: {str(len(self.deck["discard"].cards))}\n')
+        self.txt_stats.configure(state=tk.DISABLED)
 
         # We only update the GUI elements that need updating
         # based on the deck that is passed to the method.
@@ -408,10 +432,11 @@ class App:
         self.update_gui(self.deck['cardpool'])
 
     def cb_draw_card(self, deck, card):
-        # Draw a card from a deck to the destination deck set by the radio buttons
+        # Move a card from a deck to the destination deck set by the radio buttons
         # Ignore drawing from a deck onto itself
-        if not deck == self.deck[self.destination.get()]:
-            deck.move(card, self.deck[self.destination.get()])
+        destination = self.deck[self.destination.get()]
+        if not deck == destination:
+            deck.move(card, destination)
             self.cardpool_index = 0
             self.update_gui(self.deck['draw'])
             self.update_gui(self.deck['discard'])
@@ -454,10 +479,14 @@ class App:
 def initialize():
     """Prepare the initial states for all the decks.
     This is run once at the start of the game."""
-    logging.info('Initiazing.')
+    logging.info('Initializing.')
 
     # Initialize the starter deck from the available cards list
-    starter_deck = Deck('starter').populate(available_cards)
+    starter_deck = Deck('starter')
+    for card in available_cards:
+        c = Card(card[0], card[2])
+        for i in range(card[1]):
+            starter_deck.add(c)
 
     # Initialize the draw deck
     draw = DrawDeck('draw')
@@ -477,6 +506,7 @@ def initialize():
     logging.info('Hollow men drawn.')
 
     logging.info('Initialize done.')
+    
     # Return the prepared decks
     return [draw, discard, exile, cardpool]
 
