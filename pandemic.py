@@ -170,6 +170,7 @@ class App:
         # Index of the cardpool to display when a Draw Deck item is clicked
 
         self.cardpool_index = 0
+        self.cards_total = len(self.deck['draw'].cards[0].cards)
 
         # Keep track of added buttons so we can destroy and redraw them later
 
@@ -327,7 +328,7 @@ class App:
         self.lbl_stats = tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1)
         self.lbl_stats.pack()
 
-        self.txt_stats = tk.Text(self.frm_stats, width=20)
+        self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT)
         self.txt_stats.pack()
 
         btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
@@ -342,11 +343,11 @@ class App:
 
     def update_gui(self, deck):
 
-        logging.info(f'GUI upate : size of Deck "{deck.name}" is {len(deck.cards)}')
+        logging.info(f'GUI update : size of Deck "{deck.name}" is {len(deck.cards)}')
 
         self.txt_stats.configure(state=tk.NORMAL)
         self.txt_stats.delete(1.0, tk.END)
-        self.txt_stats.insert(tk.END, 'Total cards: \n')
+        self.txt_stats.insert(tk.END, f'Total cards: {self.cards_total}\n')
         self.txt_stats.insert(tk.END, f'In discard pile: {str(len(self.deck["discard"].cards))}\n')
         self.txt_stats.configure(state=tk.DISABLED)
 
@@ -405,6 +406,9 @@ class App:
                 button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
                 button.pack()
                 self.discard_buttons.append(button)
+
+        self.root.update_idletasks()
+        self.root.update()
 
     @staticmethod
     def update_textbox(textbox, deck):
