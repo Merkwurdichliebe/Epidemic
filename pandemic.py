@@ -9,13 +9,11 @@ using Tkinter for the GUI.
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.2"
+__version__ = "0.3"
 
-# TODO réorganiser 8 cartes
-# TODO draw 2, 3, 4 et 5 par épidémie
 # TODO undo
-# TODO affichage probabilités
 
+from collections import Counter
 import tkinter as tk
 from tkinter import ttk
 import logging
@@ -156,21 +154,10 @@ class App:
         self.root.configure(padx=20, pady=10)
         self.root.resizable(False, False)
 
-        # Build the deck dictionary
-
-        self.deck = {}
-        for deck in decks:
-            self.deck[deck.name] = deck
-
         # Define GUI variables and set defaults
 
         self.destination = tk.StringVar()
         self.destination.set('exile')
-
-        # Index of the cardpool to display when a Draw Deck item is clicked
-
-        self.cardpool_index = 0
-        self.cards_total = len(self.deck['draw'].cards[0].cards)
 
         # Keep track of added buttons so we can destroy and redraw them later
 
@@ -263,7 +250,7 @@ class App:
 
         # Bottom Text
 
-        self.lbl7 = tk.Label(self.frm_bottom, pady=10, text='Some Text', font=FONT_H1)
+        self.lbl7 = tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=FONT_H1)
         self.lbl7.pack()
 
         # Two textboxes containing the dynamically built lists
@@ -336,11 +323,31 @@ class App:
         self.lbl_stats = tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1)
         self.lbl_stats.pack()
 
-        self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT)
+        self.txt_stats = tk.Text(self.frm_stats, height=10, width=20, font=FONT_TEXT, wrap=tk.WORD)
         self.txt_stats.pack()
 
-        btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
-        btn_quit.pack()
+        # btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
+        # btn_quit.pack()
+
+        # Initialize a few general attributes
+
+        # Build the deck dictionary
+
+        self.deck = {}
+        for deck in decks:
+            self.deck[deck.name] = deck
+
+        # Index of the cardpool to display when a Draw Deck item is clicked
+
+        self.cardpool_index = 0
+
+        # Fixed total of all the cards in the Draw Deck
+
+        self.cards_total = len(self.deck['draw'].cards[0].cards)
+
+        # Tuple to hold three values for displaying the top card frequency
+
+        self.top_frequency_cards = ()
 
         # Update initial GUI
 
@@ -352,12 +359,6 @@ class App:
     def update_gui(self, deck):
 
         logging.info(f'GUI update : size of Deck "{deck.name}" is {len(deck.cards)}')
-
-        self.txt_stats.configure(state=tk.NORMAL)
-        self.txt_stats.delete(1.0, tk.END)
-        self.txt_stats.insert(tk.END, f'Total cards: {self.cards_total}\n')
-        self.txt_stats.insert(tk.END, f'In discard pile: {str(len(self.deck["discard"].cards))}\n')
-        self.txt_stats.configure(state=tk.DISABLED)
 
         # We only update the GUI elements that need updating
         # based on the deck that is passed to the method.
@@ -399,6 +400,8 @@ class App:
                 self.draw_buttons.append(button)
 
             self.update_dropdown(deck)
+            self.calculate_probabilities()
+            self.update_textbox_stats()
 
         if deck.name == 'discard':
             for button in self.discard_buttons:
@@ -424,6 +427,14 @@ class App:
         for card in sorted(deck.cards, key=lambda x: x.city):
             textbox.insert(tk.END, card.city + '\n')
         textbox.configure(state=tk.DISABLED)
+
+    def update_textbox_stats(self):
+        self.txt_stats.configure(state=tk.NORMAL)
+        self.txt_stats.delete(1.0, tk.END)
+        self.txt_stats.insert(tk.END, f'Total cards: {self.cards_total}\n')
+        self.txt_stats.insert(tk.END, f'In discard pile: {str(len(self.deck["discard"].cards))}\n')
+        self.txt_stats.insert(tk.END, self.top_frequency_cards_to_text())
+        self.txt_stats.configure(state=tk.DISABLED)
 
     def update_dropdown(self, deck):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
@@ -451,6 +462,33 @@ class App:
             self.update_gui(self.deck['discard'])
             self.update_gui(self.deck['exile'])
             self.update_gui(self.deck['cardpool'])
+
+    def calculate_probabilities(self):
+        # Get the total number of cards
+        card_list = self.deck['draw'].cards[-1].cards
+        total_potential_cards = len(card_list)
+
+        # Use a Counter to sort the cards by the most common ones
+        c = Counter(card_list).most_common()
+
+        # Get the frequency of the most common card
+        top_frequency = c[0][1]
+
+        # Build a list of all the cards that share that top frequency
+        top_cards = [card[0] for card in c if card[1] == top_frequency]
+        self.top_frequency_cards = (top_frequency, top_cards, total_potential_cards)
+
+    def top_frequency_cards_to_text(self):
+        text = f'\nTop card frequency:\n'
+        text += str(self.top_frequency_cards[0]) + ' '
+        text += f'({self.top_frequency_cards[0] / self.top_frequency_cards[2] :.2%})'
+        text += '\n\n('
+        for card in self.top_frequency_cards[1][:-1]:
+            text += card.city + ', '
+        text += self.top_frequency_cards[1][-1].city
+
+        text += ')'
+        return text
 
     def cb_epidemic(self):
         # Select card from bottom of draw pile based on the dropdown list
