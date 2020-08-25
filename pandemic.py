@@ -331,8 +331,13 @@ class App:
         self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT, wrap=tk.WORD)
         self.txt_stats.pack()
 
-        # btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
-        # btn_quit.pack()
+        # Center the app window on the screen
+
+        windowWidth = self.root.winfo_reqwidth()
+        windowHeight = self.root.winfo_reqheight()
+        positionRight = int(self.root.winfo_screenwidth() / 3 - windowWidth / 2)
+        positionDown = int(self.root.winfo_screenheight() / 4 - windowHeight)
+        self.root.geometry("+{}+{}".format(positionRight, positionDown))
 
         # Initialize a few general attributes
 
@@ -556,6 +561,10 @@ def main():
     """Main program entry point."""
     decks = initialize()
     root = tk.Tk()
+
+    # Gets the requested values of height and width
+
+
     App(root, decks)
     root.mainloop()
 
