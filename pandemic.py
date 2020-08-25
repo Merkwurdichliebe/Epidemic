@@ -9,16 +9,14 @@ using Tkinter for the GUI.
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.3"
+__version__ = "0.4"
 
 # TODO undo
 
 from collections import Counter
 import tkinter as tk
 from tkinter import ttk
-import logging
 
-logging.basicConfig(level=logging.DEBUG)
 
 # A list of all the cards available in the deck, including exiled ones
 # but excluding permanently destroyed cards.
@@ -92,11 +90,9 @@ class Deck:
             list = self.cards[0].cards
         else:
             list = self.cards
-        for card in list:
-            if card.city == name:
-                return card
-        # TODO handle exception and select card more gracefully
-        # raise Exception(f'Card with name "{name}" not found in Deck "{self.name}".')
+        found_card = next((card for card in list if card.city == name), None)
+        assert found_card is not None, f'Card with name "{name}" not found in Deck "{self.name}".'
+        return found_card
 
     def clear(self):
         self.cards = []
@@ -126,10 +122,8 @@ class DrawDeck(Deck):
         # from the list at the top of the deck,
         # i.e. the last element in the list."""
         if isinstance(item, Deck):
-            logging.info(f'{item} is a Deck. Removing.')
             self.remove(item)
         else:
-            logging.info(f'{item} is a Card. Removing.')
             self.cards[-1].remove(item)
             self.cards.pop()
 
@@ -137,7 +131,6 @@ class DrawDeck(Deck):
         # Remove a card from the bottom of the draw deck,
         # i.e. from list position 0,
         # then remove the list item entirely because the card was drawn.
-        logging.info(f'REMOVE_FROM_BOTTOM : Removing card from bottom : {card}.')
         self.cards[0].remove(card)
         self.cards.pop(0)
 
@@ -173,6 +166,8 @@ class App:
         FONT_H0 = ('Helvetica', 30, 'bold')
         FONT_H1 = ('Helvetica', 14, 'bold')
         FONT_TEXT = ('Helvetica', 14)
+
+        # We use ttk buttons because macOS doesn't color Tk buttons properly
 
         ttk.Style().configure('green.TButton', foreground='green', background='black')
         ttk.Style().configure('blue.TButton', foreground='blue', background='black')
@@ -363,8 +358,6 @@ class App:
 
     def update_gui(self, deck):
 
-        logging.info(f'GUI update : size of Deck "{deck.name}" is {len(deck.cards)}')
-
         # We only update the GUI elements that need updating
         # based on the deck that is passed to the method.
 
@@ -456,7 +449,6 @@ class App:
     def cb_view_cardpool(self, index):
         # Callback from the buttons used to display the possible choices in the Draw Deck.
         # Outputs the possible cards in each potential draw.
-        logging.info(f'CB_VIEW_CARDPOOL : index = {index}')
         self.cardpool_index = index
         self.update_gui(self.deck['cardpool'])
 
@@ -532,7 +524,6 @@ class App:
 def initialize():
     """Prepare the initial states for all the decks.
     This is run once at the start of the game."""
-    logging.info('Initializing.')
 
     # Initialize the starter deck from the available cards list
     starter_deck = Deck('starter')
@@ -544,22 +535,17 @@ def initialize():
     # Initialize the draw deck
     draw = DrawDeck('draw')
     draw.add(starter_deck)
-    logging.info('Draw Deck done.')
 
     # Initialize the discard and exile decks
     discard = Deck('discard')
     exile = Deck('exile')
     cardpool = Deck('cardpool')
-    logging.info('Other decks done.')
 
     # Draw the 4 "Hollow Men" cards from the draw deck
     # onto the discard pile
     for i in range(4):
         draw.move(draw.get_card_by_name('Hommes creux'), discard)
-    logging.info('Hollow men drawn.')
 
-    logging.info('Initialize done.')
-    
     # Return the prepared decks
     return [draw, discard, exile, cardpool]
 
