@@ -131,3 +131,6 @@ dmypy.json
 .idea/Pandemic-Tracker.iml
 .idea/vcs.xml
 tk.py
+
+# tz
+py2app/

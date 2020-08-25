@@ -148,6 +148,11 @@ class App:
         self.root.configure(padx=20, pady=10)
         self.root.resizable(False, False)
 
+        # Replace default menu
+
+        emptyMenu = tk.Menu(root)
+        self.root.config(menu=emptyMenu)
+
         # Define GUI variables and set defaults
 
         self.destination_choice = tk.StringVar()
@@ -516,9 +521,6 @@ class App:
         self.update_gui(self.deck['draw'])
         self.update_gui(self.deck['discard'])
         self.update_gui(self.deck['cardpool'])
-
-    def cb_quit(self):
-        self.root.destroy()
 
 
 def initialize():
