@@ -53,7 +53,7 @@ available_cards = [
     ('Mexico', 1, 'yellow'),
     ('Tripoli', 3, 'black'),
     ('Chicago', 2, 'blue'),
-    ('[ Hommes creux ]', 4, 'green')
+    ('Hommes creux', 4, 'green')
 ]
 
 
@@ -95,7 +95,8 @@ class Deck:
         for card in list:
             if card.city == name:
                 return card
-        return None
+        # TODO handle exception and select card more gracefully
+        # raise Exception(f'Card with name "{name}" not found in Deck "{self.name}".')
 
     def clear(self):
         self.cards = []
@@ -323,7 +324,7 @@ class App:
         self.lbl_stats = tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1)
         self.lbl_stats.pack()
 
-        self.txt_stats = tk.Text(self.frm_stats, height=10, width=20, font=FONT_TEXT, wrap=tk.WORD)
+        self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT, wrap=tk.WORD)
         self.txt_stats.pack()
 
         # btn_quit = ttk.Button(self.frm_menu, text='Quit', width=15, command=self.cb_quit)
@@ -458,10 +459,10 @@ class App:
         if not deck == destination:
             deck.move(card, destination)
             self.cardpool_index = 0
-            self.update_gui(self.deck['draw'])
             self.update_gui(self.deck['discard'])
             self.update_gui(self.deck['exile'])
             self.update_gui(self.deck['cardpool'])
+            self.update_gui(self.deck['draw'])
 
     def calculate_probabilities(self):
         # Get the total number of cards
@@ -482,12 +483,9 @@ class App:
         text = f'\nTop card frequency:\n'
         text += str(self.top_frequency_cards[0]) + ' '
         text += f'({self.top_frequency_cards[0] / self.top_frequency_cards[2] :.2%})'
-        text += '\n\n('
-        for card in self.top_frequency_cards[1][:-1]:
-            text += card.city + ', '
-        text += self.top_frequency_cards[1][-1].city
-
-        text += ')'
+        text += '\n\n'
+        for card in self.top_frequency_cards[1]:
+            text += '- ' + card.city + '\n'
         return text
 
     def cb_epidemic(self):
@@ -549,7 +547,7 @@ def initialize():
     # Draw the 4 "Hollow Men" cards from the draw deck
     # onto the discard pile
     for i in range(4):
-        draw.move(draw.get_card_by_name('[ Hommes creux ]'), discard)
+        draw.move(draw.get_card_by_name('Hommes creux'), discard)
     logging.info('Hollow men drawn.')
 
     logging.info('Initialize done.')
