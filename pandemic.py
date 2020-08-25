@@ -157,8 +157,10 @@ class App:
 
         # Define GUI variables and set defaults
 
-        self.destination = tk.StringVar()
-        self.destination.set('exile')
+        self.destination_choice = tk.StringVar()
+        self.destination_choice.set('exile')
+
+        self.epidemic_choice = tk.StringVar()
 
         # Keep track of added buttons so we can destroy and redraw them later
 
@@ -272,7 +274,7 @@ class App:
             self.frm_radio,
             width=15,
             text='Discard',
-            variable=self.destination,
+            variable=self.destination_choice,
             value='discard',
             anchor=tk.W,
             padx=10
@@ -282,7 +284,7 @@ class App:
             self.frm_radio,
             width=15,
             text='Exile',
-            variable=self.destination,
+            variable=self.destination_choice,
             value='exile',
             anchor=tk.W,
             padx=10
@@ -292,7 +294,7 @@ class App:
             self.frm_radio,
             width=15,
             text='Draw',
-            variable=self.destination,
+            variable=self.destination_choice,
             value='draw',
             anchor=tk.W,
             padx=10
@@ -310,10 +312,12 @@ class App:
         self.lbl_epidemic = tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1)
         self.lbl_epidemic.pack()
 
-        self.dropdown_epidemic = ttk.Combobox(self.frm_menu, width=15)
+        self.dropdown_epidemic_options = []
+        self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice, self.dropdown_epidemic_options)
+        self.dropdown_epidemic.config(width=15)
         self.dropdown_epidemic.pack()
 
-        btn_epidemic = ttk.Button(self.frm_menu, text='Epidemic', width=15, command=self.cb_epidemic)
+        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15, command=self.cb_epidemic)
         btn_epidemic.pack()
 
         # Stats
@@ -440,10 +444,14 @@ class App:
     def update_dropdown(self, deck):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
         unique_cards = sorted([card.city for card in list(set(deck.cards[0].cards))])
-        self.dropdown_epidemic.configure(values=unique_cards)
-        self.dropdown_epidemic.current(0)
-        self.dropdown_epidemic.bind('<<ComboboxSelected>>',
-                                    lambda e: print(f'UPDATE_DROPDOWN : {self.dropdown_epidemic.get()}'))
+        self.dropdown_epidemic_options = unique_cards
+        m = self.dropdown_epidemic.children['menu']
+        m.delete(0, tk.END)
+        for card in unique_cards:
+            # command value syntax is from
+            # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
+            m.add_command(label=card, command=lambda value=card: self.epidemic_choice.set(value))
+        self.epidemic_choice.set(unique_cards[0])
 
     def cb_view_cardpool(self, index):
         # Callback from the buttons used to display the possible choices in the Draw Deck.
@@ -455,7 +463,7 @@ class App:
     def cb_draw_card(self, deck, card):
         # Move a card from a deck to the destination deck set by the radio buttons
         # Ignore drawing from a deck onto itself
-        destination = self.deck[self.destination.get()]
+        destination = self.deck[self.destination_choice.get()]
         if not deck == destination:
             deck.move(card, destination)
             self.cardpool_index = 0
@@ -490,7 +498,7 @@ class App:
 
     def cb_epidemic(self):
         # Select card from bottom of draw pile based on the dropdown list
-        new_card = self.deck['draw'].get_card_by_name(self.dropdown_epidemic.get())
+        new_card = self.deck['draw'].get_card_by_name(self.epidemic_choice.get())
         self.deck['draw'].remove_from_bottom(new_card)
 
         # Add the card to the discard pile
