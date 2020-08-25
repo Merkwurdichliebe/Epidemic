@@ -9,7 +9,7 @@ using Tkinter for the GUI.
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.4"
+__version__ = "0.5"
 
 # TODO undo
 
@@ -195,7 +195,7 @@ class App:
 
         # Title
 
-        self.label_title = tk.Label(self.frm_header_title, text='CARD TRACKER', padx=10, font=FONT_H0)
+        self.label_title = tk.Label(self.frm_header_title, text='DECK TRACKER', padx=10, font=FONT_H0)
         self.label_title.pack(side=tk.LEFT)
 
         self.frm_header_line = tk.Frame(self.frm_header)
