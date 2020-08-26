@@ -134,6 +134,36 @@ class DrawDeck(Deck):
         self.cards.pop(0)
 
 
+class Stats:
+    def __init__(self, deck):
+        self.deck = deck
+        self.cards_total = 0
+        self.in_discard = 0
+        self.top_frequency = 0
+        self.top_cards = None
+        self.potential_cards_total = 0
+        self.percentage = 0
+        self.update()
+
+    def update(self):
+        self.cards_total = len(self.deck['discard'].cards) + len(self.deck['draw'].cards[0].cards)
+        self.in_discard = len(self.deck['discard'].cards)
+
+        # Calculate draw probabilities
+        card_list = self.deck['draw'].cards[-1].cards
+        self.potential_cards_total = len(card_list)
+
+        # Use a Counter to sort the cards by the most common ones
+        c = Counter(card_list).most_common()
+
+        # Get the frequency of the most common card
+        self.top_frequency = c[0][1]
+        self.percentage = self.top_frequency / self.potential_cards_total
+
+        # Build a list of all the cards that share that top frequency
+        self.top_cards = [card[0] for card in c if card[1] == self.top_frequency]
+
+
 class App:
     def __init__(self, decks):
         self.decks = decks
@@ -148,9 +178,15 @@ class App:
 
         self.top_frequency_cards = ()
 
+        self.stats = Stats(self.deck)
+
         # We don't assign the class to a variable since we are not using it later,
         # we only instantiate the window.
         self.view = MainWindow(self, self.deck)
+        self.updateview()
+
+    def updateview(self):
+        self.view.update_stats(self.stats)
 
     def cb_epidemic(self):
         # self.do_epidemic()
@@ -185,21 +221,7 @@ class App:
         # self.update_gui(self.deck['discard'])
         # self.update_gui(self.deck['cardpool'])
 
-    def get_probabilities(self):
-        # Get the total number of cards
-        card_list = self.deck['draw'].cards[-1].cards
-        total_potential_cards = len(card_list)
 
-        # Use a Counter to sort the cards by the most common ones
-        c = Counter(card_list).most_common()
-
-        # Get the frequency of the most common card
-        top_frequency = c[0][1]
-
-        # Build a list of all the cards that share that top frequency
-        top_cards = [card[0] for card in c if card[1] == top_frequency]
-        self.top_frequency_cards = (top_frequency, top_cards, total_potential_cards)
-        return self.top_frequency_cards
 
 
 def initialize():

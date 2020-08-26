@@ -273,7 +273,7 @@ class MainWindow:
             # self.update_dropdown(deck)
             # self.update_probabilities()
             # self.update_textbox_stats()
-            self.app.get_probabilities()
+            # self.app.get_probabilities()
 
         if deck.name == 'discard':
             for button in self.discard_buttons:
@@ -299,14 +299,6 @@ class MainWindow:
         for card in sorted(deck.cards, key=lambda x: x.city):
             textbox.insert(tk.END, card.city + '\n')
         textbox.configure(state=tk.DISABLED)
-
-    def update_textbox_stats(self):
-        self.txt_stats.configure(state=tk.NORMAL)
-        self.txt_stats.delete(1.0, tk.END)
-        self.txt_stats.insert(tk.END, f'Total cards: {self.cards_total}\n')
-        self.txt_stats.insert(tk.END, f'In discard pile: {str(len(self.deck["discard"].cards))}\n')
-        self.txt_stats.insert(tk.END, self.top_frequency_cards_to_text())
-        self.txt_stats.configure(state=tk.DISABLED)
 
     def update_dropdown(self, deck):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
@@ -338,14 +330,20 @@ class MainWindow:
             self.update_gui(self.deck['cardpool'])
             self.update_gui(self.deck['draw'])
 
-    def update_probabilities(self):
+    def update_stats(self, stats):
         text = f'\nTop card frequency:\n'
-        text += str(top[0]) + ' '
-        text += f'({top[0] / top[2] :.2%})'
+        text += f'{stats.top_frequency} '
+        text += f'({stats.percentage:.2%})'
         text += '\n\n'
-        for card in top[1]:
+        for card in stats.top_cards:
             text += '- ' + card.city + '\n'
-        return text
+
+        self.txt_stats.configure(state=tk.NORMAL)
+        self.txt_stats.delete(1.0, tk.END)
+        self.txt_stats.insert(tk.END, f'Total cards: {stats.cards_total}\n')
+        self.txt_stats.insert(tk.END, f'In discard pile: {stats.in_discard}\n')
+        self.txt_stats.insert(tk.END, text)
+        self.txt_stats.configure(state=tk.DISABLED)
 
     def get_epidemic_choice(self):
         return self.epidemic_choice.get()
