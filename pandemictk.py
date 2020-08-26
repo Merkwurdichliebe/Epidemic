@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from webbrowser import open as webopen
 
 
 class MainWindow:
@@ -20,10 +21,10 @@ class MainWindow:
 
         # Replace default menu
 
-        emptyMenu = tk.Menu(self.root)
-        self.root.config(menu=emptyMenu)
+        menu_bar = tk.Menu(self.root)
+        self.root.config(menu=menu_bar)
 
-        # Define GUI variables and set defaults
+        # Define GUI variables and set defaults<
 
         # Destination radio button
         self.destination_choice = tk.StringVar()
@@ -40,9 +41,9 @@ class MainWindow:
 
         # Styles
 
-        FONT_H0 = ('Helvetica', 30, 'bold')
-        FONT_H1 = ('Helvetica', 14, 'bold')
-        FONT_TEXT = ('Helvetica', 14)
+        self.font = {'h1': ('Helvetica', 30, 'bold'),
+                     'h2': ('Helvetica', 14, 'bold'),
+                     'p': ('Helvetica', 14)}
 
         # We use ttk buttons because macOS doesn't color Tk buttons properly
 
@@ -65,9 +66,13 @@ class MainWindow:
         self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
         self.lbl_logo.pack(side=tk.LEFT)
 
+        btn_help = ttk.Button(self.frm_header_title, text='Help', width=15,
+                              command=self.display_help)
+        btn_help.pack(side=tk.RIGHT)
+
         # Title
 
-        self.label_title = tk.Label(self.frm_header_title, text='DECK TRACKER', padx=10, font=FONT_H0)
+        self.label_title = tk.Label(self.frm_header_title, text='DECK TRACKER', padx=10, font=self.font['h1'])
         self.label_title.pack(side=tk.LEFT)
 
         self.frm_header_line = tk.Frame(self.frm_header)
@@ -106,24 +111,24 @@ class MainWindow:
         # Top labels above the main interface
         # They never change so we declare and pack them in one go
 
-        tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', width=20, font=FONT_H1).pack()
-        tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=FONT_H1).pack()
-        tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=FONT_H1).pack()
-        tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=FONT_H1).pack()
-        tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=FONT_H1).pack()
-        tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1).pack()
+        tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_menu, pady=10, text='Card destination', font=self.font['h2']).pack()
 
         # Bottom Text
 
-        tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=FONT_H1).pack()
+        tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=self.font['h2']).pack()
 
         # Two textboxes containing the dynamically built lists
         # for the exile deck and the cardpool deck
 
-        self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=FONT_TEXT)
+        self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=self.font['p'])
         self.txt_cardpool.pack()
 
-        self.txt_exile = tk.Text(self.frm_exile, name='txt_exile', width=20, height=50, font=FONT_TEXT)
+        self.txt_exile = tk.Text(self.frm_exile, name='txt_exile', width=20, height=50, font=self.font['p'])
         self.txt_exile.pack()
 
         # Radio buttons in their own frame
@@ -150,7 +155,7 @@ class MainWindow:
         self.frm_epidemic = tk.Frame(self.frm_menu)
         self.frm_epidemic.pack()
 
-        tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1).pack()
+        tk.Label(self.frm_menu, pady=20, text='Epidemic', font=self.font['h2']).pack()
 
         self.epidemic_options = []
         self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice,
@@ -167,9 +172,9 @@ class MainWindow:
         self.frm_stats = tk.Frame(self.frm_menu, pady=10)
         self.frm_stats.pack()
 
-        tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1).pack()
+        tk.Label(self.frm_stats, pady=10, text='Stats', font=self.font['h2']).pack()
 
-        self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT, wrap=tk.WORD)
+        self.txt_stats = tk.Text(self.frm_stats, width=20, height=15, font=self.font['p'], wrap=tk.WORD)
         self.txt_stats.pack()
 
         # Center the app window on the screen
@@ -304,3 +309,30 @@ class MainWindow:
 
     def get_epidemic(self):
         return self.epidemic_choice.get()
+
+    def display_help(self):
+        def cb_open_web():
+            webopen('https://github.com/Merkwurdichliebe/Pandemic-Tracker/wiki')
+            popup.destroy()
+
+        popup = tk.Toplevel()
+        popup.title('Pandemic Deck Tracker Help')
+        text = 'Help is available on the application\'s GitHub page.'
+        lbl1 = tk.Label(popup, text=text, pady=10, padx=20)
+        lbl1.pack()
+
+        frm_btns = tk.Frame(popup, pady=10)
+        frm_btns.pack()
+
+        btn = tk.Button(frm_btns, text='View in browser', width=15, command=cb_open_web)
+        btn.pack(side=tk.LEFT, padx=5)
+        btn = tk.Button(frm_btns, text='Close', width=15, command=popup.destroy)
+        btn.pack(side=tk.LEFT, padx=5)
+
+        width = popup.winfo_reqwidth()
+        height = popup.winfo_reqheight()
+        pos_x = int(self.root.winfo_screenwidth() / 2 - width / 2)
+        pos_y = int(self.root.winfo_screenheight() / 2 - height)
+        popup.geometry("+{}+{}".format(pos_x, pos_y))
+
+        popup.mainloop()
