@@ -34,8 +34,8 @@ class MainWindow:
 
         # Keep track of added buttons so we can destroy and redraw them later
 
-        self.cardpool_buttons = []
-        self.draw_buttons = []
+        self.cardpool_btns = []
+        self.draw_btns = []
         self.discard_buttons = []
 
         # Styles
@@ -131,19 +131,19 @@ class MainWindow:
         self.frm_radio = tk.Frame(self.frm_menu, pady=10)
         self.frm_radio.pack()
 
-        radio_draw_to_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard',
-                                               variable=self.destination_choice,
-                                               value='discard', anchor=tk.W, padx=10)
-        radio_draw_to_exile = tk.Radiobutton(self.frm_radio,width=15,text='Exile',
-                                             variable=self.destination_choice,
-                                             value='exile', anchor=tk.W, padx=10)
-        radio_draw_to_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw',
-                                            variable=self.destination_choice,
-                                            value='draw', anchor=tk.W, padx=10)
+        radio_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard',
+                                       variable=self.destination_choice,
+                                       value='discard', anchor=tk.W, padx=10)
+        radio_exile = tk.Radiobutton(self.frm_radio, width=15, text='Exile',
+                                     variable=self.destination_choice,
+                                     value='exile', anchor=tk.W, padx=10)
+        radio_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw',
+                                    variable=self.destination_choice,
+                                    value='draw', anchor=tk.W, padx=10)
 
-        radio_draw_to_discard.pack(anchor=tk.W)
-        radio_draw_to_exile.pack(anchor=tk.W)
-        radio_draw_to_draw.pack(anchor=tk.W)
+        radio_discard.pack(anchor=tk.W)
+        radio_exile.pack(anchor=tk.W)
+        radio_draw.pack(anchor=tk.W)
 
         # Dropdown menu for selecting city in epidemic
 
@@ -152,9 +152,9 @@ class MainWindow:
 
         tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1).pack()
 
-        self.dropdown_epidemic_options = []
+        self.epidemic_options = []
         self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice,
-                                               self.dropdown_epidemic_options)
+                                               self.epidemic_options)
         self.dropdown_epidemic.config(width=15)
         self.dropdown_epidemic.pack()
 
@@ -174,22 +174,15 @@ class MainWindow:
 
         # Center the app window on the screen
 
-        windowWidth = self.root.winfo_reqwidth()
-        windowHeight = self.root.winfo_reqheight()
-        positionRight = int(self.root.winfo_screenwidth() / 3 - windowWidth / 2)
-        positionDown = int(self.root.winfo_screenheight() / 4 - windowHeight)
-        self.root.geometry("+{}+{}".format(positionRight, positionDown))
+        width = self.root.winfo_reqwidth()
+        height = self.root.winfo_reqheight()
+        pos_x = int(self.root.winfo_screenwidth() / 3 - width / 2)
+        pos_y = int(self.root.winfo_screenheight() / 4 - height)
+        self.root.geometry("+{}+{}".format(pos_x, pos_y))
 
         # Index of the cardpool to display when a Draw Deck item is clicked
 
         self.cardpool_index = 0
-
-        # Update initial GUI
-
-        self.update_gui(self.deck['exile'])
-        self.update_gui(self.deck['cardpool'])
-        self.update_gui(self.deck['draw'])
-        self.update_gui(self.deck['discard'])
 
     def update_gui(self, deck):
 
@@ -203,76 +196,76 @@ class MainWindow:
             self.update_textbox(self.txt_exile, self.deck['exile'])
 
         if deck.name == 'draw':
-            for button in self.draw_buttons:
-                button.destroy()
+            for b in self.draw_btns:
+                b.destroy()
 
-            for button in self.cardpool_buttons:
-                button.destroy()
+            for b in self.cardpool_btns:
+                b.destroy()
 
             self.cardpool_index = 0
             self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
             for index, card_list in enumerate(reversed(deck.cards[-16:])):
                 if len(card_list.cards) == 1:
-                    button_text = card_list.cards[0].city
+                    text = card_list.cards[0].city
                     color = card_list.cards[0].color + '.TButton'
                 else:
-                    button_text = f'{len(card_list.cards)}'
+                    text = f'{len(card_list.cards)}'
                     color = 'black.TButton'
-                button = ttk.Button(
+                btn = ttk.Button(
                     self.frm_draw_deck,
                     style=color,
                     width=15,
-                    text=button_text
+                    text=text
                 )
-                button.configure(command=lambda x=index: self.cb_view_cardpool(x))
-                button.pack()
-                self.cardpool_buttons.append(button)
+                btn.configure(command=lambda x=index: self.cb_view_cardpool(x))
+                btn.pack()
+                self.cardpool_btns.append(btn)
 
             for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.city)):
-                button = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.city)
-                button.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-                button.pack()
-                self.draw_buttons.append(button)
+                btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.city)
+                btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+                btn.pack()
+                self.draw_btns.append(btn)
 
         if deck.name == 'discard':
-            for button in self.discard_buttons:
-                button.destroy()
+            for btn in self.discard_buttons:
+                btn.destroy()
 
             for index, card in enumerate(sorted(deck.cards, key=lambda x: x.city)):
-                button = ttk.Button(
+                btn = ttk.Button(
                     self.frm_discard,
                     style=card.color + '.TButton',
                     width=15,
                     text=card.city
                 )
-                button.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-                button.pack()
-                self.discard_buttons.append(button)
+                btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+                btn.pack()
+                self.discard_buttons.append(btn)
 
     @staticmethod
-    def update_textbox(textbox, deck):
+    def update_textbox(box, deck):
         """Update a Tk textbox with the contents of the passed Deck object.
         This is used to refresh both the cardpool textbox and the Exile textbox."""
         # Method is static because it doesn't need the self keyword,
         # it only updates the contents of the Tk textbox which is passed to it.
-        textbox.configure(state=tk.NORMAL)
-        textbox.delete(1.0, tk.END)
+        box.configure(state=tk.NORMAL)
+        box.delete(1.0, tk.END)
         for card in sorted(deck.cards, key=lambda x: x.city):
-            textbox.insert(tk.END, card.city + '\n')
-        textbox.configure(state=tk.DISABLED)
+            box.insert(tk.END, card.city + '\n')
+        box.configure(state=tk.DISABLED)
 
     def update_dropdown(self):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
-        unique_cards = sorted([card.city for card in list(set(self.deck['draw'].cards[0].cards))])
-        self.dropdown_epidemic_options = unique_cards
+        cards = sorted([card.city for card in list(set(self.deck['draw'].cards[0].cards))])
+        self.epidemic_options = cards
         m = self.dropdown_epidemic.children['menu']
         m.delete(0, tk.END)
-        for card in unique_cards:
+        for card in cards:
             # command value syntax is from
             # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
             m.add_command(label=card, command=lambda value=card: self.epidemic_choice.set(value))
-        self.epidemic_choice.set(unique_cards[0])
+        self.epidemic_choice.set(cards[0])
 
     def cb_view_cardpool(self, index):
         # Callback from the buttons used to display the possible choices in the Draw Deck.
@@ -295,8 +288,8 @@ class MainWindow:
         self.txt_stats.insert(tk.END, text)
         self.txt_stats.configure(state=tk.DISABLED)
 
-    def get_destination_choice(self):
+    def get_destination(self):
         return self.destination_choice.get()
 
-    def get_epidemic_choice(self):
+    def get_epidemic(self):
         return self.epidemic_choice.get()

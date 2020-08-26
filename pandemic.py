@@ -86,16 +86,13 @@ class Stats:
 
 class App:
     def __init__(self, decks):
+        # Build the decks dictionary so we can get a Deck object by its name
+        self.deck = {deck.name: deck for deck in decks}
 
-        # Build the decks dictionary
-        self.deck = {}
-        for deck in decks:
-            self.deck[deck.name] = deck
-
+        # Get a Stats object for calculating draw probabilities
         self.stats = Stats(self.deck)
 
-        # We don't assign the class to a variable since we are not using it later,
-        # we only instantiate the window.
+        # Instantiate the main window
         self.view = MainWindow(self)
         self.updateview()
 
@@ -109,14 +106,14 @@ class App:
     def cb_draw_card(self, deck, card):
         # Move a card from a deck to the destination deck set by the radio buttons
         # Ignore drawing from a deck onto itself
-        destination = self.deck[self.view.get_destination_choice()]
-        if not deck == destination:
-            deck.move(card, destination)
+        dest = self.deck[self.view.get_destination()]
+        if not deck == dest:
+            deck.move(card, dest)
             self.updateview()
 
     def cb_epidemic(self):
         # Select card from bottom of draw pile based on the dropdown list
-        new_card = self.deck['draw'].get_card_by_name(self.view.get_epidemic_choice())
+        new_card = self.deck['draw'].get_card_by_name(self.view.get_epidemic())
         self.deck['draw'].remove_from_bottom(new_card)
 
         # Add the card to the discard pile

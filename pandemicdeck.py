@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+
+"""
+Classes used in the Pandemic Deck Tracker application
+for representing Card objects and Deck objects.
+
+The DrawDeck object extends Deck and actually holds Decks, not Cards.
+Each of these Decks represents the possible draws at each position in the DrawDeck.
+The top card is always the last Card in the list.
+"""
+
+__author__ = "Tal Zana"
+__copyright__ = "Copyright 2020"
+__license__ = "GPL"
+__version__ = "0.6"
+
+
 class Card:
     """Basic class to represent a card with a city name and color.
     Cards are contained in Decks."""
@@ -64,11 +81,8 @@ class DrawDeck(Deck):
         # Override the Deck.remove method so that the card is removed
         # from the list at the top of the deck,
         # i.e. the last element in the list."""
-        if isinstance(item, Deck):
-            self.remove(item)
-        else:
-            self.cards[-1].remove(item)
-            self.cards.pop()
+        self.cards[-1].remove(item)
+        self.cards.pop()
 
     def remove_from_bottom(self, card):
         # Remove a card from the bottom of the draw deck,
