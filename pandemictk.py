@@ -207,7 +207,7 @@ class MainWindow:
 
             for index, card_list in enumerate(reversed(deck.cards[-16:])):
                 if len(card_list.cards) == 1:
-                    text = card_list.cards[0].city
+                    text = card_list.cards[0].name
                     color = card_list.cards[0].color + '.TButton'
                 else:
                     text = f'{len(card_list.cards)}'
@@ -222,8 +222,8 @@ class MainWindow:
                 btn.pack()
                 self.cardpool_btns.append(btn)
 
-            for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.city)):
-                btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.city)
+            for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.name)):
+                btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.name)
                 btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
                 btn.pack()
                 self.draw_btns.append(btn)
@@ -232,12 +232,12 @@ class MainWindow:
             for btn in self.discard_buttons:
                 btn.destroy()
 
-            for index, card in enumerate(sorted(deck.cards, key=lambda x: x.city)):
+            for index, card in enumerate(sorted(deck.cards, key=lambda x: x.name)):
                 btn = ttk.Button(
                     self.frm_discard,
                     style=card.color + '.TButton',
                     width=15,
-                    text=card.city
+                    text=card.name
                 )
                 btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
                 btn.pack()
@@ -251,13 +251,13 @@ class MainWindow:
         # it only updates the contents of the Tk textbox which is passed to it.
         box.configure(state=tk.NORMAL)
         box.delete(1.0, tk.END)
-        for card in sorted(deck.cards, key=lambda x: x.city):
-            box.insert(tk.END, card.city + '\n')
+        for card in sorted(deck.cards, key=lambda x: x.name):
+            box.insert(tk.END, card.name + '\n')
         box.configure(state=tk.DISABLED)
 
     def update_dropdown(self):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
-        cards = sorted([card.city for card in list(set(self.deck['draw'].cards[0].cards))])
+        cards = sorted([card.name for card in list(set(self.deck['draw'].cards[0].cards))])
         self.epidemic_options = cards
         m = self.dropdown_epidemic.children['menu']
         m.delete(0, tk.END)
@@ -279,7 +279,7 @@ class MainWindow:
         text += f'({stats.percentage:.2%})'
         text += '\n\n'
         for card in stats.top_cards:
-            text += '- ' + card.city + '\n'
+            text += '- ' + card.name + '\n'
 
         self.txt_stats.configure(state=tk.NORMAL)
         self.txt_stats.delete(1.0, tk.END)

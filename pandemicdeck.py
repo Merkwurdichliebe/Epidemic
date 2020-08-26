@@ -19,8 +19,8 @@ class Card:
     """Basic class to represent a card with a city name and color.
     Cards are contained in Decks."""
 
-    def __init__(self, city, color):
-        self.city = city
+    def __init__(self, name, color):
+        self.name = name
         self.color = color
 
 
@@ -50,7 +50,7 @@ class Deck:
             list = self.cards[0].cards
         else:
             list = self.cards
-        found_card = next((card for card in list if card.city == name), None)
+        found_card = next((card for card in list if card.name == name), None)
         assert found_card is not None, f'Card with name "{name}" not found in Deck "{self.name}".'
         return found_card
 
@@ -73,7 +73,7 @@ class DrawDeck(Deck):
             for i in item.cards:
                 self.cards.append(item)
         else:
-            new_deck = Deck(item.city)
+            new_deck = Deck(item.name)
             new_deck.add(item)
             self.cards.append(new_deck)
 
