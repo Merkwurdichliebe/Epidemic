@@ -14,8 +14,8 @@ __version__ = "0.5"
 # TODO undo
 
 from pandemictk import MainWindow
+from pandemicdeck import Card, Deck, DrawDeck
 from collections import Counter
-
 
 # A list of all the cards available in the deck, including exiled ones
 # but excluding permanently destroyed cards.
@@ -54,84 +54,7 @@ available_cards = [
 ]
 
 
-class Card:
-    """Basic class to represent a card with a city name and color.
-    Cards are contained in Decks."""
 
-    def __init__(self, city, color):
-        self.city = city
-        self.color = color
-
-
-class Deck:
-    """Basic class to define a deck of Card objects, which are held in a simple list.
-    There are three main decks in the game:
-    - Draw Deck
-    - Discard Deck
-    - Exile Deck"""
-
-    def __init__(self, name):
-        self.name = name
-        self.cards = []
-
-    def add(self, card):
-        self.cards.append(card)
-
-    def remove(self, card):
-        self.cards.remove(card)
-
-    def move(self, card, to_deck):
-        self.remove(card)
-        to_deck.add(card)
-
-    def get_card_by_name(self, name):
-        if isinstance(self, DrawDeck):
-            list = self.cards[0].cards
-        else:
-            list = self.cards
-        found_card = next((card for card in list if card.city == name), None)
-        assert found_card is not None, f'Card with name "{name}" not found in Deck "{self.name}".'
-        return found_card
-
-    def clear(self):
-        self.cards = []
-
-
-class DrawDeck(Deck):
-    """Subclass of Deck used for the Draw Deck only.
-    The Draw Deck doesn't hold Card objects, but a list of Decks objects,
-    which represent the potential cards for each draw."""
-
-    def __init__(self, name):
-        Deck.__init__(self, name)
-
-    def add(self, item):
-        # Add a card to the Draw Deck.If we're adding a single card to the Draw Deck
-        # we need to make a Deck out of it, containing a single card.
-        if isinstance(item, Deck):
-            for i in item.cards:
-                self.cards.append(item)
-        else:
-            new_deck = Deck(item.city)
-            new_deck.add(item)
-            self.cards.append(new_deck)
-
-    def remove(self, item):
-        # Override the Deck.remove method so that the card is removed
-        # from the list at the top of the deck,
-        # i.e. the last element in the list."""
-        if isinstance(item, Deck):
-            self.remove(item)
-        else:
-            self.cards[-1].remove(item)
-            self.cards.pop()
-
-    def remove_from_bottom(self, card):
-        # Remove a card from the bottom of the draw deck,
-        # i.e. from list position 0,
-        # then remove the list item entirely because the card was drawn.
-        self.cards[0].remove(card)
-        self.cards.pop(0)
 
 
 class Stats:
@@ -174,23 +97,29 @@ class App:
         for deck in decks:
             self.deck[deck.name] = deck
 
-        # Tuple to hold three values of the top Draw Deck card frequency
-
-        self.top_frequency_cards = ()
-
         self.stats = Stats(self.deck)
 
         # We don't assign the class to a variable since we are not using it later,
         # we only instantiate the window.
-        self.view = MainWindow(self, self.deck)
+        self.view = MainWindow(self)
         self.updateview()
 
     def updateview(self):
         self.view.update_stats(self.stats)
+        self.view.update_dropdown()
+
+    def cb_draw_card(self, deck, card):
+        # Move a card from a deck to the destination deck set by the radio buttons
+        # Ignore drawing from a deck onto itself
+        destination = self.deck[self.view.get_destination_choice()]
+        if not deck == destination:
+            deck.move(card, destination)
+            self.view.update_gui(deck)
+            self.view.update_gui(destination)
 
     def cb_epidemic(self):
         # self.do_epidemic()
-        pass
+        self.do_epidemic()
 
     def do_epidemic(self):
         # Select card from bottom of draw pile based on the dropdown list
@@ -212,16 +141,7 @@ class App:
         # Clear the discard pile
         self.deck['discard'].clear()
 
-        # We reset the index to 0 so that the card pool textbox displays
-        # the top item in the Draw Deck.
-        # self.cardpool_index = 0
-
-        # Update the GUI.
-        # self.update_gui(self.deck['draw'])
-        # self.update_gui(self.deck['discard'])
-        # self.update_gui(self.deck['cardpool'])
-
-
+        self.updateview()
 
 
 def initialize():

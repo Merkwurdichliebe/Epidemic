@@ -3,7 +3,7 @@ from tkinter import ttk
 
 
 class MainWindow:
-    def __init__(self, app, deck):
+    def __init__(self, app):
         """Main application designed as class in order to allow easier communication
         between interface elements. cf. http://thinkingtkinter.sourceforge.net
         """
@@ -15,8 +15,8 @@ class MainWindow:
         self.root.configure(padx=20, pady=10)
         self.root.resizable(False, False)
 
-        self.deck = deck
         self.app = app
+        self.deck = self.app.deck
 
         # Replace default menu
 
@@ -187,7 +187,7 @@ class MainWindow:
         self.dropdown_epidemic.config(width=15)
         self.dropdown_epidemic.pack()
 
-        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15, command=app.cb_epidemic)
+        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15, command=self.app.cb_epidemic)
         btn_epidemic.pack()
 
         # Stats
@@ -209,17 +209,9 @@ class MainWindow:
         positionDown = int(self.root.winfo_screenheight() / 4 - windowHeight)
         self.root.geometry("+{}+{}".format(positionRight, positionDown))
 
-        # Initialize a few general attributes
-
-
-
         # Index of the cardpool to display when a Draw Deck item is clicked
 
         self.cardpool_index = 0
-
-        # Fixed total of all the cards in the Draw Deck
-
-        self.cards_total = len(self.deck['draw'].cards[0].cards)
 
 
         # Update initial GUI
@@ -237,15 +229,15 @@ class MainWindow:
         if deck.name == 'exile':
             self.update_textbox(self.txt_exile, self.deck['exile'])
 
-        if deck.name == 'cardpool':
-            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
-
         if deck.name == 'draw':
             for button in self.draw_buttons:
                 button.destroy()
 
             for button in self.cardpool_buttons:
                 button.destroy()
+
+            self.cardpool_index = 0
+            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
             for index, card_list in enumerate(reversed(deck.cards[-16:])):
                 if len(card_list.cards) == 1:
@@ -266,14 +258,9 @@ class MainWindow:
 
             for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.city)):
                 button = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.city)
-                button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
+                button.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
                 button.pack()
                 self.draw_buttons.append(button)
-
-            # self.update_dropdown(deck)
-            # self.update_probabilities()
-            # self.update_textbox_stats()
-            # self.app.get_probabilities()
 
         if deck.name == 'discard':
             for button in self.discard_buttons:
@@ -286,12 +273,14 @@ class MainWindow:
                     width=15,
                     text=card.city
                 )
-                button.configure(command=lambda x=deck, y=card: self.cb_draw_card(x, y))
+                button.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
                 button.pack()
                 self.discard_buttons.append(button)
 
     @staticmethod
     def update_textbox(textbox, deck):
+        """Update a Tk textbox with the contents of the passed Deck object.
+        This is used to refresh both the cardpool textbox and the Exile textbox."""
         # Method is static because it doesn't need the self keyword,
         # it only updates the contents of the Tk textbox which is passed to it.
         textbox.configure(state=tk.NORMAL)
@@ -300,9 +289,9 @@ class MainWindow:
             textbox.insert(tk.END, card.city + '\n')
         textbox.configure(state=tk.DISABLED)
 
-    def update_dropdown(self, deck):
+    def update_dropdown(self):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
-        unique_cards = sorted([card.city for card in list(set(deck.cards[0].cards))])
+        unique_cards = sorted([card.city for card in list(set(self.deck['draw'].cards[0].cards))])
         self.dropdown_epidemic_options = unique_cards
         m = self.dropdown_epidemic.children['menu']
         m.delete(0, tk.END)
@@ -318,18 +307,6 @@ class MainWindow:
         self.cardpool_index = index
         self.update_gui(self.deck['cardpool'])
 
-    def cb_draw_card(self, deck, card):
-        # Move a card from a deck to the destination deck set by the radio buttons
-        # Ignore drawing from a deck onto itself
-        destination = self.deck[self.destination_choice.get()]
-        if not deck == destination:
-            deck.move(card, destination)
-            self.cardpool_index = 0
-            self.update_gui(self.deck['discard'])
-            self.update_gui(self.deck['exile'])
-            self.update_gui(self.deck['cardpool'])
-            self.update_gui(self.deck['draw'])
-
     def update_stats(self, stats):
         text = f'\nTop card frequency:\n'
         text += f'{stats.top_frequency} '
@@ -344,6 +321,9 @@ class MainWindow:
         self.txt_stats.insert(tk.END, f'In discard pile: {stats.in_discard}\n')
         self.txt_stats.insert(tk.END, text)
         self.txt_stats.configure(state=tk.DISABLED)
+
+    def get_destination_choice(self):
+        return self.destination_choice.get()
 
     def get_epidemic_choice(self):
         return self.epidemic_choice.get()
