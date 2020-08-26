@@ -12,6 +12,9 @@ __license__ = "GPL"
 __version__ = "0.7"
 
 # TODO undo
+# TODO json
+# TODO fr, en
+# TODO help
 
 from pandemictk import MainWindow
 from pandemicdeck import Card, Deck, DrawDeck
