@@ -25,9 +25,11 @@ class MainWindow:
 
         # Define GUI variables and set defaults
 
+        # Destination radio button
         self.destination_choice = tk.StringVar()
         self.destination_choice.set('exile')
 
+        # Epidemic dropdown menu
         self.epidemic_choice = tk.StringVar()
 
         # Keep track of added buttons so we can destroy and redraw them later
@@ -102,29 +104,18 @@ class MainWindow:
         self.frm_bottom.pack(side=tk.LEFT)
 
         # Top labels above the main interface
+        # They never change so we declare and pack them in one go
 
-        self.lbl1 = tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', width=20, font=FONT_H1)
-        self.lbl1.pack()
-
-        self.lbl2 = tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=FONT_H1)
-        self.lbl2.pack()
-
-        self.lbl3 = tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=FONT_H1)
-        self.lbl3.pack()
-
-        self.lbl4 = tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=FONT_H1)
-        self.lbl4.pack()
-
-        self.lbl5 = tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=FONT_H1)
-        self.lbl5.pack()
-
-        self.lbl6 = tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1)
-        self.lbl6.pack()
+        tk.Label(self.frm_cardpool, pady=10, text='POSSIBLE CARDS', width=20, font=FONT_H1).pack()
+        tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=FONT_H1).pack()
+        tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=FONT_H1).pack()
+        tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=FONT_H1).pack()
+        tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=FONT_H1).pack()
+        tk.Label(self.frm_menu, pady=10, text='Card destination', font=FONT_H1).pack()
 
         # Bottom Text
 
-        self.lbl7 = tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=FONT_H1)
-        self.lbl7.pack()
+        tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=FONT_H1).pack()
 
         # Two textboxes containing the dynamically built lists
         # for the exile deck and the cardpool deck
@@ -135,40 +126,20 @@ class MainWindow:
         self.txt_exile = tk.Text(self.frm_exile, name='txt_exile', width=20, height=50, font=FONT_TEXT)
         self.txt_exile.pack()
 
-        # Radio buttons
+        # Radio buttons in their own frame
 
         self.frm_radio = tk.Frame(self.frm_menu, pady=10)
         self.frm_radio.pack()
 
-        radio_draw_to_discard = tk.Radiobutton(
-            self.frm_radio,
-            width=15,
-            text='Discard',
-            variable=self.destination_choice,
-            value='discard',
-            anchor=tk.W,
-            padx=10
-
-        )
-        radio_draw_to_exile = tk.Radiobutton(
-            self.frm_radio,
-            width=15,
-            text='Exile',
-            variable=self.destination_choice,
-            value='exile',
-            anchor=tk.W,
-            padx=10
-
-        )
-        radio_draw_to_draw = tk.Radiobutton(
-            self.frm_radio,
-            width=15,
-            text='Draw',
-            variable=self.destination_choice,
-            value='draw',
-            anchor=tk.W,
-            padx=10
-        )
+        radio_draw_to_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard',
+                                               variable=self.destination_choice,
+                                               value='discard', anchor=tk.W, padx=10)
+        radio_draw_to_exile = tk.Radiobutton(self.frm_radio,width=15,text='Exile',
+                                             variable=self.destination_choice,
+                                             value='exile', anchor=tk.W, padx=10)
+        radio_draw_to_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw',
+                                            variable=self.destination_choice,
+                                            value='draw', anchor=tk.W, padx=10)
 
         radio_draw_to_discard.pack(anchor=tk.W)
         radio_draw_to_exile.pack(anchor=tk.W)
@@ -179,15 +150,16 @@ class MainWindow:
         self.frm_epidemic = tk.Frame(self.frm_menu)
         self.frm_epidemic.pack()
 
-        self.lbl_epidemic = tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1)
-        self.lbl_epidemic.pack()
+        tk.Label(self.frm_menu, pady=20, text='Epidemic', font=FONT_H1).pack()
 
         self.dropdown_epidemic_options = []
-        self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice, self.dropdown_epidemic_options)
+        self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice,
+                                               self.dropdown_epidemic_options)
         self.dropdown_epidemic.config(width=15)
         self.dropdown_epidemic.pack()
 
-        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15, command=self.app.cb_epidemic)
+        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15,
+                                  command=self.app.cb_epidemic)
         btn_epidemic.pack()
 
         # Stats
@@ -195,8 +167,7 @@ class MainWindow:
         self.frm_stats = tk.Frame(self.frm_menu, pady=10)
         self.frm_stats.pack()
 
-        self.lbl_stats = tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1)
-        self.lbl_stats.pack()
+        tk.Label(self.frm_stats, pady=10, text='Stats', font=FONT_H1).pack()
 
         self.txt_stats = tk.Text(self.frm_stats, width=20, font=FONT_TEXT, wrap=tk.WORD)
         self.txt_stats.pack()
@@ -213,7 +184,6 @@ class MainWindow:
 
         self.cardpool_index = 0
 
-
         # Update initial GUI
 
         self.update_gui(self.deck['exile'])
@@ -225,6 +195,9 @@ class MainWindow:
 
         # We only update the GUI elements that need updating
         # based on the deck that is passed to the method.
+
+        if deck.name == 'cardpool':
+            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
         if deck.name == 'exile':
             self.update_textbox(self.txt_exile, self.deck['exile'])

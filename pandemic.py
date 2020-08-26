@@ -9,7 +9,7 @@ using Tkinter for the GUI.
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.5"
+__version__ = "0.6"
 
 # TODO undo
 
@@ -54,9 +54,6 @@ available_cards = [
 ]
 
 
-
-
-
 class Stats:
     def __init__(self, deck):
         self.deck = deck
@@ -89,10 +86,8 @@ class Stats:
 
 class App:
     def __init__(self, decks):
-        self.decks = decks
 
-        # Build the deck dictionary
-
+        # Build the decks dictionary
         self.deck = {}
         for deck in decks:
             self.deck[deck.name] = deck
@@ -105,6 +100,9 @@ class App:
         self.updateview()
 
     def updateview(self):
+        self.stats.update()
+        for deck in self.deck:
+            self.view.update_gui(self.deck[deck])
         self.view.update_stats(self.stats)
         self.view.update_dropdown()
 
@@ -114,14 +112,9 @@ class App:
         destination = self.deck[self.view.get_destination_choice()]
         if not deck == destination:
             deck.move(card, destination)
-            self.view.update_gui(deck)
-            self.view.update_gui(destination)
+            self.updateview()
 
     def cb_epidemic(self):
-        # self.do_epidemic()
-        self.do_epidemic()
-
-    def do_epidemic(self):
         # Select card from bottom of draw pile based on the dropdown list
         new_card = self.deck['draw'].get_card_by_name(self.view.get_epidemic_choice())
         self.deck['draw'].remove_from_bottom(new_card)
