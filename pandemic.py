@@ -9,7 +9,7 @@ using Tkinter for the GUI.
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.6"
+__version__ = "0.7"
 
 # TODO undo
 
