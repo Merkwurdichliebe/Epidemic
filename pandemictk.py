@@ -34,9 +34,9 @@ class MainWindow:
 
         # Keep track of added buttons so we can destroy and redraw them later
 
-        self.cardpool_btns = []
-        self.draw_btns = []
-        self.discard_buttons = []
+        self.draw_deck_btns = []
+        self.draw_card_btns = []
+        self.discard_btns = []
 
         # Styles
 
@@ -196,21 +196,25 @@ class MainWindow:
             self.update_textbox(self.txt_exile, self.deck['exile'])
 
         if deck.name == 'draw':
-            for b in self.draw_btns:
-                b.destroy()
 
-            for b in self.cardpool_btns:
-                b.destroy()
-
+            # Reset the cardpool index to point to the top of the Draw Deck
             self.cardpool_index = 0
-            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
-            for index, card_list in enumerate(reversed(deck.cards[-16:])):
-                if len(card_list.cards) == 1:
-                    text = card_list.cards[0].name
-                    color = card_list.cards[0].color + '.TButton'
+            # Refresh Draw Deck buttons:
+            # Destroy old buttons if they exist
+            if self.draw_deck_btns:
+                for b in self.draw_deck_btns:
+                    b.destroy()
+
+            # Define new ones
+            for i, c in enumerate(reversed(deck.cards[-16:])):
+                # If the top card is a single card we display its name,
+                # otherwise we display the number of possible cards.
+                if len(c.cards) == 1:
+                    text = c.cards[0].name
+                    color = c.cards[0].color + '.TButton'
                 else:
-                    text = f'{len(card_list.cards)}'
+                    text = f'{len(c.cards)}'
                     color = 'black.TButton'
                 btn = ttk.Button(
                     self.frm_draw_deck,
@@ -218,30 +222,36 @@ class MainWindow:
                     width=15,
                     text=text
                 )
-                btn.configure(command=lambda x=index: self.cb_view_cardpool(x))
+                # The callback for the cardpool update is part of this class,
+                # no need to ask App to do that.
+                btn.configure(command=lambda x=i: self.cb_view_cardpool(x))
                 btn.pack()
-                self.cardpool_btns.append(btn)
+                self.draw_deck_btns.append(btn)
 
-            for index, card in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.name)):
-                btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton', width=15, text=card.name)
-                btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+            # Refresh draw card buttons
+
+            if self.draw_card_btns:
+                for b in self.draw_card_btns:
+                    b.destroy()
+
+            for i, c in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.name)):
+                btn = ttk.Button(self.frm_draw_card, style=c.color + '.TButton',
+                                 width=15, text=c.name)
+                btn.configure(command=lambda d=deck, e=c: self.app.cb_draw_card(d, e))
                 btn.pack()
-                self.draw_btns.append(btn)
+                self.draw_card_btns.append(btn)
 
         if deck.name == 'discard':
-            for btn in self.discard_buttons:
-                btn.destroy()
+            if self.discard_btns:
+                for btn in self.discard_btns:
+                    btn.destroy()
 
-            for index, card in enumerate(sorted(deck.cards, key=lambda x: x.name)):
-                btn = ttk.Button(
-                    self.frm_discard,
-                    style=card.color + '.TButton',
-                    width=15,
-                    text=card.name
-                )
-                btn.configure(command=lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+            for i, c in enumerate(sorted(deck.cards, key=lambda x: x.name)):
+                btn = ttk.Button(self.frm_discard, style=c.color + '.TButton',
+                                 width=15, text=c.name)
+                btn.configure(command=lambda d=deck, e=c: self.app.cb_draw_card(d, e))
                 btn.pack()
-                self.discard_buttons.append(btn)
+                self.discard_btns.append(btn)
 
     @staticmethod
     def update_textbox(box, deck):
@@ -257,14 +267,15 @@ class MainWindow:
 
     def update_dropdown(self):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
-        cards = sorted([card.name for card in list(set(self.deck['draw'].cards[0].cards))])
+        cards = sorted([c.name for c in list(set(self.deck['draw'].cards[0].cards))])
         self.epidemic_options = cards
+
+        # command value lambda syntax is from
+        # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
         m = self.dropdown_epidemic.children['menu']
         m.delete(0, tk.END)
-        for card in cards:
-            # command value syntax is from
-            # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
-            m.add_command(label=card, command=lambda value=card: self.epidemic_choice.set(value))
+        for c in cards:
+            m.add_command(label=c, command=lambda v=c: self.epidemic_choice.set(v))
         self.epidemic_choice.set(cards[0])
 
     def cb_view_cardpool(self, index):
@@ -275,7 +286,7 @@ class MainWindow:
 
     def update_stats(self, stats):
         text = f'\nTop card frequency:\n'
-        text += f'{stats.top_frequency} '
+        text += f'{stats.top_freq} '
         text += f'({stats.percentage:.2%})'
         text += '\n\n'
         for card in stats.top_cards:
@@ -283,7 +294,7 @@ class MainWindow:
 
         self.txt_stats.configure(state=tk.NORMAL)
         self.txt_stats.delete(1.0, tk.END)
-        self.txt_stats.insert(tk.END, f'Total cards: {stats.cards_total}\n')
+        self.txt_stats.insert(tk.END, f'Total cards: {stats.total}\n')
         self.txt_stats.insert(tk.END, f'In discard pile: {stats.in_discard}\n')
         self.txt_stats.insert(tk.END, text)
         self.txt_stats.configure(state=tk.DISABLED)

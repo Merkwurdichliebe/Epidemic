@@ -50,12 +50,13 @@ class Deck:
             list = self.cards[0].cards
         else:
             list = self.cards
-        found_card = next((card for card in list if card.name == name), None)
-        assert found_card is not None, f'Card with name "{name}" not found in Deck "{self.name}".'
-        return found_card
+        found = next((card for card in list if card.name == name), None)
+        assert found is not None,\
+            f'Card with name "{name}" not found in Deck "{self.name}".'
+        return found
 
     def clear(self):
-        self.cards = []
+        self.cards.clear()
 
 
 class DrawDeck(Deck):
@@ -67,21 +68,25 @@ class DrawDeck(Deck):
         Deck.__init__(self, name)
 
     def add(self, item):
-        # Add a card to the Draw Deck.If we're adding a single card to the Draw Deck
-        # we need to make a Deck out of it, containing a single card.
+        # Override Deck.add. This method adds a card to the Draw Deck.
+        # If we're adding a single card to the Draw Deck
+        # we need to make a Deck out of it, containing a single card,
+        # which is why we are checking the item's class.
         if isinstance(item, Deck):
             for i in item.cards:
                 self.cards.append(item)
         else:
-            new_deck = Deck(item.name)
-            new_deck.add(item)
-            self.cards.append(new_deck)
+            deck = Deck(item.name)
+            deck.add(item)
+            self.cards.append(deck)
 
-    def remove(self, item):
-        # Override the Deck.remove method so that the card is removed
-        # from the list at the top of the deck,
-        # i.e. the last element in the list."""
-        self.cards[-1].remove(item)
+    def remove(self, card):
+        # Override Deck.remove:
+        # Remove the card from the Deck at the last position in the list
+        # (i.e. representing the top card on the deck)
+        # so that it's excluded from future possible draws,
+        # then removes the Deck itself from the Draw Deck.
+        self.cards[-1].remove(card)
         self.cards.pop()
 
     def remove_from_bottom(self, card):
