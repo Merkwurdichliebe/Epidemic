@@ -12,49 +12,13 @@ __license__ = "GPL"
 __version__ = "0.7"
 
 # TODO undo
-# TODO json
 # TODO fr, en
 
 from pandemictk import MainWindow
 from pandemicdeck import Card, Deck, DrawDeck
 from collections import Counter
-
-# A list of all the cards available in the deck, including exiled ones
-# but excluding permanently destroyed cards.
-# The city name is followed by the number of copies of that card,
-# and its family color.
-# "Hollow Men" are green for no particular reason.
-
-available_cards = [
-    ('Jacksonville', 3, 'yellow'),
-    ('Lagos', 3, 'yellow'),
-    ('Le Caire', 3, 'black'),
-    ('Londres', 3, 'blue'),
-    ('New York', 3, 'blue'),
-    ('Sao Paolo', 3, 'yellow'),
-    ('Washington', 3, 'blue'),
-    ('Bogota', 2, 'yellow'),
-    ('Buenos Aires', 2, 'yellow'),
-    ('Paris', 2, 'blue'),
-    ('Francfort', 2, 'blue'),
-    ('Atlanta', 1, 'blue'),
-    ('Lima', 1, 'yellow'),
-    ('Moscou', 1, 'black'),
-    ('Los Angeles', 1, 'yellow'),
-    ('San Francisco', 2, 'blue'),
-    ('Denver', 2, 'blue'),
-    ('Baghdad', 2, 'black'),
-    ('Kinshasa', 1, 'yellow'),
-    ('Khartoum', 1, 'yellow'),
-    ('Johannesbourg', 2, 'blue'),
-    ('Saint-Pétersbourg', 1, 'blue'),
-    ('Santiago', 1, 'yellow'),
-    ('Mexico', 1, 'yellow'),
-    ('Tripoli', 3, 'black'),
-    ('Chicago', 2, 'blue'),
-    ('Hommes creux', 4, 'green')
-]
-
+import yaml
+import os
 
 class Stats:
     def __init__(self, deck):
@@ -140,16 +104,22 @@ def initialize():
     """Prepare the initial states for all the decks.
     This is run once at the start of the game."""
 
-    # Initialize the starter deck from the available cards list
-    starter_deck = Deck('starter')
-    for card in available_cards:
-        c = Card(card[0], card[2])
-        for i in range(card[1]):
-            starter_deck.add(c)
+    # Initialize the initial deck from the available cards list in cards.yml
+    file = os.path.realpath('data/cards.yml')
+    init_deck = Deck('Starter Deck')
+    try:
+        with open(file) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            for item in data:
+                card = Card(item['name'], item['color'])
+                for i in range(item['count']):
+                    init_deck.add(card)
+    except FileNotFoundError as e:
+        print(f'Missing or damaged cards.yml configuration file\n({e})')
 
     # Initialize the draw deck
     draw = DrawDeck('draw')
-    draw.add(starter_deck)
+    draw.add(init_deck)
 
     # Initialize the discard and exile decks
     discard = Deck('discard')

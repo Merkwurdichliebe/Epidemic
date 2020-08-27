@@ -8,12 +8,14 @@ Usage:
 from setuptools import setup
 
 APP = ['pandemic.py']
-DATA_FILES = ['img/pandemic-logo.png']
+DATA_FILES = [('img', ['img/pandemic-logo.png']), ('data', ['data/cards.yml'])]
+# DATA_FILES = ['img/pandemic-logo.png', 'data/cards.yml']
+
 OPTIONS = {'iconfile': 'icon.icns'}
 
 setup(
     app=APP,
-    name="Pandemic Deck Tracker",
+    name='Pandemic Deck Tracker',
     data_files=DATA_FILES,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
