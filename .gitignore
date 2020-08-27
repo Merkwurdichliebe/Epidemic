@@ -133,4 +133,4 @@ dmypy.json
 tk.py
 
 # tz
-py2app/
+etc/
