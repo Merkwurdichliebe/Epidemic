@@ -9,7 +9,6 @@ from setuptools import setup
 
 APP = ['pandemic.py']
 DATA_FILES = [('img', ['img/pandemic-logo.png']), ('data', ['data/cards.yml'])]
-# DATA_FILES = ['img/pandemic-logo.png', 'data/cards.yml']
 
 OPTIONS = {'iconfile': 'icon.icns'}
 

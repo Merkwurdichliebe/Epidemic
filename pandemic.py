@@ -13,12 +13,14 @@ __version__ = "0.7"
 
 # TODO undo
 # TODO fr, en
+# TODO parse YML import for empty file or wrong colors
 
 from pandemictk import MainWindow
 from pandemicdeck import Card, Deck, DrawDeck
 from collections import Counter
 import yaml
 import os
+
 
 class Stats:
     def __init__(self, deck):
@@ -104,22 +106,9 @@ def initialize():
     """Prepare the initial states for all the decks.
     This is run once at the start of the game."""
 
-    # Initialize the initial deck from the available cards list in cards.yml
-    file = os.path.realpath('data/cards.yml')
-    init_deck = Deck('Starter Deck')
-    try:
-        with open(file) as f:
-            data = yaml.load(f, Loader=yaml.FullLoader)
-            for item in data:
-                card = Card(item['name'], item['color'])
-                for i in range(item['count']):
-                    init_deck.add(card)
-    except FileNotFoundError as e:
-        print(f'Missing or damaged cards.yml configuration file\n({e})')
-
     # Initialize the draw deck
     draw = DrawDeck('draw')
-    draw.add(init_deck)
+    draw.add(get_initial_deck())
 
     # Initialize the discard and exile decks
     discard = Deck('discard')
@@ -133,6 +122,28 @@ def initialize():
 
     # Return the prepared decks
     return [draw, discard, exile, cardpool]
+
+
+def get_initial_deck():
+    # Initialize the initial deck from the available cards list in cards.yml
+    file = os.path.realpath('data/cards.yml')
+    init_deck = Deck('Starter Deck')
+    valid_colors = ['blue', 'yellow', 'black', 'green']
+    try:
+        with open(file) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            for item in data:
+                if item['color'] not in valid_colors:
+                    pass # TODO fix this
+                card = Card(item['name'], item['color'])
+                for i in range(item['count']):
+                    init_deck.add(card)
+    except FileNotFoundError as e:
+        print(f'Missing or damaged cards.yml configuration file\n({e})')
+    except ValueError as e:
+        print(f"Invalid color specified for {item['name']}\n({e}")
+
+    return init_deck
 
 
 def main():
