@@ -134,3 +134,4 @@ tk.py
 # tz
 etc/
 *.app
+.idea/
