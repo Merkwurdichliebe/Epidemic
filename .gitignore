@@ -8,9 +8,8 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
-dist/
+build/
 downloads/
 eggs/
 .eggs/
@@ -134,3 +133,4 @@ tk.py
 
 # tz
 etc/
+*.app
