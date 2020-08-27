@@ -129,19 +129,25 @@ def get_initial_deck():
     file = os.path.realpath('data/cards.yml')
     init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
+
+    # Read the cards.yml file
     try:
         with open(file) as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
-            for item in data:
-                if item['color'] not in valid_colors:
-                    pass # TODO fix this
-                card = Card(item['name'], item['color'])
-                for i in range(item['count']):
-                    init_deck.add(card)
     except FileNotFoundError as e:
         print(f'Missing or damaged cards.yml configuration file\n({e})')
-    except ValueError as e:
-        print(f"Invalid color specified for {item['name']}\n({e}")
+
+    # Check for valid card colors
+    try:
+        for item in data:
+            if item['color'] not in valid_colors:
+                raise ValueError(f"Invalid color specified in cards.yml for card: {item}")
+            card = Card(item['name'], item['color'])
+            for i in range(item['count']):
+                init_deck.add(card)
+    except ValueError:
+        # Raise the error again to stop execution after displaying the Exception
+        raise
 
     return init_deck
 
