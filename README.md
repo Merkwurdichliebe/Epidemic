@@ -6,3 +6,5 @@ Pandemic Deck Tracker is a personal Python project for keeping track of the draw
 This software is in no way affiliated with the authors or publishers of Pandemic.
 
 A [help page](https://github.com/Merkwurdichliebe/Pandemic-Tracker/wiki) for the application is available.
+
+![Epidemic Screenshot](https://github.com/Merkwurdichliebe/Pandemic-Tracker/blob/master/docs/epidemic-screen.jpg?raw=true)
