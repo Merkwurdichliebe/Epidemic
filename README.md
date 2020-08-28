@@ -5,4 +5,4 @@ This software is in no way affiliated with the authors or publishers of Pandemic
 
 A [help page](https://github.com/Merkwurdichliebe/Epidemic/wiki) for the application is available.
 
-![Epidemic Screenshot](https://github.com/Merkwurdichliebe/Epidemicr/blob/master/docs/epidemic-screen.jpg?raw=true)
+![Epidemic Screenshot](https://github.com/Merkwurdichliebe/Epidemic/blob/master/docs/epidemic-screen.jpg?raw=true)
