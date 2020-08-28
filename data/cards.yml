@@ -1,4 +1,4 @@
-# Configuration file for cards used in the Pandemic Deck Tracker application
+# Configuration file for cards used in the Epidemic application
 #
 # Each cards should have a name, a count (the number of copies of that card
 # in the draw deck) and a color. You can add more cards or delete existing ones.

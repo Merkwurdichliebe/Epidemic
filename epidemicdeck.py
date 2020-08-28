@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Classes used in the Pandemic Deck Tracker application
+Classes used in the Epidemic application
 for representing Card objects and Deck objects.
 
 The DrawDeck object extends Deck and actually holds Decks, not Cards.

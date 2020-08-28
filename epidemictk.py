@@ -12,7 +12,7 @@ class MainWindow:
         # Main Tk window
 
         self.root = tk.Tk()
-        self.root.title('Pandemic Deck Tracker')
+        self.root.title('Epidemic')
         self.root.configure(padx=20, pady=10)
         self.root.resizable(False, False)
 
@@ -312,11 +312,11 @@ class MainWindow:
 
     def display_help(self):
         def cb_open_web():
-            webopen('https://github.com/Merkwurdichliebe/Pandemic-Tracker/wiki')
+            webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
             popup.destroy()
 
         popup = tk.Toplevel()
-        popup.title('Pandemic Deck Tracker Help')
+        popup.title('Epidemic Help')
         text = 'Help is available on the application\'s GitHub page.'
         lbl1 = tk.Label(popup, text=text, pady=10, padx=20)
         lbl1.pack()

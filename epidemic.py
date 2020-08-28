@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-PANDEMIC TRACKER is designed to assist in evaluating card draw probabilities
+EPIDEMIC is designed to assist in evaluating card draw probabilities
 in the board game Pandemic. It is my first attempt at a working project
 using Tkinter for the GUI.
 """
@@ -15,8 +15,8 @@ __version__ = "0.7"
 # TODO fr, en
 # TODO parse YML import for empty file or wrong colors
 
-from pandemictk import MainWindow
-from pandemicdeck import Card, Deck, DrawDeck
+from epidemictk import MainWindow
+from epidemicdeck import Card, Deck, DrawDeck
 from collections import Counter
 import yaml
 import os
