@@ -19,7 +19,7 @@ from epidemictk import MainWindow
 from epidemicdeck import Card, Deck, DrawDeck
 from collections import Counter
 import yaml
-import os
+from AppKit import NSBundle
 
 
 class Stats:
@@ -126,7 +126,8 @@ def initialize():
 
 def get_initial_deck():
     # Initialize the initial deck from the available cards list in cards.yml
-    file = os.path.realpath('data/cards.yml')
+    # file = os.path.realpath('data/cards.yml')
+    file = NSBundle.mainBundle().pathForResource_ofType_("cards", "yml")
     init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
 
