@@ -62,9 +62,9 @@ class MainWindow:
 
         # Logo
 
-        self.img_logo = tk.PhotoImage(file='img/pandemic-logo.png')
-        self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
-        self.lbl_logo.pack(side=tk.LEFT)
+        # self.img_logo = tk.PhotoImage(file='img/pandemic-logo.png')
+        # self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
+        # self.lbl_logo.pack(side=tk.LEFT)
 
         btn_help = ttk.Button(self.frm_header_title, text='Help', width=15,
                               command=self.display_help)
