@@ -68,7 +68,7 @@
 - name: Paris
   count: 2
   color: blue
-- name: Saint-Pétersbourg
+- name: Saint-Petersbourg
   count: 1
   color: blue
 - name: San Francisco

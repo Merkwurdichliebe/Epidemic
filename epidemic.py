@@ -127,7 +127,7 @@ def initialize():
 def get_initial_deck():
     # Initialize the initial deck from the available cards list in cards.yml
     # file = os.path.realpath('data/cards.yml')
-    file = NSBundle.mainBundle().pathForResource_ofType_("cards", "yml")
+    file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
     init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
 
