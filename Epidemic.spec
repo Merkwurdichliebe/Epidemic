@@ -21,7 +21,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='Epidemic.app',
+          name='Epidemic',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -34,8 +34,11 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Epidemic.app')
+               name='Epidemic')
 app = BUNDLE(coll,
-             name='Epidemic.app.app',
+             name='Epidemic.app',
              icon='icon.icns',
-             bundle_identifier=None)
+             bundle_identifier=None,
+             info_plist={
+                  'NSHighResolutionCapable': 'True'
+                })
