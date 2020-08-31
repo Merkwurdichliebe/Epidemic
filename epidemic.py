@@ -133,7 +133,7 @@ def get_initial_deck():
 
     # Read the cards.yml file
     try:
-        with open(file) as f:
+        with open(file, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
     except FileNotFoundError as e:
         print(f'Missing or damaged cards.yml configuration file\n({e})')
