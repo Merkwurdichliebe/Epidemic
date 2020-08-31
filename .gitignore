@@ -136,3 +136,4 @@ etc/
 *.app
 .idea/
 pyinstaller/
+dist/

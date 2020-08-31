@@ -155,10 +155,19 @@ def get_initial_deck():
 
 def main():
     """Main program entry point."""
-    decks = initialize()
-    app = App(decks)
-    app.view.root.mainloop()
+    try:
+        decks = initialize()
+        app = App(decks)
+        app.view.root.mainloop()
+    except Exception as e:
+        with open("/tmp/epidebug.log", 'w') as f:
+            f.write(f"Error {e}")
+    else:
+        with open("/tmp/epidebug.log", 'w') as f:
+            f.write(f"No errors")
 
 
 if __name__ == '__main__':
     main()
+
+# Error 'ascii' codec can't decode byte 0xc3 in position 1202: ordinal not in range(128)%
