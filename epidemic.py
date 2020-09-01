@@ -21,6 +21,7 @@ from collections import Counter
 import yaml
 import os
 import platform
+import utility
 
 
 class Stats:
@@ -125,22 +126,11 @@ def initialize():
     return [draw, discard, exile, cardpool]
 
 
-def get_path(filename):
-    name = os.path.splitext(filename)[0]
-    ext = os.path.splitext(filename)[1]
-    if platform.system() == "Darwin":
-        from AppKit import NSBundle
-        file = NSBundle.mainBundle().pathForResource_ofType_(name, ext)
-        return file or os.path.realpath(filename)
-    else:
-        return os.path.realpath(filename)
-
-
 def get_initial_deck():
     # Initialize the initial deck from the available cards list in cards.yml
     # file = os.path.realpath('data/cards.yml')
     # file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
-    file = get_path('data/cards.yml')
+    file = utility.get_path('data/cards.yml')
     init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
 
