@@ -110,7 +110,7 @@ def initialize():
 
     # Initialize the draw deck
     draw = DrawDeck('draw')
-    draw.add(get_initial_deck())
+    draw.add(read_decks_on_file())
 
     # Initialize the discard and exile decks
     discard = Deck('discard')
@@ -126,7 +126,7 @@ def initialize():
     return [draw, discard, exile, cardpool]
 
 
-def get_initial_deck():
+def read_decks_on_file():
     # Initialize the initial deck from the available cards list in cards.yml
     # file = os.path.realpath('data/cards.yml')
     # file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
