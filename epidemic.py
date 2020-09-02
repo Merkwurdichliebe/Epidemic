@@ -159,6 +159,7 @@ def get_initial_deck():
 def main():
     """Main program entry point."""
     try:
+        print('Initializing...')
         decks = initialize()
         app = App(decks)
         app.view.root.mainloop()
