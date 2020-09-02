@@ -169,19 +169,19 @@ class MainWindow:
                                   command=self.app.cb_epidemic)
         btn_epidemic.pack()
 
-        # # Deck reset section
-        #
-        # tk.Label(self.frm_menu, pady=20, text='Reset', font=self.font['h2']).pack()
-        #
-        # self.reset_options = []
-        # self.dropdown_reset = tk.OptionMenu(self.frm_menu, self.reset_choice,
-        #                                     self.reset_options)
-        # self.dropdown_reset.config(width=15)
-        # self.dropdown_reset.pack()
-        #
-        # btn_reset = ttk.Button(self.frm_menu, text='Reset Decks', width=15,
-        #                        command=self.app.cb_reset)
-        # btn_reset.pack()
+        # Deck reset section
+
+        tk.Label(self.frm_menu, pady=20, text='Reset', font=self.font['h2']).pack()
+
+        self.reset_options = []
+        self.dropdown_reset = tk.OptionMenu(self.frm_menu, self.reset_choice,
+                                            self.reset_options)
+        self.dropdown_reset.config(width=15)
+        self.dropdown_reset.pack()
+
+        btn_reset = ttk.Button(self.frm_menu, text='Reset Decks', width=15,
+                               command=self.app.cb_reset)
+        btn_reset.pack()
 
         # Stats
 
