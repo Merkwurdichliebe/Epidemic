@@ -7,11 +7,18 @@ Usage:
 
 from setuptools import setup
 
+# The main executable to compile
 APP = ['epidemic.py']
+
+# First item of tuple is the directory to create for the file inside the compiled bundle
+# Second item is the file to import
 DATA_FILES = [('img', ['img/pandemic-logo.png']), ('data', ['data/cards.yml'])]
 
+# For a command-line option such as --xref,
+# add a dictionary entry 'xref': 1
 OPTIONS = {'iconfile': 'icon.icns'}
 
+# name: name of .app bundle
 setup(
     app=APP,
     name='Epidemic',

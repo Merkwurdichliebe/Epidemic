@@ -5,84 +5,85 @@
 #
 # Only use blue, black, yellow and green. Edit with care.
 
-- name: Atlanta
-  count: 1
-  color: blue
-- name: Baghdad
-  count: 2
-  color: black
-- name: Bogota
-  count: 2
-  color: yellow
-- name: Buenos Aires
-  count: 2
-  color: yellow
-- name: Chicago
-  count: 2
-  color: blue
-- name: Denver
-  count: 2
-  color: blue
-- name: Francfort
-  count: 2
-  color: blue
-- name: Hommes creux
-  count: 4
-  color: green
-- name: Jacksonville
-  count: 3
-  color: yellow
-- name: Johannesbourg
-  count: 2
-  color: blue
-- name: Khartoum
-  count: 1
-  color: yellow
-- name: Kinshasa
-  count: 1
-  color: yellow
-- name: Lagos
-  count: 3
-  color: yellow
-- name: Le Caire
-  count: 3
-  color: black
-- name: Lima
-  count: 1
-  color: yellow
-- name: Londres
-  count: 3
-  color: blue
-- name: Los Angeles
-  count: 1
-  color: yellow
-- name: Mexico
-  count: 1
-  color: yellow
-- name: Moscou
-  count: 1
-  color: black
-- name: New York
-  count: 3
-  color: blue
-- name: Paris
-  count: 2
-  color: blue
-- name: Saint-Pétersbourg
-  count: 1
-  color: blue
-- name: San Francisco
-  count: 2
-  color: blue
-- name: Santiago
-  count: 1
-  color: yellow
-- name: Sao Paolo
-  count: 3
-  color: yellow
-- name: Tripoli
-  count: 3
-  color: black
-- name: Washington
-  count: 3
-  color: blue
+# Pandemic Legacy Season 2:
+  - name: Atlanta
+    count: 1
+    color: blue
+  - name: Baghdad
+    count: 2
+    color: black
+  - name: Bogota
+    count: 2
+    color: yellow
+  - name: Buenos Aires
+    count: 2
+    color: yellow
+  - name: Chicago
+    count: 2
+    color: blue
+  - name: Denver
+    count: 2
+    color: blue
+  - name: Francfort
+    count: 2
+    color: blue
+  - name: Hommes creux
+    count: 4
+    color: green
+  - name: Jacksonville
+    count: 3
+    color: yellow
+  - name: Johannesbourg
+    count: 2
+    color: blue
+  - name: Khartoum
+    count: 1
+    color: yellow
+  - name: Kinshasa
+    count: 1
+    color: yellow
+  - name: Lagos
+    count: 3
+    color: yellow
+  - name: Le Caire
+    count: 3
+    color: black
+  - name: Lima
+    count: 1
+    color: yellow
+  - name: Londres
+    count: 3
+    color: blue
+  - name: Los Angeles
+    count: 1
+    color: yellow
+  - name: Mexico
+    count: 1
+    color: yellow
+  - name: Moscou
+    count: 1
+    color: black
+  - name: New York
+    count: 3
+    color: blue
+  - name: Paris
+    count: 2
+    color: blue
+  - name: Saint-Pétersbourg
+    count: 1
+    color: blue
+  - name: San Francisco
+    count: 2
+    color: blue
+  - name: Santiago
+    count: 1
+    color: yellow
+  - name: Sao Paolo
+    count: 3
+    color: yellow
+  - name: Tripoli
+    count: 3
+    color: black
+  - name: Washington
+    count: 3
+    color: blue

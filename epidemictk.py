@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from webbrowser import open as webopen
+import utility
 
 
 class MainWindow:
@@ -28,10 +29,13 @@ class MainWindow:
 
         # Destination radio button
         self.destination_choice = tk.StringVar()
-        self.destination_choice.set('exile')
+        self.destination_choice.set('exclude')
 
         # Epidemic dropdown menu
         self.epidemic_choice = tk.StringVar()
+
+        # Reset dropdown menu
+        self.reset_choice = tk.StringVar()
 
         # Keep track of added buttons so we can destroy and redraw them later
 
@@ -62,7 +66,8 @@ class MainWindow:
 
         # Logo
 
-        self.img_logo = tk.PhotoImage(file='img/pandemic-logo.png')
+        img = utility.get_path('img/pandemic-logo.png')
+        self.img_logo = tk.PhotoImage(file=img)
         self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
         self.lbl_logo.pack(side=tk.LEFT)
 
@@ -99,8 +104,8 @@ class MainWindow:
         self.frm_discard = tk.Frame(self.frm_main, padx=10)
         self.frm_discard.pack(side=tk.LEFT, anchor=tk.N)
 
-        self.frm_exile = tk.Frame(self.frm_main, padx=10)
-        self.frm_exile.pack(side=tk.LEFT, anchor=tk.N)
+        self.frm_exclude = tk.Frame(self.frm_main, padx=10)
+        self.frm_exclude.pack(side=tk.LEFT, anchor=tk.N)
 
         self.frm_menu = tk.Frame(self.frm_main, padx=10)
         self.frm_menu.pack(side=tk.LEFT, anchor=tk.N)
@@ -115,45 +120,42 @@ class MainWindow:
         tk.Label(self.frm_draw_deck, pady=10, text='DRAW DECK', width=20, font=self.font['h2']).pack()
         tk.Label(self.frm_draw_card, pady=10, text='DRAW CARD', width=20, font=self.font['h2']).pack()
         tk.Label(self.frm_discard, pady=10, text='DISCARD DECK', width=20, font=self.font['h2']).pack()
-        tk.Label(self.frm_exile, pady=10, text='ABANDONED or EXILED', width=20, font=self.font['h2']).pack()
+        tk.Label(self.frm_exclude, pady=10, text='EXCLUDE', width=20, font=self.font['h2']).pack()
         tk.Label(self.frm_menu, pady=10, text='Card destination', font=self.font['h2']).pack()
 
         # Bottom Text
 
-        tk.Label(self.frm_bottom, pady=10, text='© 2020 Tal Zana', font=self.font['h2']).pack()
+        tk.Label(self.frm_bottom, pady=10, text='', font=self.font['h2']).pack()
 
         # Two textboxes containing the dynamically built lists
-        # for the exile deck and the cardpool deck
+        # for the exclude deck and the cardpool deck
 
         self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=self.font['p'])
         self.txt_cardpool.pack()
 
-        self.txt_exile = tk.Text(self.frm_exile, name='txt_exile', width=20, height=50, font=self.font['p'])
-        self.txt_exile.pack()
+        self.txt_exclude = tk.Text(self.frm_exclude, name='txt_exclude', width=20, height=50, font=self.font['p'])
+        self.txt_exclude.pack()
 
         # Radio buttons in their own frame
 
         self.frm_radio = tk.Frame(self.frm_menu, pady=10)
         self.frm_radio.pack()
 
-        radio_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard',
+        radio_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard Deck',
                                        variable=self.destination_choice,
                                        value='discard', anchor=tk.W, padx=10)
-        radio_exile = tk.Radiobutton(self.frm_radio, width=15, text='Exile',
-                                     variable=self.destination_choice,
-                                     value='exile', anchor=tk.W, padx=10)
-        radio_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw',
+        radio_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw Deck',
                                     variable=self.destination_choice,
                                     value='draw', anchor=tk.W, padx=10)
+        radio_exclude = tk.Radiobutton(self.frm_radio, width=15, text='Exclude',
+                                     variable=self.destination_choice,
+                                     value='exclude', anchor=tk.W, padx=10)
 
         radio_discard.pack(anchor=tk.W)
-        radio_exile.pack(anchor=tk.W)
         radio_draw.pack(anchor=tk.W)
+        radio_exclude.pack(anchor=tk.W)
 
         # Dropdown menu for selecting city in epidemic
-
-        self.frm_epidemic = tk.Frame(self.frm_menu)
-        self.frm_epidemic.pack()
 
         tk.Label(self.frm_menu, pady=20, text='Epidemic', font=self.font['h2']).pack()
 
@@ -166,6 +168,20 @@ class MainWindow:
         btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15,
                                   command=self.app.cb_epidemic)
         btn_epidemic.pack()
+
+        # # Deck reset section
+        #
+        # tk.Label(self.frm_menu, pady=20, text='Reset', font=self.font['h2']).pack()
+        #
+        # self.reset_options = []
+        # self.dropdown_reset = tk.OptionMenu(self.frm_menu, self.reset_choice,
+        #                                     self.reset_options)
+        # self.dropdown_reset.config(width=15)
+        # self.dropdown_reset.pack()
+        #
+        # btn_reset = ttk.Button(self.frm_menu, text='Reset Decks', width=15,
+        #                        command=self.app.cb_reset)
+        # btn_reset.pack()
 
         # Stats
 
@@ -197,8 +213,8 @@ class MainWindow:
         if deck.name == 'cardpool':
             self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
 
-        if deck.name == 'exile':
-            self.update_textbox(self.txt_exile, self.deck['exile'])
+        if deck.name == 'exclude':
+            self.update_textbox(self.txt_exclude, self.deck['exclude'])
 
         if deck.name == 'draw':
 
@@ -261,7 +277,7 @@ class MainWindow:
     @staticmethod
     def update_textbox(box, deck):
         """Update a Tk textbox with the contents of the passed Deck object.
-        This is used to refresh both the cardpool textbox and the Exile textbox."""
+        This is used to refresh both the cardpool textbox and the exclude textbox."""
         # Method is static because it doesn't need the self keyword,
         # it only updates the contents of the Tk textbox which is passed to it.
         box.configure(state=tk.NORMAL)

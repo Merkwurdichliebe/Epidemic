@@ -20,6 +20,8 @@ from epidemicdeck import Card, Deck, DrawDeck
 from collections import Counter
 import yaml
 import os
+import platform
+import utility
 
 
 class Stats:
@@ -101,6 +103,9 @@ class App:
 
         self.updateview()
 
+    def cb_reset(self):
+        print('clicked')
+
 
 def initialize():
     """Prepare the initial states for all the decks.
@@ -108,11 +113,11 @@ def initialize():
 
     # Initialize the draw deck
     draw = DrawDeck('draw')
-    draw.add(get_initial_deck())
+    draw.add(read_decks_on_file())
 
-    # Initialize the discard and exile decks
+    # Initialize the discard and exclude decks
     discard = Deck('discard')
-    exile = Deck('exile')
+    exclude = Deck('exclude')
     cardpool = Deck('cardpool')
 
     # Draw the 4 "Hollow Men" cards from the draw deck
@@ -121,18 +126,20 @@ def initialize():
         draw.move(draw.get_card_by_name('Hommes creux'), discard)
 
     # Return the prepared decks
-    return [draw, discard, exile, cardpool]
+    return [draw, discard, exclude, cardpool]
 
 
-def get_initial_deck():
+def read_decks_on_file():
     # Initialize the initial deck from the available cards list in cards.yml
-    file = os.path.realpath('data/cards.yml')
+    # file = os.path.realpath('data/cards.yml')
+    # file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
+    file = utility.get_path('data/cards.yml')
     init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
 
     # Read the cards.yml file
     try:
-        with open(file) as f:
+        with open(file, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
     except FileNotFoundError as e:
         print(f'Missing or damaged cards.yml configuration file\n({e})')
@@ -154,10 +161,19 @@ def get_initial_deck():
 
 def main():
     """Main program entry point."""
-    decks = initialize()
-    app = App(decks)
-    app.view.root.mainloop()
+    try:
+        decks = initialize()
+        app = App(decks)
+        app.view.root.mainloop()
+    except Exception as e:
+        with open("/tmp/epidebug.log", 'w') as f:
+            f.write(f"Error {e}")
+    else:
+        with open("/tmp/epidebug.log", 'w') as f:
+            f.write(f"No errors")
 
 
 if __name__ == '__main__':
     main()
+
+# Error 'ascii' codec can't decode byte 0xc3 in position 1202: ordinal not in range(128)%
