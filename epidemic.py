@@ -103,6 +103,9 @@ class App:
 
         self.updateview()
 
+    def cb_reset(self):
+        print('clicked')
+
 
 def initialize():
     """Prepare the initial states for all the decks.
@@ -112,9 +115,9 @@ def initialize():
     draw = DrawDeck('draw')
     draw.add(read_decks_on_file())
 
-    # Initialize the discard and exile decks
+    # Initialize the discard and exclude decks
     discard = Deck('discard')
-    exile = Deck('exile')
+    exclude = Deck('exclude')
     cardpool = Deck('cardpool')
 
     # Draw the 4 "Hollow Men" cards from the draw deck
@@ -123,7 +126,7 @@ def initialize():
         draw.move(draw.get_card_by_name('Hommes creux'), discard)
 
     # Return the prepared decks
-    return [draw, discard, exile, cardpool]
+    return [draw, discard, exclude, cardpool]
 
 
 def read_decks_on_file():
@@ -159,7 +162,6 @@ def read_decks_on_file():
 def main():
     """Main program entry point."""
     try:
-        print('Initializing...')
         decks = initialize()
         app = App(decks)
         app.view.root.mainloop()

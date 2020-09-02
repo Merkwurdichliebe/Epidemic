@@ -34,6 +34,9 @@ class MainWindow:
         # Epidemic dropdown menu
         self.epidemic_choice = tk.StringVar()
 
+        # Reset dropdown menu
+        self.reset_choice = tk.StringVar()
+
         # Keep track of added buttons so we can destroy and redraw them later
 
         self.draw_deck_btns = []
@@ -154,9 +157,6 @@ class MainWindow:
 
         # Dropdown menu for selecting city in epidemic
 
-        self.frm_epidemic = tk.Frame(self.frm_menu)
-        self.frm_epidemic.pack()
-
         tk.Label(self.frm_menu, pady=20, text='Epidemic', font=self.font['h2']).pack()
 
         self.epidemic_options = []
@@ -168,6 +168,20 @@ class MainWindow:
         btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15,
                                   command=self.app.cb_epidemic)
         btn_epidemic.pack()
+
+        # # Deck reset section
+        #
+        # tk.Label(self.frm_menu, pady=20, text='Reset', font=self.font['h2']).pack()
+        #
+        # self.reset_options = []
+        # self.dropdown_reset = tk.OptionMenu(self.frm_menu, self.reset_choice,
+        #                                     self.reset_options)
+        # self.dropdown_reset.config(width=15)
+        # self.dropdown_reset.pack()
+        #
+        # btn_reset = ttk.Button(self.frm_menu, text='Reset Decks', width=15,
+        #                        command=self.app.cb_reset)
+        # btn_reset.pack()
 
         # Stats
 
