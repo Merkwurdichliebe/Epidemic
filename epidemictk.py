@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from webbrowser import open as webopen
 import utility
+import epidemictkdialogs
 
 
 class MainWindow:
@@ -72,7 +72,7 @@ class MainWindow:
         self.lbl_logo.pack(side=tk.LEFT)
 
         btn_help = ttk.Button(self.frm_header_title, text='Help', width=15,
-                              command=self.display_help)
+                              command=lambda x=self.root: epidemictkdialogs.display_help(x))
         btn_help.pack(side=tk.RIGHT)
 
         # Title
@@ -325,30 +325,3 @@ class MainWindow:
 
     def get_epidemic(self):
         return self.epidemic_choice.get()
-
-    def display_help(self):
-        def cb_open_web():
-            webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
-            popup.destroy()
-
-        popup = tk.Toplevel()
-        popup.title('Epidemic Help')
-        text = 'Help is available on the application\'s GitHub page.'
-        lbl1 = tk.Label(popup, text=text, pady=10, padx=20)
-        lbl1.pack()
-
-        frm_btns = tk.Frame(popup, pady=10)
-        frm_btns.pack()
-
-        btn = tk.Button(frm_btns, text='View in browser', width=15, command=cb_open_web)
-        btn.pack(side=tk.LEFT, padx=5)
-        btn = tk.Button(frm_btns, text='Close', width=15, command=popup.destroy)
-        btn.pack(side=tk.LEFT, padx=5)
-
-        width = popup.winfo_reqwidth()
-        height = popup.winfo_reqheight()
-        pos_x = int(self.root.winfo_screenwidth() / 2 - width / 2)
-        pos_y = int(self.root.winfo_screenheight() / 2 - height)
-        popup.geometry("+{}+{}".format(pos_x, pos_y))
-
-        popup.mainloop()
