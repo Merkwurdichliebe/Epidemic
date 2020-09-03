@@ -5,7 +5,7 @@
 #
 # Only use blue, black, yellow and green. Edit with care.
 
-# Pandemic Legacy Season 2:
+Legacy Season 2:
   - name: Atlanta
     count: 1
     color: blue
@@ -85,5 +85,12 @@
     count: 3
     color: black
   - name: Washington
+    count: 3
+    color: blue
+Blah:
+  - name: Jérusalem
+    count: 2
+    color: yellow
+  - name: Tel Aviv
     count: 3
     color: blue

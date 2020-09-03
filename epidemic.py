@@ -54,7 +54,10 @@ class Stats:
 
 
 class App:
-    def __init__(self, decks):
+    def __init__(self, games):
+        self.games = games
+        t = input('select :')
+        decks = self.initialize(t)
         # Build the decks dictionary so we can get a Deck object by its name
         self.deck = {deck.name: deck for deck in decks}
 
@@ -64,6 +67,27 @@ class App:
         # Instantiate the main window
         self.view = MainWindow(self)
         self.updateview()
+
+    def initialize(self, deck):
+        """Prepare the initial states for all the decks.
+        This is run once at the start of the game."""
+
+        # Initialize the draw deck
+        draw = DrawDeck('draw')
+        draw.add(self.games[deck])
+
+        # Initialize the discard and exclude decks
+        discard = Deck('discard')
+        exclude = Deck('exclude')
+        cardpool = Deck('cardpool')
+
+        # Draw the 4 "Hollow Men" cards from the draw deck
+        # onto the discard pile
+        # for i in range(4):
+        #     draw.move(draw.get_card_by_name('Hommes creux'), discard)
+
+        # Return the prepared decks
+        return [draw, discard, exclude, cardpool]
 
     # TODO Fix this, be careful with cb_view_cardpool
     def updateview(self):
@@ -107,34 +131,12 @@ class App:
         print('clicked')
 
 
-def initialize():
-    """Prepare the initial states for all the decks.
-    This is run once at the start of the game."""
-
-    # Initialize the draw deck
-    draw = DrawDeck('draw')
-    draw.add(read_decks_on_file())
-
-    # Initialize the discard and exclude decks
-    discard = Deck('discard')
-    exclude = Deck('exclude')
-    cardpool = Deck('cardpool')
-
-    # Draw the 4 "Hollow Men" cards from the draw deck
-    # onto the discard pile
-    for i in range(4):
-        draw.move(draw.get_card_by_name('Hommes creux'), discard)
-
-    # Return the prepared decks
-    return [draw, discard, exclude, cardpool]
-
-
 def read_decks_on_file():
     # Initialize the initial deck from the available cards list in cards.yml
     # file = os.path.realpath('data/cards.yml')
     # file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
+    game = {}
     file = utility.get_path('data/cards.yml')
-    init_deck = Deck('Starter Deck')
     valid_colors = ['blue', 'yellow', 'black', 'green']
 
     # Read the cards.yml file
@@ -146,28 +148,32 @@ def read_decks_on_file():
 
     # Check for valid card colors
     try:
-        for item in data:
-            if item['color'] not in valid_colors:
-                raise ValueError(f"Invalid color specified in cards.yml for card: {item}")
-            card = Card(item['name'], item['color'])
-            for i in range(item['count']):
-                init_deck.add(card)
+        for game_item in data.keys():
+            deck = Deck(game_item)
+            for item in data[game_item]:
+                if item['color'] not in valid_colors:
+                    raise ValueError(f"Invalid color specified in cards.yml for card: {item}")
+                card = Card(item['name'], item['color'])
+                for i in range(item['count']):
+                    deck.add(card)
+            game[game_item] = deck
     except ValueError:
         # Raise the error again to stop execution after displaying the Exception
         raise
 
-    return init_deck
+    return game
 
 
 def main():
     """Main program entry point."""
     try:
-        decks = initialize()
-        app = App(decks)
+        games = read_decks_on_file()
+        app = App(games)
         app.view.root.mainloop()
     except Exception as e:
-        with open("/tmp/epidebug.log", 'w') as f:
-            f.write(f"Error {e}")
+        # with open("/tmp/epidebug.log", 'w') as f:
+        #     f.write(f"Error {e}")
+        raise e
     else:
         with open("/tmp/epidebug.log", 'w') as f:
             f.write(f"No errors")
@@ -175,5 +181,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# Error 'ascii' codec can't decode byte 0xc3 in position 1202: ordinal not in range(128)%
