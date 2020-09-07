@@ -17,7 +17,7 @@ __version__ = "0.7"
 
 from epidemictk import MainWindow
 from epidemicdeck import Card, Deck, DrawDeck
-from collections import Counter
+from collections import Counter, namedtuple
 import yaml
 import os
 import platform
@@ -56,8 +56,8 @@ class Stats:
 class App:
     def __init__(self, games):
         self.games = games
-        t = input('select :')
-        decks = self.initialize(t)
+        # t = input('select :')
+        decks = self.initialize('Legacy Season 2')
         # Build the decks dictionary so we can get a Deck object by its name
         self.deck = {deck.name: deck for deck in decks}
 
