@@ -71,9 +71,13 @@ class MainWindow:
         self.lbl_logo = tk.Label(self.frm_header_title, image=self.img_logo)
         self.lbl_logo.pack(side=tk.LEFT)
 
-        btn_help = ttk.Button(self.frm_header_title, text='Help', width=15,
+        btn_help = ttk.Button(self.frm_header_title, text='Help', width=10,
                               command=lambda x=self.root: epidemictkdialogs.display_help(x))
-        btn_help.pack(side=tk.RIGHT)
+        btn_help.pack(side=tk.RIGHT, padx=5)
+
+        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10,
+                                  command=lambda x=self.root: epidemictkdialogs.display_select_game(x))
+        btn_new_game.pack(side=tk.RIGHT)
 
         # Title
 
