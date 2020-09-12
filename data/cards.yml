@@ -63,6 +63,9 @@ Legacy Season 2:
   - name: Moscou
     count: 1
     color: black
+  - name: Navi Mumbai
+    count: 2
+    color: black
   - name: New York
     count: 3
     color: blue
@@ -81,6 +84,9 @@ Legacy Season 2:
   - name: Sao Paolo
     count: 3
     color: yellow
+  - name: Téhéran
+    count: 1
+    color: black
   - name: Tripoli
     count: 3
     color: black
