@@ -72,10 +72,10 @@ class MainWindow:
         self.lbl_logo.pack(side=tk.LEFT)
 
         btn_help = ttk.Button(self.frm_header_title, text='Help', width=10,
-                              command=app.cb_dialog_help)
+                              command=self.cb_dialog_help)
         btn_help.pack(side=tk.RIGHT, padx=5)
 
-        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10, command=app.cb_new_game)
+        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10, command=self.cb_dialog_new_game)
         btn_new_game.pack(side=tk.RIGHT)
 
         # Title
@@ -293,6 +293,14 @@ class MainWindow:
         # Outputs the possible cards in each potential draw.
         self.cardpool_index = index
         self.update_gui(self.deck['cardpool'])
+
+    def cb_dialog_help(self):
+        dialog = epidemictkdialogs.DialogHelp(self.root)
+        self.root.wait_window(dialog.top)
+
+    def cb_dialog_new_game(self):
+        dialog = epidemictkdialogs.DialogNewGame(self.root)
+        self.root.wait_window(dialog.top)
 
     def update_stats(self, stats):
         text = f'\nTop card frequency:\n'

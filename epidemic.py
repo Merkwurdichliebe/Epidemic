@@ -70,10 +70,10 @@ class App:
         self.updateview()
 
     def new_game(self):
+        pass
         # a = epidemictkdialogs.display_select_game(self.view)
         # print(a)
-        dialog = epidemictkdialogs.DialogHelp(self)
-        self.view.root.wait_window(dialog.top)
+
 
     def initialize(self, deck):
         """Prepare the initial states for all the decks.
