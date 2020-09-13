@@ -72,11 +72,10 @@ class MainWindow:
         self.lbl_logo.pack(side=tk.LEFT)
 
         btn_help = ttk.Button(self.frm_header_title, text='Help', width=10,
-                              command=lambda x=self.root: epidemictkdialogs.display_help(x))
+                              command=app.cb_dialog_help)
         btn_help.pack(side=tk.RIGHT, padx=5)
 
-        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10,
-                                  command=lambda x=self.root: epidemictkdialogs.display_select_game(x))
+        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10, command=app.cb_new_game)
         btn_new_game.pack(side=tk.RIGHT)
 
         # Title
@@ -172,20 +171,6 @@ class MainWindow:
         btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15,
                                   command=self.app.cb_epidemic)
         btn_epidemic.pack()
-
-        # Deck reset section
-
-        tk.Label(self.frm_menu, pady=20, text='Reset', font=self.font['h2']).pack()
-
-        self.reset_options = []
-        self.dropdown_reset = tk.OptionMenu(self.frm_menu, self.reset_choice,
-                                            self.reset_options)
-        self.dropdown_reset.config(width=15)
-        self.dropdown_reset.pack()
-
-        btn_reset = ttk.Button(self.frm_menu, text='Reset Decks', width=15,
-                               command=self.app.cb_reset)
-        btn_reset.pack()
 
         # Stats
 

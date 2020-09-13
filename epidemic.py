@@ -18,6 +18,7 @@ __version__ = "0.7"
 from epidemictk import MainWindow
 from epidemicdeck import Card, Deck, DrawDeck
 from collections import Counter, namedtuple
+import epidemictkdialogs
 import yaml
 import os
 import platform
@@ -67,6 +68,12 @@ class App:
         # Instantiate the main window
         self.view = MainWindow(self)
         self.updateview()
+
+    def new_game(self):
+        # a = epidemictkdialogs.display_select_game(self.view)
+        # print(a)
+        dialog = epidemictkdialogs.DialogHelp(self)
+        self.view.root.wait_window(dialog.top)
 
     def initialize(self, deck):
         """Prepare the initial states for all the decks.
@@ -127,9 +134,12 @@ class App:
 
         self.updateview()
 
-    def cb_reset(self):
-        print('clicked')
+    def cb_new_game(self):
+        self.new_game()
 
+    def cb_dialog_help(self):
+        dialog = epidemictkdialogs.DialogHelp(self)
+        self.view.root.wait_window(dialog.top)
 
 def read_decks_on_file():
     # Initialize the initial deck from the available cards list in cards.yml
