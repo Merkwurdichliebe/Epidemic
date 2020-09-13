@@ -69,11 +69,13 @@ class App:
         self.view = MainWindow(self)
         self.updateview()
 
-    def new_game(self):
-        pass
-        # a = epidemictkdialogs.display_select_game(self.view)
-        # print(a)
-
+    def new_game(self, game):
+        # TODO This should be called at game init
+        # TODO fix possible cards pool not updating to reflect
+        decks = self.initialize(game)
+        self.deck = {deck.name: deck for deck in decks}
+        self.stats = Stats(self.deck)
+        self.updateview()
 
     def initialize(self, deck):
         """Prepare the initial states for all the decks.

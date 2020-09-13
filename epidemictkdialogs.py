@@ -35,14 +35,15 @@ class DialogHelp:
 
 
 class DialogNewGame:
-    def __init__(self, parent):
+    """Display a dialog box for selecting a game type. Expects the parent window and a list of game strings."""
+    def __init__(self, parent, games):
         self.top = tk.Toplevel(parent)
         self.top.title('Select Game')
         self.top.transient(parent)
         self.top.grab_set()
         self.top.attributes("-topmost", True)
 
-        self.game_options = ['Pandemic (regular)', 'Legacy Season 1', 'Legacy Season 2']
+        self.game_options = games
         self.game_choice = tk.StringVar()
         self.game_choice.set(self.game_options[0])
 
@@ -69,8 +70,9 @@ class DialogNewGame:
         self.top.geometry("+{}+{}".format(pos_x, pos_y))
 
     def cb_cancel(self):
+        self.game_choice = None
         self.top.destroy()
 
     def cb_start_game(self):
-        print(self.game_choice.get())
+        self.top.destroy()
 

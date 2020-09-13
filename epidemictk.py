@@ -295,12 +295,21 @@ class MainWindow:
         self.update_gui(self.deck['cardpool'])
 
     def cb_dialog_help(self):
+        """Callback from the Help button. Displays the Help dialog box."""
         dialog = epidemictkdialogs.DialogHelp(self.root)
         self.root.wait_window(dialog.top)
 
     def cb_dialog_new_game(self):
-        dialog = epidemictkdialogs.DialogNewGame(self.root)
+        """Callback from the New Game button. Initialises the app for a new game."""
+
+        # We pass the dialog box a list of the games dictionary's keys,
+        # to be displayed in a dropdown menu.
+        dialog = epidemictkdialogs.DialogNewGame(self.root, list(self.app.games.keys()))
         self.root.wait_window(dialog.top)
+
+        # If the box hasn't been canceled, start a new game.
+        if dialog.game_choice is not None:
+            self.app.new_game(dialog.game_choice.get())
 
     def update_stats(self, stats):
         text = f'\nTop card frequency:\n'
