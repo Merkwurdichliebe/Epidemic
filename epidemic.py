@@ -4,6 +4,11 @@
 EPIDEMIC is designed to assist in evaluating card draw probabilities
 in the board game Pandemic. It is my first attempt at a working project
 using Tkinter for the GUI.
+
+The Application uses the MVC pattern:
+Model : Game (in game.py)
+View : MainWindow (in tkgui.py)
+Controller : App (in this file)
 """
 
 __author__ = "Tal Zana"
@@ -26,12 +31,16 @@ import tkdialogs
 
 class App:
     def __init__(self):
+        # Instantiate the game-logic object (the Model in MVC)
         self.game = Game()
 
-        # Instantiate the main window
+        # Instantiate the main window (the View in MVC)
+        # We pass it the App object so that we can use callbacks
+        # (Better way?)
         self.view = MainWindow(self)
 
         # Display select new game dialog
+        # (We reuse the callback function for the New Game button)
         self.cb_new_game()
 
     def updateview(self):
@@ -39,14 +48,14 @@ class App:
         self.view.update_exclude(self.game.deck['exclude'])
         self.view.update_drawdeck(self.game.deck['draw'])
         self.view.update_discard(self.game.deck['discard'])
-        self.view.update_stats(self.game.stats)
         self.view.update_dropdown(self.game.deck['draw'])
+        self.view.update_stats(self.game.stats)
 
-    def cb_draw_card(self, deck, card):
+    def cb_draw_card(self, from_deck, card):
         # Move a card from a deck to the destination deck
-        # set by the radio buttons.
-        dest = self.game.deck[self.view.get_destination()]
-        self.game.draw(deck, dest, card)
+        # set by the radio buttons in MainWindow.
+        to_deck = self.game.deck[self.view.get_destination()]
+        self.game.draw(from_deck, to_deck, card)
         self.updateview()
 
     def cb_view_cardpool(self, index):
@@ -56,6 +65,8 @@ class App:
         self.view.update_cardpool(self.game.deck['draw'])
 
     def cb_epidemic(self):
+        """Callback from the Epidemic button.
+        Runs the epidemic shuffle function based on the selected card."""
         new_card = self.view.get_epidemic()
         self.game.epidemic(new_card)
         self.updateview()
@@ -76,6 +87,8 @@ class App:
             self.updateview()
 
     def cb_dialog_help(self):
+        """Callback from the Help button.
+        Displays a dialog with the option to view Help in browser."""
         dialog = tkdialogs.DialogHelp(self.view.root)
         self.view.root.wait_window(dialog.top)
 

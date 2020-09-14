@@ -9,11 +9,6 @@ Each of these Decks represents the possible draws at each position
 in the DrawDeck. The top card is always the last Card in the list.
 """
 
-__author__ = "Tal Zana"
-__copyright__ = "Copyright 2020"
-__license__ = "GPL"
-__version__ = "0.6"
-
 
 class Card:
     """Basic class to represent a card with a city name and color.
