@@ -42,13 +42,16 @@ class Game:
         self.stats = None
 
     def init(self, game):
-        """Prepare the initial states for all the decks.
-        This is run once at the start of the game."""
+        """Prepare the initial state for the game. Initialise all decks.
+        This is run once at the start of every game."""
 
-        # Initialise the draw deck
+        # Initialise the draw deck:
+        # We use deepcopy to get a new copy of the deck
+        # from the games variable, which stores all possible game types.
         drawdeck = DrawDeck('draw')
         drawdeck.add(deepcopy(self.games[game]))
 
+        # Create a list with the Draw Deck and the 3 other empty decks
         self.decks = [drawdeck, Deck('discard'), Deck('exclude'), Deck('cardpool')]
 
         # Build the decks dictionary so we can get a Deck object by its name
@@ -58,14 +61,16 @@ class Game:
         self.stats = Stats(self.deck)
 
     def draw(self, from_deck, to_deck, card):
-        # Move a card from a deck to the destination deck set by the radio buttons
-        # Ignore drawing from a deck onto itself
+        # Move a card from a source deck to a destination deck.
+        # Ignore drawing from a deck onto itself.
         if not from_deck == to_deck:
             from_deck.move(card, to_deck)
         self.stats.update()
 
     def epidemic(self, card):
-        # Select card from bottom of draw pile based on the dropdown list
+        """Do the epidemic shuffle phase: draw a card from the bottom
+        of the Draw Deck, discard it and shuffle the discard pile back
+        onto the top of the Draw Deck."""
         new_card = self.deck['draw'].get_card_by_name(card)
         self.deck['draw'].remove_from_bottom(new_card)
 
