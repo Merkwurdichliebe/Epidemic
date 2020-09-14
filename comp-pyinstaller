@@ -1,8 +1,0 @@
-#!zsh
-
-rm -rf build dist
-# pyinstaller epidemic.py --onedir --windowed -y --add-data "data/cards.yml:data" --add-data "img/pandemic-logo.png:img" --icon=icon.icns --name='Epidemic'
-pyinstaller Epidemic.spec
-cp -r /Library/Frameworks/Python.framework/Versions/3.8/lib/tcl8.6 dist/Epidemic.app/Contents/MacOS/tcl
-cp -r /Library/Frameworks/Python.framework/Versions/3.8/lib/tk8.6 dist/Epidemic.app/Contents/MacOS/tk
-cp -r /Library/Frameworks/Python.framework/Versions/3.8/lib/tcl8 dist/Epidemic.app/Contents/MacOS/tcl8

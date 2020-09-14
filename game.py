@@ -1,4 +1,4 @@
-from epidemicdeck import Card, Deck, DrawDeck
+from decks import Card, Deck, DrawDeck
 from collections import Counter
 from copy import deepcopy
 import utility
