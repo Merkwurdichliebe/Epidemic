@@ -40,8 +40,8 @@ class DialogNewGame:
         self.top = tk.Toplevel(parent)
         self.top.title('Select Game')
         self.top.transient(parent)
+        self.top.focus_set()
         self.top.grab_set()
-        self.top.attributes("-topmost", True)
 
         self.game_options = games
         self.game_choice = tk.StringVar()

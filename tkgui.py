@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import utility
-import epidemictkdialogs
+import tkdialogs
 
 
 class MainWindow:
@@ -18,7 +18,7 @@ class MainWindow:
         self.root.resizable(False, False)
 
         self.app = app
-        self.deck = self.app.deck
+        # self.deck = self.app.deck
 
         # Replace default menu
 
@@ -55,6 +55,7 @@ class MainWindow:
         ttk.Style().configure('blue.TButton', foreground='blue', background='black')
         ttk.Style().configure('yellow.TButton', foreground='orange', background='red')
         ttk.Style().configure('black.TButton', foreground='black', background='black')
+        ttk.Style().configure('red.TButton', foreground='red', background='black')
 
         # Window header
 
@@ -72,15 +73,17 @@ class MainWindow:
         self.lbl_logo.pack(side=tk.LEFT)
 
         btn_help = ttk.Button(self.frm_header_title, text='Help', width=10,
-                              command=self.cb_dialog_help)
+                              command=self.app.cb_dialog_help)
         btn_help.pack(side=tk.RIGHT, padx=5)
 
-        btn_new_game = ttk.Button(self.frm_header_title, text='New Game', width=10, command=self.cb_dialog_new_game)
+        btn_new_game = ttk.Button(self.frm_header_title, text='New Game',
+                                  width=10, command=self.app.cb_new_game)
         btn_new_game.pack(side=tk.RIGHT)
 
         # Title
 
-        self.label_title = tk.Label(self.frm_header_title, text='DECK TRACKER', padx=10, font=self.font['h1'])
+        self.label_title = tk.Label(self.frm_header_title, text='DECK TRACKER',
+                                    padx=10, font=self.font['h1'])
         self.label_title.pack(side=tk.LEFT)
 
         self.frm_header_line = tk.Frame(self.frm_header)
@@ -194,74 +197,68 @@ class MainWindow:
 
         self.cardpool_index = 0
 
-    def update_gui(self, deck):
+    def update_cardpool(self, drawdeck):
+        self.update_textbox(self.txt_cardpool, drawdeck.cards[-1 - self.cardpool_index])
 
-        # We only update the GUI elements that need updating
-        # based on the deck that is passed to the method.
+    def update_exclude(self, exclude):
+        self.update_textbox(self.txt_exclude, exclude)
 
-        if deck.name == 'cardpool':
-            self.update_textbox(self.txt_cardpool, self.deck['draw'].cards[-1 - self.cardpool_index])
+    def update_discard(self, discard):
+        if self.discard_btns:
+            for btn in self.discard_btns:
+                btn.destroy()
 
-        if deck.name == 'exclude':
-            self.update_textbox(self.txt_exclude, self.deck['exclude'])
+        for i, c in enumerate(sorted(discard.cards, key=lambda x: x.name)):
+            btn = ttk.Button(self.frm_discard, style=c.color + '.TButton',
+                             width=15, text=c.name)
+            btn.configure(command=lambda d=discard, e=c: self.app.cb_draw_card(d, e))
+            btn.pack()
+            self.discard_btns.append(btn)
 
-        if deck.name == 'draw':
+    def update_drawdeck(self, drawdeck):
+        # Reset the cardpool index to point to the top of the Draw Deck
+        self.cardpool_index = 0
 
-            # Reset the cardpool index to point to the top of the Draw Deck
-            self.cardpool_index = 0
+        # Refresh Draw Deck buttons:
+        # Destroy old buttons if they exist
+        if self.draw_deck_btns:
+            for b in self.draw_deck_btns:
+                b.destroy()
 
-            # Refresh Draw Deck buttons:
-            # Destroy old buttons if they exist
-            if self.draw_deck_btns:
-                for b in self.draw_deck_btns:
-                    b.destroy()
+        # Define new ones
+        for i, c in enumerate(reversed(drawdeck.cards[-16:])):
+            # If the top card is a single card we display its name,
+            # otherwise we display the number of possible cards.
+            if len(c.cards) == 1:
+                text = c.cards[0].name
+                color = c.cards[0].color + '.TButton'
+            else:
+                text = f'{len(c.cards)}'
+                color = 'black.TButton'
+            btn = ttk.Button(
+                self.frm_draw_deck,
+                style=color,
+                width=15,
+                text=text
+            )
+            # The callback for the cardpool update is part of this class,
+            # no need to ask App to do that.
+            btn.configure(command=lambda x=i: self.app.cb_view_cardpool(x))
+            btn.pack()
+            self.draw_deck_btns.append(btn)
 
-            # Define new ones
-            for i, c in enumerate(reversed(deck.cards[-16:])):
-                # If the top card is a single card we display its name,
-                # otherwise we display the number of possible cards.
-                if len(c.cards) == 1:
-                    text = c.cards[0].name
-                    color = c.cards[0].color + '.TButton'
-                else:
-                    text = f'{len(c.cards)}'
-                    color = 'black.TButton'
-                btn = ttk.Button(
-                    self.frm_draw_deck,
-                    style=color,
-                    width=15,
-                    text=text
-                )
-                # The callback for the cardpool update is part of this class,
-                # no need to ask App to do that.
-                btn.configure(command=lambda x=i: self.cb_view_cardpool(x))
-                btn.pack()
-                self.draw_deck_btns.append(btn)
+        # Refresh draw card buttons
 
-            # Refresh draw card buttons
+        if self.draw_card_btns:
+            for b in self.draw_card_btns:
+                b.destroy()
 
-            if self.draw_card_btns:
-                for b in self.draw_card_btns:
-                    b.destroy()
-
-            for i, c in enumerate(sorted(set(deck.cards[-1].cards), key=lambda x: x.name)):
-                btn = ttk.Button(self.frm_draw_card, style=c.color + '.TButton',
-                                 width=15, text=c.name)
-                btn.configure(command=lambda d=deck, e=c: self.app.cb_draw_card(d, e))
-                btn.pack()
-                self.draw_card_btns.append(btn)
-
-        if deck.name == 'discard':
-            if self.discard_btns:
-                for btn in self.discard_btns:
-                    btn.destroy()
-
-            for i, c in enumerate(sorted(deck.cards, key=lambda x: x.name)):
-                btn = ttk.Button(self.frm_discard, style=c.color + '.TButton',
-                                 width=15, text=c.name)
-                btn.configure(command=lambda d=deck, e=c: self.app.cb_draw_card(d, e))
-                btn.pack()
-                self.discard_btns.append(btn)
+        for i, card in enumerate(sorted(set(drawdeck.cards[-1].cards), key=lambda x: x.name)):
+            btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton',
+                             width=15, text=card.name)
+            btn.configure(command=lambda d=drawdeck, c=card: self.app.cb_draw_card(d, c))
+            btn.pack()
+            self.draw_card_btns.append(btn)
 
     @staticmethod
     def update_textbox(box, deck):
@@ -275,9 +272,9 @@ class MainWindow:
             box.insert(tk.END, card.name + '\n')
         box.configure(state=tk.DISABLED)
 
-    def update_dropdown(self):
+    def update_dropdown(self, drawdeck):
         # Update the epidemic dropdown list based on the available cards in the Draw Deck.
-        cards = sorted([c.name for c in list(set(self.deck['draw'].cards[0].cards))])
+        cards = sorted([c.name for c in list(set(drawdeck.cards[0].cards))])
         self.epidemic_options = cards
 
         # command value lambda syntax is from
@@ -287,29 +284,6 @@ class MainWindow:
         for c in cards:
             m.add_command(label=c, command=lambda v=c: self.epidemic_choice.set(v))
         self.epidemic_choice.set(cards[0])
-
-    def cb_view_cardpool(self, index):
-        # Callback from the buttons used to display the possible choices in the Draw Deck.
-        # Outputs the possible cards in each potential draw.
-        self.cardpool_index = index
-        self.update_gui(self.deck['cardpool'])
-
-    def cb_dialog_help(self):
-        """Callback from the Help button. Displays the Help dialog box."""
-        dialog = epidemictkdialogs.DialogHelp(self.root)
-        self.root.wait_window(dialog.top)
-
-    def cb_dialog_new_game(self):
-        """Callback from the New Game button. Initialises the app for a new game."""
-
-        # We pass the dialog box a list of the games dictionary's keys,
-        # to be displayed in a dropdown menu.
-        dialog = epidemictkdialogs.DialogNewGame(self.root, list(self.app.games.keys()))
-        self.root.wait_window(dialog.top)
-
-        # If the box hasn't been canceled, start a new game.
-        if dialog.game_choice is not None:
-            self.app.new_game(dialog.game_choice.get())
 
     def update_stats(self, stats):
         text = f'\nTop card frequency:\n'

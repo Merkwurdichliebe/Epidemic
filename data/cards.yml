@@ -93,10 +93,148 @@ Legacy Season 2:
   - name: Washington
     count: 3
     color: blue
-Blah:
-  - name: Jérusalem
-    count: 2
+Pandemic Classic:
+  - name: Alger
+    count: 1
+    color: black
+  - name: Atlanta
+    count: 1
+    color: blue
+  - name: Baghdad
+    count: 1
+    color: black
+  - name: Bangkok
+    count: 1
+    color: red
+  - name: Bogota
+    count: 1
     color: yellow
-  - name: Tel Aviv
-    count: 3
+  - name: Buenos Aires
+    count: 1
+    color: yellow
+  - name: Calcutta
+    count: 1
+    color: black
+  - name: Chennai
+    count: 1
+    color: black
+  - name: Chicago
+    count: 1
+    color: blue
+  - name: Delhi
+    count: 1
+    color: black
+  - name: Essen
+    count: 1
+    color: blue
+  - name: Hô-Chi-Minh-Ville
+    count: 1
+    color: red
+  - name: Hong Kong
+    count: 1
+    color: red
+  - name: Istanbul
+    count: 1
+    color: black
+  - name: Jakarta
+    count: 1
+    color: red
+  - name: Johannesbourg
+    count: 1
+    color: blue
+  - name: Karachi
+    count: 1
+    color: black
+  - name: Khartoum
+    count: 1
+    color: yellow
+  - name: Kinshasa
+    count: 1
+    color: yellow
+  - name: Lagos
+    count: 1
+    color: yellow
+  - name: Le Caire
+    count: 1
+    color: black
+  - name: Lima
+    count: 1
+    color: yellow
+  - name: Londres
+    count: 1
+    color: blue
+  - name: Los Angeles
+    count: 1
+    color: yellow
+  - name: Madrid
+    count: 1
+    color: blue
+  - name: Manille
+    count: 1
+    color: red
+  - name: Mexico
+    count: 1
+    color: yellow
+  - name: Miami
+    count: 1
+    color: yellow
+  - name: Milan
+    count: 1
+    color: blue
+  - name: Montréal
+    count: 1
+    color: blue
+  - name: Moscou
+    count: 1
+    color: black
+  - name: Mumbai
+    count: 1
+    color: black
+  - name: New York
+    count: 1
+    color: blue
+  - name: Osaka
+    count: 1
+    color: red
+  - name: Paris
+    count: 1
+    color: blue
+  - name: Riyad
+    count: 1
+    color: black
+  - name: Pékin
+    count: 1
+    color: red
+  - name: Saint-Pétersbourg
+    count: 1
+    color: blue
+  - name: San Francisco
+    count: 1
+    color: blue
+  - name: Santiago
+    count: 1
+    color: yellow
+  - name: Sao Paolo
+    count: 1
+    color: yellow
+  - name: Séoul
+    count: 1
+    color: red
+  - name: Shanghai
+    count: 1
+    color: red
+  - name: Sydney
+    count: 1
+    color: red
+  - name: Taipei
+    count: 1
+    color: red
+  - name: Téhéran
+    count: 1
+    color: black
+  - name: Tokyo
+    count: 1
+    color: red
+  - name: Washington
+    count: 1
     color: blue
