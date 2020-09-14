@@ -14,7 +14,8 @@ class Stats:
         self.top_cards = None
         self.percentage = 0
         # Cards total should only be updated on object creation
-        self.total = len(self.deck['discard'].cards) + len(self.deck['draw'].cards[0].cards)
+        self.total = len(self.deck['discard'].cards) + \
+                     len(self.deck['draw'].cards[0].cards)
         self.update()
 
     def update(self):
@@ -52,7 +53,10 @@ class Game:
         drawdeck.add(deepcopy(self.games[game]))
 
         # Create a list with the Draw Deck and the 3 other empty decks
-        self.decks = [drawdeck, Deck('discard'), Deck('exclude'), Deck('cardpool')]
+        self.decks = [drawdeck,
+                      Deck('discard'),
+                      Deck('exclude'),
+                      Deck('cardpool')]
 
         # Build the decks dictionary so we can get a Deck object by its name
         self.deck = {deck.name: deck for deck in self.decks}
@@ -92,9 +96,7 @@ class Game:
 
     @staticmethod
     def read_decks_on_file():
-        # Initialize the initial deck from the available cards list in cards.yml
-        # file = os.path.realpath('data/cards.yml')
-        # file = NSBundle.mainBundle().pathForResource_ofType_("data/cards", "yml")
+        # Initialize the initial deck from the card list in cards.yml
         game = {}
         file = utility.get_path('data/cards.yml')
         valid_colors = ['blue', 'yellow', 'black', 'green', 'red']
@@ -112,13 +114,13 @@ class Game:
                 deck = Deck(game_item)
                 for item in data[game_item]:
                     if item['color'] not in valid_colors:
-                        raise ValueError(f"Invalid color specified in cards.yml for card: {item}")
+                        raise ValueError(f"Invalid color: {item}")
                     card = Card(item['name'], item['color'])
                     for i in range(item['count']):
                         deck.add(card)
                 game[game_item] = deck
         except ValueError:
-            # Raise the error again to stop execution after displaying the Exception
+            # Raise the error again to stop execution
             raise
 
         return game

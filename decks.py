@@ -5,8 +5,8 @@ Classes used in the Epidemic application
 for representing Card objects and Deck objects.
 
 The DrawDeck object extends Deck and actually holds Decks, not Cards.
-Each of these Decks represents the possible draws at each position in the DrawDeck.
-The top card is always the last Card in the list.
+Each of these Decks represents the possible draws at each position
+in the DrawDeck. The top card is always the last Card in the list.
 """
 
 __author__ = "Tal Zana"
@@ -25,7 +25,8 @@ class Card:
 
 
 class Deck:
-    """Basic class to define a deck of Card objects, which are held in a simple list.
+    """Basic class to define a deck of Card objects,
+    which are held in a simple list.
     There are three main decks in the game:
     - Draw Deck
     - Discard Deck

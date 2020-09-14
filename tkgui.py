@@ -6,8 +6,9 @@ import tkdialogs
 
 class MainWindow:
     def __init__(self, app):
-        """Main application designed as class in order to allow easier communication
-        between interface elements. cf. http://thinkingtkinter.sourceforge.net
+        """Main application designed as class in order to allow
+        easier communication between interface elements.
+        cf. http://thinkingtkinter.sourceforge.net
         """
 
         # Main Tk window
@@ -136,10 +137,12 @@ class MainWindow:
         # Two textboxes containing the dynamically built lists
         # for the exclude deck and the cardpool deck
 
-        self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool', width=20, height=50, font=self.font['p'])
+        self.txt_cardpool = tk.Text(self.frm_cardpool, name='txt_cardpool',
+                                    width=20, height=50, font=self.font['p'])
         self.txt_cardpool.pack()
 
-        self.txt_exclude = tk.Text(self.frm_exclude, name='txt_exclude', width=20, height=50, font=self.font['p'])
+        self.txt_exclude = tk.Text(self.frm_exclude, name='txt_exclude',
+                                   width=20, height=50, font=self.font['p'])
         self.txt_exclude.pack()
 
         # Radio buttons in their own frame
@@ -147,15 +150,18 @@ class MainWindow:
         self.frm_radio = tk.Frame(self.frm_menu, pady=10)
         self.frm_radio.pack()
 
-        radio_discard = tk.Radiobutton(self.frm_radio, width=15, text='Discard Deck',
+        radio_discard = tk.Radiobutton(self.frm_radio,
+                                       width=15, text='Discard Deck',
                                        variable=self.destination_choice,
                                        value='discard', anchor=tk.W, padx=10)
-        radio_draw = tk.Radiobutton(self.frm_radio, width=15, text='Draw Deck',
+        radio_draw = tk.Radiobutton(self.frm_radio,
+                                    width=15, text='Draw Deck',
                                     variable=self.destination_choice,
                                     value='draw', anchor=tk.W, padx=10)
-        radio_exclude = tk.Radiobutton(self.frm_radio, width=15, text='Exclude',
-                                     variable=self.destination_choice,
-                                     value='exclude', anchor=tk.W, padx=10)
+        radio_exclude = tk.Radiobutton(self.frm_radio,
+                                       width=15, text='Exclude',
+                                       variable=self.destination_choice,
+                                       value='exclude', anchor=tk.W, padx=10)
 
         radio_discard.pack(anchor=tk.W)
         radio_draw.pack(anchor=tk.W)
@@ -163,16 +169,18 @@ class MainWindow:
 
         # Dropdown menu for selecting city in epidemic
 
-        tk.Label(self.frm_menu, pady=20, text='Epidemic', font=self.font['h2']).pack()
+        tk.Label(self.frm_menu, pady=20, text='Epidemic',
+                 font=self.font['h2']).pack()
 
         self.epidemic_options = []
-        self.dropdown_epidemic = tk.OptionMenu(self.frm_menu, self.epidemic_choice,
+        self.dropdown_epidemic = tk.OptionMenu(self.frm_menu,
+                                               self.epidemic_choice,
                                                self.epidemic_options)
         self.dropdown_epidemic.config(width=15)
         self.dropdown_epidemic.pack()
 
-        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic', width=15,
-                                  command=self.app.cb_epidemic)
+        btn_epidemic = ttk.Button(self.frm_menu, text='Shuffle as epidemic',
+                                  width=15, command=self.app.cb_epidemic)
         btn_epidemic.pack()
 
         # Stats
@@ -180,9 +188,11 @@ class MainWindow:
         self.frm_stats = tk.Frame(self.frm_menu, pady=10)
         self.frm_stats.pack()
 
-        tk.Label(self.frm_stats, pady=10, text='Stats', font=self.font['h2']).pack()
+        tk.Label(self.frm_stats, pady=10, text='Stats',
+                 font=self.font['h2']).pack()
 
-        self.txt_stats = tk.Text(self.frm_stats, width=20, height=15, font=self.font['p'], wrap=tk.WORD)
+        self.txt_stats = tk.Text(self.frm_stats, width=20, height=15,
+                                 font=self.font['p'], wrap=tk.WORD)
         self.txt_stats.pack()
 
         # Center the app window on the screen
@@ -198,7 +208,8 @@ class MainWindow:
         self.cardpool_index = 0
 
     def update_cardpool(self, drawdeck):
-        self.update_textbox(self.txt_cardpool, drawdeck.cards[-1 - self.cardpool_index])
+        self.update_textbox(self.txt_cardpool,
+                            drawdeck.cards[-1 - self.cardpool_index])
 
     def update_exclude(self, exclude):
         self.update_textbox(self.txt_exclude, exclude)
@@ -211,7 +222,8 @@ class MainWindow:
         for i, c in enumerate(sorted(discard.cards, key=lambda x: x.name)):
             btn = ttk.Button(self.frm_discard, style=c.color + '.TButton',
                              width=15, text=c.name)
-            btn.configure(command=lambda d=discard, e=c: self.app.cb_draw_card(d, e))
+            btn.configure(command=lambda d=discard, e=c:
+                          self.app.cb_draw_card(d, e))
             btn.pack()
             self.discard_btns.append(btn)
 
@@ -253,7 +265,8 @@ class MainWindow:
             for b in self.draw_card_btns:
                 b.destroy()
 
-        for i, card in enumerate(sorted(set(drawdeck.cards[-1].cards), key=lambda x: x.name)):
+        for i, card in enumerate(sorted(set(drawdeck.cards[-1].cards),
+                                        key=lambda x: x.name)):
             btn = ttk.Button(self.frm_draw_card, style=card.color + '.TButton',
                              width=15, text=card.name)
             btn.configure(command=lambda d=drawdeck, c=card: self.app.cb_draw_card(d, c))
@@ -263,7 +276,8 @@ class MainWindow:
     @staticmethod
     def update_textbox(box, deck):
         """Update a Tk textbox with the contents of the passed Deck object.
-        This is used to refresh both the cardpool textbox and the exclude textbox."""
+        This is used to refresh both the cardpool textbox
+        and the exclude textbox."""
         # Method is static because it doesn't need the self keyword,
         # it only updates the contents of the Tk textbox which is passed to it.
         box.configure(state=tk.NORMAL)
@@ -273,7 +287,8 @@ class MainWindow:
         box.configure(state=tk.DISABLED)
 
     def update_dropdown(self, drawdeck):
-        # Update the epidemic dropdown list based on the available cards in the Draw Deck.
+        # Update the epidemic dropdown list
+        # based on the available cards in the Draw Deck.
         cards = sorted([c.name for c in list(set(drawdeck.cards[0].cards))])
         self.epidemic_options = cards
 
@@ -282,7 +297,8 @@ class MainWindow:
         m = self.dropdown_epidemic.children['menu']
         m.delete(0, tk.END)
         for c in cards:
-            m.add_command(label=c, command=lambda v=c: self.epidemic_choice.set(v))
+            m.add_command(label=c,
+                          command=lambda v=c: self.epidemic_choice.set(v))
         self.epidemic_choice.set(cards[0])
 
     def update_stats(self, stats):

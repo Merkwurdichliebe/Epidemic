@@ -15,9 +15,11 @@ class DialogHelp:
         frm_btns = tk.Frame(self.top, pady=10)
         frm_btns.pack()
 
-        btn = tk.Button(frm_btns, text='View in browser', width=15, command=self.cb_open_web)
+        btn = tk.Button(frm_btns, text='View in browser',
+                        width=15, command=self.cb_open_web)
         btn.pack(side=tk.LEFT, padx=5)
-        btn = tk.Button(frm_btns, text='Close', width=15, command=self.cb_close)
+        btn = tk.Button(frm_btns, text='Close',
+                        width=15, command=self.cb_close)
         btn.pack(side=tk.LEFT, padx=5)
 
         width = self.top.winfo_reqwidth()
@@ -35,7 +37,8 @@ class DialogHelp:
 
 
 class DialogNewGame:
-    """Display a dialog box for selecting a game type. Expects the parent window and a list of game strings."""
+    """Display a dialog box for selecting a game type.
+    Expects the parent window and a list of game strings."""
     def __init__(self, parent, games):
         self.top = tk.Toplevel(parent)
         self.top.title('Select Game')
@@ -50,17 +53,21 @@ class DialogNewGame:
         text = 'Select the game you wish to track:'
         tk.Label(self.top, text=text, pady=10, padx=20).pack()
 
-        # TODO Why do we need to unpack the option list here and not in epidemic_options
-        self.dropdown_game = tk.OptionMenu(self.top, self.game_choice, *self.game_options)
+        # TODO Why do we need to unpack the option list here
+        #  and not in epidemic_options
+        self.dropdown_game = tk.OptionMenu(self.top, self.game_choice,
+                                           *self.game_options)
         self.dropdown_game.config(width=20)
         self.dropdown_game.pack()
 
         frm_btns = tk.Frame(self.top, pady=10)
         frm_btns.pack()
 
-        btn = tk.Button(frm_btns, text='Cancel', width=15, command=self.cb_cancel)
+        btn = tk.Button(frm_btns, text='Cancel',
+                        width=15, command=self.cb_cancel)
         btn.pack(side=tk.LEFT, padx=5)
-        btn = tk.Button(frm_btns, text='Start New Game', width=15, command=self.cb_start_game)
+        btn = tk.Button(frm_btns, text='Start New Game',
+                        width=15, command=self.cb_start_game)
         btn.pack(side=tk.LEFT, padx=5)
 
         width = self.top.winfo_reqwidth()

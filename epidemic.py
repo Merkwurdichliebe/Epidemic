@@ -43,15 +43,15 @@ class App:
         self.view.update_dropdown(self.game.deck['draw'])
 
     def cb_draw_card(self, deck, card):
-        # Move a card from a deck to the destination deck set by the radio buttons
-        # Ignore drawing from a deck onto itself
+        # Move a card from a deck to the destination deck
+        # set by the radio buttons.
         dest = self.game.deck[self.view.get_destination()]
         self.game.draw(deck, dest, card)
         self.updateview()
 
     def cb_view_cardpool(self, index):
-        # Callback from the buttons used to display the possible choices in the Draw Deck.
-        # Outputs the possible cards in each potential draw.
+        # Callback from the buttons used to display the possible choices
+        # in the Draw Deck. Outputs the possible cards in each potential draw.
         self.view.cardpool_index = index
         self.view.update_cardpool(self.game.deck['draw'])
 
@@ -61,11 +61,13 @@ class App:
         self.updateview()
 
     def cb_new_game(self):
-        """Callback from the New Game button. Initialises the app for a new game."""
+        """Callback from the New Game button.
+        Initialises the app for a new game."""
 
         # We pass the dialog box a list of the games dictionary's keys,
         # to be displayed in a dropdown menu.
-        dialog = tkdialogs.DialogNewGame(self.view.root, list(self.game.games.keys()))
+        dialog = tkdialogs.DialogNewGame(self.view.root,
+                                         list(self.game.games.keys()))
         self.view.root.wait_window(dialog.top)
 
         # If the box hasn't been canceled, start a new game.
