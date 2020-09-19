@@ -8,14 +8,18 @@ The DrawDeck object extends Deck and actually holds Decks, not Cards.
 Each of these Decks represents the possible draws at each position
 in the DrawDeck. The top card is always the last Card in the list.
 """
+# TODO replace if isinstance(self, DrawDeck): with property
 
 
 class Card:
     """Basic class to represent a card with a city name and color.
-    Cards are contained in Decks."""
+    Cards are grouped in Decks."""
+
+    valid_colors = ['blue', 'yellow', 'black', 'green', 'red']
 
     def __init__(self, name, color):
         self.name = name
+        assert color in Card.valid_colors, f'Invalid color: {color}'
         self.color = color
 
 
@@ -54,6 +58,9 @@ class Deck:
     def clear(self):
         self.cards.clear()
 
+    def sorted(self):
+        return sorted(self.cards, key=lambda x: x.name)
+
 
 class DrawDeck(Deck):
     """Subclass of Deck used for the Draw Deck only.
@@ -91,3 +98,9 @@ class DrawDeck(Deck):
         # then remove the list item entirely because the card was drawn.
         self.cards[0].remove(card)
         self.cards.pop(0)
+
+    def sorted(self):
+        # We override Deck.sorted because we are only interested
+        # in a sorted list of unique possible cards
+        # from the Deck at the top (last) position
+        return sorted(set(self.cards[-1].cards), key=lambda x: x.name)
