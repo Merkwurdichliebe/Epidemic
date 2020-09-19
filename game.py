@@ -18,21 +18,25 @@ class Stats:
                      len(self.deck['draw'].cards[0].cards)
         self.update()
 
+    # TODO Properties
     def update(self):
         self.in_discard = len(self.deck['discard'].cards)
 
-        # Calculate draw probabilities
-        card_list = self.deck['draw'].cards[-1].cards
+        if not self.deck['draw'].cards:
+            print('empty')
+        else:
+            # Calculate draw probabilities
+            card_list = self.deck['draw'].cards[-1].cards
 
-        # Use a Counter to sort the cards by the most common ones
-        c = Counter(card_list).most_common()
+            # Use a Counter to sort the cards by the most common ones
+            c = Counter(card_list).most_common()
 
-        # Get the frequency of the most common card
-        self.top_freq = c[0][1]
-        self.percentage = self.top_freq / len(card_list)
+            # Get the frequency of the most common card
+            self.top_freq = c[0][1]
+            self.percentage = self.top_freq / len(card_list)
 
-        # Build a list of all the cards that share that top frequency
-        self.top_cards = [card[0] for card in c if card[1] == self.top_freq]
+            # Build a list of all the cards that share that top frequency
+            self.top_cards = [card[0] for card in c if card[1] == self.top_freq]
 
 
 class Game:
@@ -84,22 +88,20 @@ class Game:
         # Create new card pool
         # We use copy in order to reset the discard pile
         # without affecting the newly pooled cards
-        new_pool = Deck('pool')
+        new_cards = Deck('epidemic')
         for card in self.deck['discard'].cards.copy():
-            new_pool.add(card)
+            new_cards.add(card)
 
-        self.deck['draw'].add(new_pool)
+        self.deck['draw'].add(new_cards)
 
         # Clear the discard pile
         self.deck['discard'].clear()
         self.stats.update()
 
-    @staticmethod
-    def read_decks_on_file():
+    def read_decks_on_file(self):
         # Initialize the initial deck from the card list in cards.yml
         game = {}
         file = utility.get_path('data/cards.yml')
-        valid_colors = ['blue', 'yellow', 'black', 'green', 'red']
 
         # Read the cards.yml file
         try:
@@ -108,19 +110,24 @@ class Game:
         except FileNotFoundError as e:
             print(f'Missing or damaged cards.yml configuration file\n({e})')
 
-        # Check for valid card colors
         try:
-            for game_item in data.keys():
-                deck = Deck(game_item)
-                for item in data[game_item]:
-                    if item['color'] not in valid_colors:
-                        raise ValueError(f"Invalid color: {item}")
-                    card = Card(item['name'], item['color'])
-                    for i in range(item['count']):
-                        deck.add(card)
-                game[game_item] = deck
+            for game_title in data.keys():
+                game[game_title] = self.initialise_deck(game_title, data)
         except ValueError:
             # Raise the error again to stop execution
             raise
 
         return game
+
+    @staticmethod
+    def initialise_deck(game_title, data):
+        deck = Deck(game_title)
+        for item in data[game_title]:
+            if item['color'] not in Card.valid_colors:
+                raise ValueError(f"Invalid color '{item['color']}' in "
+                                 f"'{game_title} : {item['name']}'")
+            else:
+                card = Card(item['name'], item['color'])
+                for i in range(item['count']):
+                    deck.add(card)
+        return deck
