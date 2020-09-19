@@ -1,13 +1,13 @@
 from PySide2.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton
+    QLabel, QPushButton, QButtonGroup, QGroupBox, QRadioButton
 
 from PySide2.QtCore import Qt, QSize
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()  # QWidget defaults
-        # self.app = app
+        self.app = app
         self.cardpool_index = 0
 
         self.drawdeck_btns = []
@@ -15,7 +15,11 @@ class MainWindow(QWidget):
         self.vbox_deck = {'drawdeck': QVBoxLayout(),
                           'draw': QVBoxLayout(),
                           'discard': QVBoxLayout(),
-                          'exile': QVBoxLayout()}
+                          'exclude': QVBoxLayout()}
+
+        self.destination_draw = QRadioButton('Draw')
+        self.destination_discard = QRadioButton('Discard')
+        self.destination_exclude = QRadioButton('Exclude')
 
         self.initialise_ui()
 
@@ -32,47 +36,84 @@ class MainWindow(QWidget):
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout();
-        hbox_main.addLayout(vbox_cardpool)
         label = QLabel('CARD POOL')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_cardpool.addWidget(label)
         vbox_cardpool.addStretch()
+        hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
-        hbox_main.addLayout(self.vbox_deck['drawdeck'])
         label = QLabel('DRAW DECK')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['drawdeck'].addWidget(label)
         self.vbox_deck['drawdeck'].setSpacing(5)
         self.vbox_deck['drawdeck'].addStretch()
+        hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
-        hbox_main.addLayout(self.vbox_deck['draw'])
         label = QLabel('DRAW CARD')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['draw'].addWidget(label)
         self.vbox_deck['draw'].setSpacing(5)
         self.vbox_deck['draw'].addStretch()
+        hbox_main.addLayout(self.vbox_deck['draw'])
 
         # Discard Box
-        hbox_main.addLayout(self.vbox_deck['discard'])
         label = QLabel('DISCARD')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['discard'].addWidget(label)
         self.vbox_deck['discard'].setSpacing(5)
         self.vbox_deck['discard'].addStretch()
+        hbox_main.addLayout(self.vbox_deck['discard'])
 
-        # Exile Box
-        hbox_main.addLayout(self.vbox_deck['exile'])
-        label = QLabel('EXILE')
+        # exclude Box
+        label = QLabel('exclude')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
-        self.vbox_deck['exile'].addWidget(label)
-        self.vbox_deck['exile'].addStretch()
+        self.vbox_deck['exclude'].addWidget(label)
+        self.vbox_deck['exclude'].addStretch()
+        hbox_main.addLayout(self.vbox_deck['exclude'])
+
+        # Menu Box
+        vbox_menu = QVBoxLayout();
+        label = QLabel('OPTIONS')
+        label.setMinimumWidth(150)
+        label.setAlignment(Qt.AlignHCenter)
+        vbox_menu.addWidget(label)
+        vbox_menu.addStretch()
+        hbox_main.addLayout(vbox_menu)
+
+        # Destination Radio Box
+        vbox_destination = QVBoxLayout()
+        label = QLabel('Card Destination')
+        label.setMinimumWidth(150)
+        label.setAlignment(Qt.AlignHCenter)
+        vbox_destination.addWidget(label)
+
+        group_box = QGroupBox()
+        group_box.setWindowTitle('Destination')
+
+        b_group = QButtonGroup()
+
+        # b_group.addButton(draw)
+        # b_group.addButton(discard)
+        # b_group.addButton(exclude)
+        # b_group.buttonToggled.connect(self.set_destination)
+
+        self.destination_exclude.setChecked(True)
+
+        vbox_destination.addWidget(self.destination_draw)
+        vbox_destination.addWidget(self.destination_discard)
+        vbox_destination.addWidget(self.destination_exclude)
+        group_box.setLayout(vbox_destination)
+
+        vbox_menu.addWidget(group_box)
+        vbox_menu.addStretch()
+
 
         self.setLayout(self.vbox_app)
 
@@ -97,12 +138,13 @@ class MainWindow(QWidget):
         self.vbox_deck['drawdeck'].addStretch(1)
 
     def show_deck(self, deck):
+        bgroup = QButtonGroup()
         for i, card in self.buttons_to_display(deck):
 
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
             self.vbox_deck[deck.name].addWidget(btn)
-            btn.clicked.connect(self.function)
+            btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
@@ -113,5 +155,15 @@ class MainWindow(QWidget):
         else:
             return enumerate(deck.sorted())
 
-    def function(self):
-        pass
+    def function(self, d, c):
+        sender = self.sender()
+        print(sender)
+        print(d, c)
+
+    def get_destination(self):
+        if self.destination_draw.isChecked():
+            return 'draw'
+        elif self.destination_discard.isChecked():
+            return 'discard'
+        elif self.destination_exclude.isChecked():
+            return 'exclude'

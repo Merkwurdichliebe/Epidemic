@@ -30,18 +30,19 @@ from game import Game
 
 
 class App:
-    def __init__(self, window):
+    def __init__(self):
         # Instantiate the game-logic object (the Model in MVC)
         self.game = Game()
 
         # Instantiate the main window (the View in MVC)
         # We pass it the App object so that we can use callbacks
         # (Better way?)
-        self.view = window
+        self.view = MainWindow(self)
 
         # self.view = MainWindow(self)
         # self.show_select_game_dialog()
         self.game.initialise('Legacy Season 2')
+        self.view.show()
         self.updateview()
 
     def updateview(self):
@@ -103,9 +104,7 @@ class App:
 def main():
     """Main program entry point."""
     application = QApplication()
-    window = MainWindow()
-    app = App(window)
-    window.show()
+    app = App()
     application.exec_()
 
 
