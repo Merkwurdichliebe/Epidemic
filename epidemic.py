@@ -24,30 +24,34 @@ __version__ = "0.8"
 # TODO make game selection dialog receive focus on launch
 # TODO For V2 : Make buttons into labels with hover color
 
-from tkgui import MainWindow
+from PySide2.QtWidgets import QApplication
+from qt import MainWindow
 from game import Game
-import tkdialogs
 
 
 class App:
-    def __init__(self):
+    def __init__(self, window):
         # Instantiate the game-logic object (the Model in MVC)
         self.game = Game()
 
         # Instantiate the main window (the View in MVC)
         # We pass it the App object so that we can use callbacks
         # (Better way?)
-        self.view = MainWindow(self)
+        self.view = window
 
-        self.show_select_game_dialog()
+        # self.view = MainWindow(self)
+        # self.show_select_game_dialog()
+        self.game.initialise('Legacy Season 2')
+        self.updateview()
 
     def updateview(self):
-        self.view.update_cardpool(self.game.deck['draw'])
-        self.view.update_exclude(self.game.deck['exclude'])
-        self.view.update_drawdeck(self.game.deck['draw'])
-        self.view.update_discard(self.game.deck['discard'])
-        self.view.update_dropdown(self.game.deck['draw'])
-        self.view.update_stats(self.game.stats)
+        self.view.show_drawdeck(self.game.deck['draw'])
+        # self.view.update_cardpool(self.game.deck['draw'])
+        # self.view.update_exclude(self.game.deck['exclude'])
+        self.view.show_deck(self.game.deck['draw'])
+        self.view.show_deck(self.game.deck['discard'])
+        # self.view.update_dropdown(self.game.deck['draw'])
+        # self.view.update_stats(self.game.stats)
 
     def show_select_game_dialog(self):
         # Display select new game dialog
@@ -98,8 +102,11 @@ class App:
 
 def main():
     """Main program entry point."""
-    app = App()
-    app.view.root.mainloop()
+    application = QApplication()
+    window = MainWindow()
+    app = App(window)
+    window.show()
+    application.exec_()
 
 
 if __name__ == '__main__':
