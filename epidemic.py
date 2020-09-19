@@ -86,7 +86,7 @@ class App:
 
         # If the box hasn't been canceled, start a new game.
         if dialog.game_choice is not None:
-            self.game.init(dialog.game_choice.get())
+            self.game.initialise(dialog.game_choice.get())
             self.updateview()
 
     def cb_dialog_help(self):

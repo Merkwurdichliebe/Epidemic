@@ -10,32 +10,33 @@ import yaml
 
 class Game:
     def __init__(self):
-        self.games = self.read_decks_on_file()
-        self.decks = None
+        self.games = self.read_decks_from_file()
         self.deck = None
         self.stats = None
 
-    def init(self, game):
+    def initialise(self, game):
         """Prepare the initial state for the game. Initialise all decks.
         This is run once at the start of every game."""
 
-        # Initialise the draw deck:
-        # We use deepcopy to get a new copy of the deck
-        # from the games variable, which stores all possible game types.
-        drawdeck = DrawDeck('draw')
-        drawdeck.add(deepcopy(self.games[game]))
-
         # Create a list with the Draw Deck and the 3 other empty decks
-        self.decks = [drawdeck,
+        game_decks = [self.initialise_draw_deck(game),
                       Deck('discard'),
                       Deck('exclude'),
                       Deck('cardpool')]
 
         # Build the decks dictionary so we can get a Deck object by its name
-        self.deck = {deck.name: deck for deck in self.decks}
+        self.deck = {deck.name: deck for deck in game_decks}
 
         # Get a Stats object for calculating draw probabilities
         self.stats = Stats(self.deck)
+
+    def initialise_draw_deck(self, game):
+        # Initialise the draw deck
+        d = DrawDeck('draw')
+        # We use deepcopy to get a new copy of the deck
+        # from the games variable, which stores all possible game types.
+        d.add(deepcopy(self.games[game]))
+        return d
 
     def draw(self, from_deck, to_deck, card):
         # Move a card from a source deck to a destination deck.
@@ -65,7 +66,7 @@ class Game:
         # Clear the discard pile
         self.deck['discard'].clear()
 
-    def read_decks_on_file(self):
+    def read_decks_from_file(self):
         # Initialize the initial deck from the card list in cards.yml
         game = {}
         file = utility.get_path('data/cards.yml')
@@ -79,7 +80,7 @@ class Game:
 
         try:
             for game_title in data.keys():
-                game[game_title] = self.initialise_deck(game_title, data)
+                game[game_title] = self.create_deck(game_title, data)
         except ValueError:
             # Raise the error again to stop execution
             raise
@@ -87,7 +88,7 @@ class Game:
         return game
 
     @staticmethod
-    def initialise_deck(game_title, data):
+    def create_deck(game_title, data):
         deck = Deck(game_title)
         for item in data[game_title]:
             if item['color'] not in Card.valid_colors:
