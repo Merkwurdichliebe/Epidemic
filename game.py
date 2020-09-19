@@ -1,42 +1,11 @@
+# Epidemic modules
 from decks import Card, Deck, DrawDeck
-from collections import Counter
-from copy import deepcopy
+from stats import Stats
 import utility
+
+# Other modules
+from copy import deepcopy
 import yaml
-
-
-class Stats:
-    def __init__(self, deck):
-        self.deck = deck
-        self.total = 0
-        self.in_discard = 0
-        self.top_freq = 0
-        self.top_cards = None
-        self.percentage = 0
-        # Cards total should only be updated on object creation
-        self.total = len(self.deck['discard'].cards) + \
-                     len(self.deck['draw'].cards[0].cards)
-        self.update()
-
-    # TODO Properties
-    def update(self):
-        self.in_discard = len(self.deck['discard'].cards)
-
-        if not self.deck['draw'].cards:
-            print('empty')
-        else:
-            # Calculate draw probabilities
-            card_list = self.deck['draw'].cards[-1].cards
-
-            # Use a Counter to sort the cards by the most common ones
-            c = Counter(card_list).most_common()
-
-            # Get the frequency of the most common card
-            self.top_freq = c[0][1]
-            self.percentage = self.top_freq / len(card_list)
-
-            # Build a list of all the cards that share that top frequency
-            self.top_cards = [card[0] for card in c if card[1] == self.top_freq]
 
 
 class Game:
@@ -73,7 +42,6 @@ class Game:
         # Ignore drawing from a deck onto itself.
         if not from_deck == to_deck:
             from_deck.move(card, to_deck)
-        self.stats.update()
 
     def epidemic(self, card):
         """Do the epidemic shuffle phase: draw a card from the bottom
@@ -96,7 +64,6 @@ class Game:
 
         # Clear the discard pile
         self.deck['discard'].clear()
-        self.stats.update()
 
     def read_decks_on_file(self):
         # Initialize the initial deck from the card list in cards.yml

@@ -39,9 +39,7 @@ class App:
         # (Better way?)
         self.view = MainWindow(self)
 
-        # Display select new game dialog
-        # (We reuse the callback function for the New Game button)
-        self.cb_new_game()
+        self.show_select_game_dialog()
 
     def updateview(self):
         self.view.update_cardpool(self.game.deck['draw'])
@@ -50,6 +48,11 @@ class App:
         self.view.update_discard(self.game.deck['discard'])
         self.view.update_dropdown(self.game.deck['draw'])
         self.view.update_stats(self.game.stats)
+
+    def show_select_game_dialog(self):
+        # Display select new game dialog
+        # (We reuse the callback function for the New Game button)
+        self.cb_new_game()
 
     def cb_draw_card(self, from_deck, card):
         # Move a card from a deck to the destination deck
