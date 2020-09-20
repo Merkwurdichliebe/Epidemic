@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QButtonGroup, QGroupBox, QRadioButton
+    QLabel, QPushButton, QButtonGroup, QGroupBox, QRadioButton, QComboBox
 
 from PySide2.QtCore import Qt, QSize
 
@@ -27,6 +27,7 @@ class MainWindow(QWidget):
                           'exclude': QWidget()}
 
         self.text_cardpool = QLabel()
+        self.combo_epidemic = QComboBox()
 
         self.initialise_ui()
 
@@ -109,6 +110,19 @@ class MainWindow(QWidget):
         group_box.setLayout(vbox_destination)
 
         vbox_menu.addWidget(group_box)
+
+        # Epidemic dropdown
+        vbox_epidemic = QVBoxLayout()
+        vbox_epidemic.setSpacing(5)
+        label = QLabel('Epidemic')
+        label.setAlignment(Qt.AlignHCenter)
+        vbox_epidemic.addWidget(label)
+        vbox_epidemic.addWidget(self.combo_epidemic)
+        btn = QPushButton('Shuffle Epidemic')
+        btn.clicked.connect(self.app.cb_epidemic)
+        vbox_epidemic.addWidget(btn)
+        vbox_menu.addLayout(vbox_epidemic)
+
         vbox_menu.addStretch()
 
         # Tell the Main Window to use the outer QVBoxLayout
@@ -179,6 +193,28 @@ class MainWindow(QWidget):
         button_vbox.setSpacing(5)
         p.setLayout(button_vbox)
         return button_vbox
+
+    def update_epidemic_combo(self):
+        deck = self.app.game.deck['draw']
+        # Update the epidemic dropdown list
+        # based on the available cards in the Draw Deck.
+        cards = sorted([c.name for c in list(set(deck.cards[0].cards))])
+
+        self.combo_epidemic.clear()
+        self.combo_epidemic.addItems(cards)
+        self.combo_epidemic.repaint()
+        # TODO don't clear this each time, add/remove items individiually
+
+        # self.epidemic_options = cards
+        #
+        # # command value lambda syntax is from
+        # # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
+        # m = self.dropdown_epidemic.children['menu']
+        # m.delete(0, tk.END)
+        # for c in cards:
+        #     m.add_command(label=c,
+        #                   command=lambda v=c: self.epidemic_choice.set(v))
+        # self.epidemic_choice.set(cards[0])
 
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false

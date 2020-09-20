@@ -61,6 +61,7 @@ class App:
         for deck in decks:
             if deck.name == 'draw':
                 self.view.show_drawdeck(self.game.deck['draw'])
+                self.view.update_epidemic_combo()
             self.view.show_deck(self.game.deck[deck.name])
 
     def cb_draw_card(self, from_deck, card):
@@ -76,9 +77,10 @@ class App:
     def cb_epidemic(self):
         """Callback from the Epidemic button.
         Runs the epidemic shuffle function based on the selected card."""
-        new_card = self.view.get_epidemic()
-        self.game.epidemic(new_card)
-        self.updateview()
+        new_card_name = self.view.combo_epidemic.currentText()
+        self.game.epidemic(new_card_name)
+        self.update_gui(self.game.deck['draw'])
+        self.update_gui(self.game.deck['discard'])
 
     def cb_new_game(self):
         """Callback from the New Game button.
