@@ -115,7 +115,7 @@ class MainWindow(QWidget):
         self.setLayout(self.vbox_app)
 
     def show_cardpool(self, drawdeck):
-        d = drawdeck.cards[-1 - 0]
+        d = drawdeck.cards[-1 - self.cardpool_index]
         text = ''
         for card in sorted(set(d.cards), key=lambda x: x.name):
             text += f'{card.name} ({d.cards.count(card)})\n'
@@ -145,7 +145,7 @@ class MainWindow(QWidget):
             btn = QPushButton(text, self)
             btn.setFixedSize(QSize(150, 30))
             button_vbox.addWidget(btn)
-            btn.clicked.connect(lambda index=i: self.function(index))  # self.app.cb_update_cardpool
+            btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
         button_vbox.addStretch()
 
     def show_deck(self, deck):
@@ -188,3 +188,7 @@ class MainWindow(QWidget):
 
     def function(self, i):
         print(i)
+
+# 1: See SO article for reasons for "ignore" argument:
+# https://stackoverflow.com/questions/18836291/lambda-function-returning-false
+
