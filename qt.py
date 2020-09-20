@@ -115,16 +115,20 @@ class MainWindow(QWidget):
         self.setLayout(self.vbox_app)
 
     def show_cardpool(self, drawdeck):
+        print('--> In show_cardpool')
+        print(f'cardpool_index is {self.cardpool_index}')
         d = drawdeck.cards[-1 - self.cardpool_index]
         text = ''
         for card in sorted(set(d.cards), key=lambda x: x.name):
+            print(f'Adding {card.name}')
             text += f'{card.name} ({d.cards.count(card)})\n'
         self.text_cardpool.setText(text)
+        self.text_cardpool.repaint()  # 2
+        print('Done show_cardpool')
 
     def show_drawdeck(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
-        self.cardpool_index = 0
-
+        self.app.cb_update_cardpool(0)
         box = self.get_new_deck_vbox('drawdeck')
 
         # Define new ones
@@ -182,3 +186,5 @@ class MainWindow(QWidget):
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
 
+# 2: A hack which should be fixed with a better event handling
+# https://stackoverflow.com/questions/4510712/qlabel-settext-not-displaying-text-immediately-before-running-other-method

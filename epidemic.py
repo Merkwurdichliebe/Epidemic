@@ -67,10 +67,14 @@ class App:
         self.updateview()
 
     def cb_update_cardpool(self, index):
+        print('--> In cb_update_cardpool')
+        print(f'Passed index is {index}')
         # Callback from the buttons used to display the possible choices
         # in the Draw Deck. Outputs the possible cards in each potential draw.
         self.view.cardpool_index = index
+        print(f'cardpool_index is now {self.view.cardpool_index}')
         self.view.show_cardpool(self.game.deck['draw'])
+        print('Back in cb_update_cardpool, done')
 
     def cb_epidemic(self):
         """Callback from the Epidemic button.
