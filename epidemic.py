@@ -38,19 +38,17 @@ class App:
         # We pass it the App object so that we can use callbacks
         # (Better way?)
         self.view = MainWindow(self)
-
-        # self.view = MainWindow(self)
-        # self.show_select_game_dialog()
         self.game.initialise('Legacy Season 2')
+        self.update_gui(*self.get_all_decks())
         self.view.show()
-        self.updateview()
 
     def updateview(self):
-        self.view.show_cardpool(self.game.deck['draw'])
-        self.view.show_drawdeck(self.game.deck['draw'])
-        self.view.show_deck(self.game.deck['draw'])
-        self.view.show_deck(self.game.deck['discard'])
-        self.view.show_deck(self.game.deck['exclude'])
+        # self.view.show_cardpool(self.game.deck['draw'])
+        # self.view.show_drawdeck(self.game.deck['draw'])
+        # self.view.show_deck(self.game.deck['draw'])
+        # self.view.show_deck(self.game.deck['discard'])
+        # self.view.show_deck(self.game.deck['exclude'])
+        pass
         # self.view.update_dropdown(self.game.deck['draw'])
         # self.view.update_stats(self.game.stats)
 
@@ -59,22 +57,21 @@ class App:
         # (We reuse the callback function for the New Game button)
         self.cb_new_game()
 
+    def update_gui(self, *decks):
+        for deck in decks:
+            if deck.name == 'draw':
+                self.view.show_drawdeck(self.game.deck['draw'])
+            self.view.show_deck(self.game.deck[deck.name])
+
     def cb_draw_card(self, from_deck, card):
-        # Move a card from a deck to the destination deck
-        # set by the radio buttons in MainWindow.
         to_deck = self.view.get_destination()
-        self.game.draw(from_deck, to_deck, card)
-        self.updateview()
+        if not from_deck == to_deck:
+            self.game.draw_card(from_deck, to_deck, card)
+            self.update_gui(from_deck, to_deck)
 
     def cb_update_cardpool(self, index):
-        print('--> In cb_update_cardpool')
-        print(f'Passed index is {index}')
-        # Callback from the buttons used to display the possible choices
-        # in the Draw Deck. Outputs the possible cards in each potential draw.
         self.view.cardpool_index = index
-        print(f'cardpool_index is now {self.view.cardpool_index}')
         self.view.show_cardpool(self.game.deck['draw'])
-        print('Back in cb_update_cardpool, done')
 
     def cb_epidemic(self):
         """Callback from the Epidemic button.
@@ -103,6 +100,9 @@ class App:
         Displays a dialog with the option to view Help in browser."""
         dialog = tkdialogs.DialogHelp(self.view.root)
         self.view.root.wait_window(dialog.top)
+
+    def get_all_decks(self):
+        return list(self.game.deck.values())
 
 
 def main():

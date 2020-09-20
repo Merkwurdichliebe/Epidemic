@@ -21,8 +21,7 @@ class Game:
         # Create a list with the Draw Deck and the 3 other empty decks
         game_decks = [self.initialise_draw_deck(game),
                       Deck('discard'),
-                      Deck('exclude'),
-                      Deck('cardpool')]
+                      Deck('exclude')]
 
         # Build the decks dictionary so we can get a Deck object by its name
         self.deck = {deck.name: deck for deck in game_decks}
@@ -31,16 +30,12 @@ class Game:
         self.stats = Stats(self.deck)
 
     def initialise_draw_deck(self, game):
-        # Initialise the draw deck
         d = DrawDeck('draw')
-        # We use deepcopy to get a new copy of the deck
-        # from the games variable, which stores all possible game types.
+        # Get a copy of the deck from the games list
         d.add(deepcopy(self.games[game]))
         return d
 
-    def draw(self, from_deck, to_deck, card):
-        # Move a card from a source deck to a destination deck.
-        # Ignore drawing from a deck onto itself.
+    def draw_card(self, from_deck, to_deck, card):
         if not from_deck == to_deck:
             from_deck.move(card, to_deck)
 
@@ -71,7 +66,6 @@ class Game:
         game = {}
         file = utility.get_path('data/cards.yml')
 
-        # Read the cards.yml file
         try:
             with open(file, encoding='utf-8') as f:
                 data = yaml.load(f, Loader=yaml.FullLoader)

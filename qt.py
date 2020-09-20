@@ -116,15 +116,12 @@ class MainWindow(QWidget):
 
     def show_cardpool(self, drawdeck):
         print('--> In show_cardpool')
-        print(f'cardpool_index is {self.cardpool_index}')
         d = drawdeck.cards[-1 - self.cardpool_index]
         text = ''
         for card in sorted(set(d.cards), key=lambda x: x.name):
-            print(f'Adding {card.name}')
             text += f'{card.name} ({d.cards.count(card)})\n'
         self.text_cardpool.setText(text)
-        self.text_cardpool.repaint()  # 2
-        print('Done show_cardpool')
+        self.text_cardpool.repaint()  # 2 TODO Fix repaint
 
     def show_drawdeck(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
