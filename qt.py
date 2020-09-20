@@ -6,9 +6,10 @@ from PySide2.QtCore import Qt, QSize
 
 COLORS = {'blue': '#3333ff',
           'black': '#000000',
-          'yellow': '#ff8000',
+          'yellow': '#e68019',
           'red': '#cc0000',
-          'green': '#009933'}
+          'green': '#009933',
+          'gray': '#bfbfbf'}
 
 
 class MainWindow(QWidget):
@@ -176,7 +177,7 @@ class MainWindow(QWidget):
         for i, card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
-            color = '#bfbfbf' if deck.name == 'exclude' else COLORS[card.color]
+            color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
             btn.setStyleSheet(f'color: {color}')
             box.addWidget(btn)
             btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
