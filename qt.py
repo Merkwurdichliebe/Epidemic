@@ -1,7 +1,14 @@
-from PySide2.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QButtonGroup, QGroupBox, QRadioButton, QComboBox
+from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
+    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox
 
 from PySide2.QtCore import Qt, QSize
+
+
+COLORS = {'blue': '#3333ff',
+          'black': '#000000',
+          'yellow': '#ff8000',
+          'red': '#cc0000',
+          'green': '#009933'}
 
 
 class MainWindow(QWidget):
@@ -169,6 +176,8 @@ class MainWindow(QWidget):
         for i, card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
+            color = '#bfbfbf' if deck.name == 'exclude' else COLORS[card.color]
+            btn.setStyleSheet(f'color: {color}')
             box.addWidget(btn)
             btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
         box.addStretch()
@@ -224,6 +233,7 @@ class MainWindow(QWidget):
 
         self.text_stats.setText(text)
         self.text_stats.repaint()
+        # TODO make stats a function
 
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
