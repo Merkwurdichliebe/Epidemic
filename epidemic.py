@@ -48,9 +48,9 @@ class App:
     def updateview(self):
         self.view.show_drawdeck(self.game.deck['draw'])
         # self.view.update_cardpool(self.game.deck['draw'])
-        # self.view.update_exclude(self.game.deck['exclude'])
         self.view.show_deck(self.game.deck['draw'])
         self.view.show_deck(self.game.deck['discard'])
+        self.view.show_deck(self.game.deck['exclude'])
         # self.view.update_dropdown(self.game.deck['draw'])
         # self.view.update_stats(self.game.stats)
 

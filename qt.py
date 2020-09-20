@@ -45,7 +45,6 @@ class MainWindow(QWidget):
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_cardpool.addWidget(label)
-        vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
@@ -54,7 +53,6 @@ class MainWindow(QWidget):
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['drawdeck'].addWidget(label)
         self.vbox_deck['drawdeck'].setSpacing(5)
-        self.vbox_deck['drawdeck'].addStretch()
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
@@ -63,7 +61,6 @@ class MainWindow(QWidget):
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['draw'].addWidget(label)
         self.vbox_deck['draw'].setSpacing(5)
-        self.vbox_deck['draw'].addStretch()
         hbox_main.addLayout(self.vbox_deck['draw'])
 
         # Discard Box
@@ -72,24 +69,22 @@ class MainWindow(QWidget):
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['discard'].addWidget(label)
         self.vbox_deck['discard'].setSpacing(5)
-        self.vbox_deck['discard'].addStretch()
         hbox_main.addLayout(self.vbox_deck['discard'])
 
         # exclude Box
-        label = QLabel('exclude')
+        label = QLabel('EXCLUDE')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['exclude'].addWidget(label)
-        self.vbox_deck['exclude'].addStretch()
+        self.vbox_deck['discard'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['exclude'])
 
         # Menu Box
-        vbox_menu = QVBoxLayout();
+        vbox_menu = QVBoxLayout()
         label = QLabel('OPTIONS')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_menu.addWidget(label)
-        vbox_menu.addStretch()
         hbox_main.addLayout(vbox_menu)
 
         # Destination Radio Box
@@ -140,25 +135,24 @@ class MainWindow(QWidget):
             btn.setFixedSize(QSize(150, 30))
             button_vbox.addWidget(btn)
             btn.clicked.connect(self.function)
-
-        # self.vbox_deck['drawdeck'].addStretch()
         button_vbox.addStretch()
 
     def show_deck(self, deck):
         self.buttons_root[deck.name].deleteLater()
         self.buttons_root[deck.name] = QWidget()
         p = self.buttons_root[deck.name]
+        p.setFixedWidth(150)
         self.vbox_deck[deck.name].addWidget(p)
         button_vbox = QVBoxLayout()
         button_vbox.setSpacing(5)
-        button_vbox.addStretch()
+
         p.setLayout(button_vbox)
         for i, card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
             button_vbox.addWidget(btn)
             btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-        self.vbox_deck[deck.name].addStretch(1)
+        button_vbox.addStretch()
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
