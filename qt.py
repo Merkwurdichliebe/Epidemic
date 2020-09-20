@@ -174,7 +174,7 @@ class MainWindow(QWidget):
 
     def show_deck(self, deck):
         box = self.get_new_deck_vbox(deck.name)
-        for i, card in self.buttons_to_display(deck):
+        for card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
             color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
@@ -187,10 +187,9 @@ class MainWindow(QWidget):
     # TODO not working for drawdeck, fix later when app is working
     def buttons_to_display(deck):
         if deck.name == 'drawdeck':
-            print('k')
-            return enumerate(reversed(deck.cards[-16:]))
+            return reversed(deck.cards[-16:])
         else:
-            return enumerate(deck.sorted())
+            return deck.sorted()
 
     def get_destination(self):
         if self.destination_draw.isChecked():
