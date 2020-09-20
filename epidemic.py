@@ -46,8 +46,8 @@ class App:
         self.updateview()
 
     def updateview(self):
+        self.view.show_cardpool(self.game.deck['draw'])
         self.view.show_drawdeck(self.game.deck['draw'])
-        # self.view.update_cardpool(self.game.deck['draw'])
         self.view.show_deck(self.game.deck['draw'])
         self.view.show_deck(self.game.deck['discard'])
         self.view.show_deck(self.game.deck['exclude'])
@@ -66,11 +66,11 @@ class App:
         self.game.draw(from_deck, to_deck, card)
         self.updateview()
 
-    def cb_view_cardpool(self, index):
+    def cb_update_cardpool(self, index):
         # Callback from the buttons used to display the possible choices
         # in the Draw Deck. Outputs the possible cards in each potential draw.
         self.view.cardpool_index = index
-        self.view.update_cardpool(self.game.deck['draw'])
+        self.view.show_cardpool(self.game.deck['draw'])
 
     def cb_epidemic(self):
         """Callback from the Epidemic button.

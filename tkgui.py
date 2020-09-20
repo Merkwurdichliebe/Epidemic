@@ -255,7 +255,7 @@ class MainWindow:
             )
             # The callback for the cardpool update is part of this class,
             # no need to ask App to do that.
-            btn.configure(command=lambda x=i: self.app.cb_view_cardpool(x))
+            btn.configure(command=lambda x=i: self.app.cb_update_cardpool(x))
             btn.pack()
             self.draw_deck_btns.append(btn)
 

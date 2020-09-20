@@ -26,6 +26,8 @@ class MainWindow(QWidget):
                           'discard': QWidget(),
                           'exclude': QWidget()}
 
+        self.text_cardpool = QLabel()
+
         self.initialise_ui()
 
     def initialise_ui(self):
@@ -45,6 +47,8 @@ class MainWindow(QWidget):
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_cardpool.addWidget(label)
+        vbox_cardpool.addWidget(self.text_cardpool)
+        vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
@@ -110,6 +114,13 @@ class MainWindow(QWidget):
         # Tell the Main Window to use the outer QVBoxLayout
         self.setLayout(self.vbox_app)
 
+    def show_cardpool(self, drawdeck):
+        d = drawdeck.cards[-1 - 0]
+        text = ''
+        for card in sorted(set(d.cards), key=lambda x: x.name):
+            text += f'{card.name} ({d.cards.count(card)})\n'
+        self.text_cardpool.setText(text)
+
     def show_drawdeck(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
         self.cardpool_index = 0
@@ -134,7 +145,7 @@ class MainWindow(QWidget):
             btn = QPushButton(text, self)
             btn.setFixedSize(QSize(150, 30))
             button_vbox.addWidget(btn)
-            btn.clicked.connect(self.function)
+            btn.clicked.connect(lambda index=i: self.function(index))  # self.app.cb_update_cardpool
         button_vbox.addStretch()
 
     def show_deck(self, deck):
@@ -175,5 +186,5 @@ class MainWindow(QWidget):
         print(b)
         print(f'{c} from {d} to {self.get_destination()}')
 
-    def function(self):
-        pass
+    def function(self, i):
+        print(i)
