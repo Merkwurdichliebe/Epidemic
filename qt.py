@@ -21,6 +21,11 @@ class MainWindow(QWidget):
         self.destination_discard = QRadioButton('Discard')
         self.destination_exclude = QRadioButton('Exclude')
 
+        self.buttons_root = {'drawdeck': QWidget(),
+                          'draw': QWidget(),
+                          'discard': QWidget(),
+                          'exclude': QWidget()}
+
         self.initialise_ui()
 
     def initialise_ui(self):
@@ -97,13 +102,6 @@ class MainWindow(QWidget):
         group_box = QGroupBox()
         group_box.setWindowTitle('Destination')
 
-        b_group = QButtonGroup()
-
-        # b_group.addButton(draw)
-        # b_group.addButton(discard)
-        # b_group.addButton(exclude)
-        # b_group.buttonToggled.connect(self.set_destination)
-
         self.destination_exclude.setChecked(True)
 
         vbox_destination.addWidget(self.destination_draw)
@@ -114,12 +112,20 @@ class MainWindow(QWidget):
         vbox_menu.addWidget(group_box)
         vbox_menu.addStretch()
 
-
+        # Tell the Main Window to use the outer QVBoxLayout
         self.setLayout(self.vbox_app)
 
     def show_drawdeck(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
         self.cardpool_index = 0
+
+        self.buttons_root['drawdeck'].deleteLater()
+        self.buttons_root['drawdeck'] = QWidget()
+        p = self.buttons_root['drawdeck']
+        self.vbox_deck['drawdeck'].addWidget(p)
+        button_vbox = QVBoxLayout()
+        button_vbox.setSpacing(5)
+        p.setLayout(button_vbox)
 
         # Define new ones
         for i, c in enumerate(reversed(deck.cards[-16:])):
@@ -132,19 +138,27 @@ class MainWindow(QWidget):
 
             btn = QPushButton(text, self)
             btn.setFixedSize(QSize(150, 30))
-            self.vbox_deck['drawdeck'].addWidget(btn)
+            button_vbox.addWidget(btn)
             btn.clicked.connect(self.function)
 
-        self.vbox_deck['drawdeck'].addStretch(1)
+        # self.vbox_deck['drawdeck'].addStretch()
+        button_vbox.addStretch()
 
     def show_deck(self, deck):
-        bgroup = QButtonGroup()
+        self.buttons_root[deck.name].deleteLater()
+        self.buttons_root[deck.name] = QWidget()
+        p = self.buttons_root[deck.name]
+        self.vbox_deck[deck.name].addWidget(p)
+        button_vbox = QVBoxLayout()
+        button_vbox.setSpacing(5)
+        button_vbox.addStretch()
+        p.setLayout(button_vbox)
         for i, card in self.buttons_to_display(deck):
-
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
-            self.vbox_deck[deck.name].addWidget(btn)
+            button_vbox.addWidget(btn)
             btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+        self.vbox_deck[deck.name].addStretch(1)
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
@@ -155,15 +169,17 @@ class MainWindow(QWidget):
         else:
             return enumerate(deck.sorted())
 
-    def function(self, d, c):
-        sender = self.sender()
-        print(sender)
-        print(d, c)
-
     def get_destination(self):
         if self.destination_draw.isChecked():
-            return 'draw'
+            return self.app.game.deck['draw']
         elif self.destination_discard.isChecked():
-            return 'discard'
+            return self.app.game.deck['discard']
         elif self.destination_exclude.isChecked():
-            return 'exclude'
+            return self.app.game.deck['exclude']
+
+    def clicked(self, b, d, c):
+        print(b)
+        print(f'{c} from {d} to {self.get_destination()}')
+
+    def function(self):
+        pass

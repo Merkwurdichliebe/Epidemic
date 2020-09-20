@@ -62,7 +62,7 @@ class App:
     def cb_draw_card(self, from_deck, card):
         # Move a card from a deck to the destination deck
         # set by the radio buttons in MainWindow.
-        to_deck = self.game.deck[self.view.get_destination()]
+        to_deck = self.view.get_destination()
         self.game.draw(from_deck, to_deck, card)
         self.updateview()
 
