@@ -42,16 +42,6 @@ class App:
         self.update_gui(*self.get_all_decks())
         self.view.show()
 
-    def updateview(self):
-        # self.view.show_cardpool(self.game.deck['draw'])
-        # self.view.show_drawdeck(self.game.deck['draw'])
-        # self.view.show_deck(self.game.deck['draw'])
-        # self.view.show_deck(self.game.deck['discard'])
-        # self.view.show_deck(self.game.deck['exclude'])
-        pass
-        # self.view.update_dropdown(self.game.deck['draw'])
-        # self.view.update_stats(self.game.stats)
-
     def show_select_game_dialog(self):
         # Display select new game dialog
         # (We reuse the callback function for the New Game button)
@@ -62,6 +52,7 @@ class App:
             if deck.name == 'draw':
                 self.view.show_drawdeck(self.game.deck['draw'])
                 self.view.update_epidemic_combo()
+                self.view.update_stats(self.game.stats)
             self.view.show_deck(self.game.deck[deck.name])
 
     def cb_draw_card(self, from_deck, card):

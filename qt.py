@@ -27,6 +27,7 @@ class MainWindow(QWidget):
                           'exclude': QWidget()}
 
         self.text_cardpool = QLabel()
+        self.text_stats = QLabel()
         self.combo_epidemic = QComboBox()
 
         self.initialise_ui()
@@ -123,6 +124,12 @@ class MainWindow(QWidget):
         vbox_epidemic.addWidget(btn)
         vbox_menu.addLayout(vbox_epidemic)
 
+        # Stats
+        label = QLabel('Stats')
+        label.setAlignment(Qt.AlignHCenter)
+        vbox_menu.addWidget(label)
+        vbox_menu.addWidget(self.text_stats)
+
         vbox_menu.addStretch()
 
         # Tell the Main Window to use the outer QVBoxLayout
@@ -205,16 +212,18 @@ class MainWindow(QWidget):
         self.combo_epidemic.repaint()
         # TODO don't clear this each time, add/remove items individiually
 
-        # self.epidemic_options = cards
-        #
-        # # command value lambda syntax is from
-        # # https://stackoverflow.com/questions/28412496/updating-optionmenu-from-list
-        # m = self.dropdown_epidemic.children['menu']
-        # m.delete(0, tk.END)
-        # for c in cards:
-        #     m.add_command(label=c,
-        #                   command=lambda v=c: self.epidemic_choice.set(v))
-        # self.epidemic_choice.set(cards[0])
+    def update_stats(self, stats):
+        text = f'Total cards: {stats.total}\n'
+        text += f'In discard pile: {stats.in_discard}\n'
+        text += f'\nTop card frequency:\n'
+        text += f'{stats.top_freq} '
+        text += f'({stats.percentage:.2%})'
+        text += '\n\n'
+        for card in stats.top_cards:
+            text += '- ' + card.name + '\n'
+
+        self.text_stats.setText(text)
+        self.text_stats.repaint()
 
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
