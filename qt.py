@@ -76,7 +76,7 @@ class MainWindow(QWidget):
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['exclude'].addWidget(label)
-        self.vbox_deck['discard'].setSpacing(5)
+        self.vbox_deck['exclude'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['exclude'])
 
         # Menu Box
