@@ -125,13 +125,7 @@ class MainWindow(QWidget):
         # Reset the cardpool index to point to the top of the Draw Deck
         self.cardpool_index = 0
 
-        self.buttons_root['drawdeck'].deleteLater()
-        self.buttons_root['drawdeck'] = QWidget()
-        p = self.buttons_root['drawdeck']
-        self.vbox_deck['drawdeck'].addWidget(p)
-        button_vbox = QVBoxLayout()
-        button_vbox.setSpacing(5)
-        p.setLayout(button_vbox)
+        box = self.get_new_deck_vbox('drawdeck')
 
         # Define new ones
         for i, c in enumerate(reversed(deck.cards[-16:])):
@@ -144,26 +138,18 @@ class MainWindow(QWidget):
 
             btn = QPushButton(text, self)
             btn.setFixedSize(QSize(150, 30))
-            button_vbox.addWidget(btn)
+            box.addWidget(btn)
             btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
-        button_vbox.addStretch()
+        box.addStretch()
 
     def show_deck(self, deck):
-        self.buttons_root[deck.name].deleteLater()
-        self.buttons_root[deck.name] = QWidget()
-        p = self.buttons_root[deck.name]
-        p.setFixedWidth(150)
-        self.vbox_deck[deck.name].addWidget(p)
-        button_vbox = QVBoxLayout()
-        button_vbox.setSpacing(5)
-
-        p.setLayout(button_vbox)
+        box = self.get_new_deck_vbox(deck.name)
         for i, card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
             btn.setFixedSize(QSize(150, 30))
-            button_vbox.addWidget(btn)
+            box.addWidget(btn)
             btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-        button_vbox.addStretch()
+        box.addStretch()
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
@@ -182,12 +168,16 @@ class MainWindow(QWidget):
         elif self.destination_exclude.isChecked():
             return self.app.game.deck['exclude']
 
-    def clicked(self, b, d, c):
-        print(b)
-        print(f'{c} from {d} to {self.get_destination()}')
-
-    def function(self, i):
-        print(i)
+    def get_new_deck_vbox(self, deck_name):
+        self.buttons_root[deck_name].deleteLater()
+        self.buttons_root[deck_name] = QWidget()
+        p = self.buttons_root[deck_name]
+        p.setFixedWidth(150)
+        self.vbox_deck[deck_name].addWidget(p)
+        button_vbox = QVBoxLayout()
+        button_vbox.setSpacing(5)
+        p.setLayout(button_vbox)
+        return button_vbox
 
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
