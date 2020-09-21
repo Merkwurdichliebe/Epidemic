@@ -136,3 +136,4 @@ etc/
 .idea/
 pyinstaller/
 dist/
+.venv*

@@ -1,11 +1,3 @@
-altgraph==0.17
-cx-Freeze==6.2
-macholib==1.14
-modulegraph==0.18
-py2app==0.21
-pyaml==20.4.0
-pyinstaller==4.0
-pyinstaller-hooks-contrib==2020.7
 pyobjc==6.2.2
 pyobjc-core==6.2.2
 pyobjc-framework-Accounts==6.2.2

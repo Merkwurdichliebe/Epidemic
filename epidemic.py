@@ -99,7 +99,6 @@ class App:
 
 
 def main():
-    """Main program entry point."""
     application = QApplication()
     app = App()
     application.exec_()
