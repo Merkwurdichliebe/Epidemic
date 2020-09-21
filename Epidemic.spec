@@ -38,7 +38,7 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
              name='Epidemic.app',
              icon='icon.icns',
-             bundle_identifier=None,
+             bundle_identifier='com.talzana.epidemic',
              info_plist={
                   'NSHighResolutionCapable': 'True'
                 })
