@@ -35,7 +35,8 @@ class Game:
         d.add(deepcopy(self.games[game]))
         return d
 
-    def draw_card(self, from_deck, to_deck, card):
+    @staticmethod
+    def draw_card(from_deck, to_deck, card):
         if not from_deck == to_deck:
             from_deck.move(card, to_deck)
 
