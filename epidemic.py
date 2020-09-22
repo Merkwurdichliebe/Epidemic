@@ -2,12 +2,14 @@
 
 """
 EPIDEMIC is designed to assist in evaluating card draw probabilities
-in the board game Pandemic. It is my first attempt at a working project
-using Tkinter for the GUI.
+in the board game Pandemic.
 
-The Application uses the MVC pattern:
+This is my first attempt at a working project
+using the Qt framework with PySide2.
+
+The Application a simplified MVC pattern:
 Model : Game (in game.py)
-View : MainWindow (in tkgui.py)
+View : MainWindow (in qt.py)
 Controller : App (in this file)
 """
 
