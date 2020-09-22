@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
 
 from PySide2.QtCore import Qt, QSize
 
+# TODO center dialog boxes
 
 COLORS = {'blue': '#3333ff',
           'black': '#000000',
@@ -108,6 +109,7 @@ class MainWindow(QWidget):
         b_new_game.clicked.connect(self.app.cb_new_game)
         vbox_game.addWidget(b_new_game)
         b_help = QPushButton('Help')
+        b_help.clicked.connect(self.app.cb_dialog_help)
         vbox_game.addWidget(b_help)
         vbox_menu.addLayout(vbox_game)
 
@@ -254,7 +256,7 @@ class MainWindow(QWidget):
 class DialogNewGame(QDialog):
     def __init__(self, games):
         super().__init__()
-
+        self.setWindowTitle('Start New Game')
         vbox_dialog = QVBoxLayout()
         label = QLabel('Select the game you wish to track:')
         vbox_dialog.addWidget(label)
@@ -278,3 +280,23 @@ class DialogNewGame(QDialog):
 
     def cancel(self):
         self.reject()
+
+
+class DialogHelp(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Open Help Page')
+        vbox = QVBoxLayout()
+        label = QLabel('Help is available on the application\'s GitHub page.')
+        vbox.addWidget(label)
+        hbox_buttons = QHBoxLayout()
+        b_cancel = QPushButton('Close')
+        b_cancel.clicked.connect(self.reject)
+        hbox_buttons.addWidget(b_cancel)
+        b_start = QPushButton('View in browser')
+        b_start.clicked.connect(self.accept)
+        b_start.setDefault(True)
+        hbox_buttons.addWidget(b_start)
+        vbox.addLayout(hbox_buttons)
+        self.setLayout(vbox)
+

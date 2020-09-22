@@ -25,8 +25,9 @@ __version__ = "0.8"
 # TODO For V2 : Make buttons into labels with hover color
 
 from PySide2.QtWidgets import QApplication
-from qt import MainWindow, DialogNewGame
+from qt import MainWindow, DialogNewGame, DialogHelp
 from game import Game
+from webbrowser import open as webopen
 
 
 class App:
@@ -38,9 +39,8 @@ class App:
         # We pass it the App object so that we can use callbacks
         # (Better way?)
         self.view = MainWindow(self)
-        self.game.initialise('Legacy Season 2')
-        self.update_gui(*self.get_all_decks())
         self.view.show()
+        self.show_select_game_dialog()
 
     def show_select_game_dialog(self):
         # Display select new game dialog
@@ -85,8 +85,9 @@ class App:
     def cb_dialog_help(self):
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
-        dialog = tkdialogs.DialogHelp(self.view.root)
-        self.view.root.wait_window(dialog.top)
+        dialog = DialogHelp()
+        if dialog.exec_():
+            webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
 
     def get_all_decks(self):
         return list(self.game.deck.values())
