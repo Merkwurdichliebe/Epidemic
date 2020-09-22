@@ -61,6 +61,9 @@ class Deck:
     def sorted(self):
         return sorted(self.cards, key=lambda x: x.name)
 
+    def __len__(self):
+        return len(self.cards)
+
 
 class DrawDeck(Deck):
     """Subclass of Deck used for the Draw Deck only.
@@ -104,3 +107,4 @@ class DrawDeck(Deck):
         # in a sorted list of unique possible cards
         # from the Deck at the top (last) position
         return sorted(set(self.cards[-1].cards), key=lambda x: x.name)
+

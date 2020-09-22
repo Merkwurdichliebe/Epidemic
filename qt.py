@@ -93,13 +93,22 @@ class MainWindow(QWidget):
         self.vbox_deck['exclude'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['exclude'])
 
-        # Menu Box
+        # Options Box
         vbox_menu = QVBoxLayout()
         label = QLabel('OPTIONS')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_menu.addWidget(label)
         hbox_main.addLayout(vbox_menu)
+
+        # New Game & Help
+        vbox_game = QVBoxLayout()
+        vbox_game.setSpacing(5)
+        b_new_game = QPushButton('New Game')
+        vbox_game.addWidget(b_new_game)
+        b_help = QPushButton('Help')
+        vbox_game.addWidget(b_help)
+        vbox_menu.addLayout(vbox_game)
 
         # Destination Radio Box
         vbox_destination = QVBoxLayout()
@@ -161,10 +170,10 @@ class MainWindow(QWidget):
         for i, c in enumerate(reversed(deck.cards[-16:])):
             # If the top card is a single card we display its name,
             # otherwise we display the number of possible cards.
-            if len(c.cards) == 1:
+            if len(c) == 1:
                 text = c.cards[0].name
             else:
-                text = f'{len(c.cards)}'
+                text = f'{len(c)}'
 
             btn = QPushButton(text, self)
             btn.setFixedSize(QSize(150, 30))

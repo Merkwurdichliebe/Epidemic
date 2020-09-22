@@ -11,13 +11,13 @@ class Stats:
         self.deck = deck
 
         # Cards total should only be updated on object creation
-        self.total = len(self.deck['discard'].cards) + \
-                     len(self.deck['draw'].cards[0].cards)
+        self.total = len(self.deck['discard']) + \
+                     len(self.deck['draw'].cards[0])
 
     @property
     def in_discard(self):
         """Get the discard deck card count"""
-        return len(self.deck['discard'].cards)
+        return len(self.deck['discard'])
 
     @property
     def most_common(self):
@@ -33,7 +33,7 @@ class Stats:
     @property
     def percentage(self):
         """Get the highest frequency card draw probablity as a percentage"""
-        return self.top_freq / len(self.deck['draw'].cards[-1].cards)
+        return self.top_freq / len(self.deck['draw'].cards[-1])
 
     @property
     def top_cards(self):
