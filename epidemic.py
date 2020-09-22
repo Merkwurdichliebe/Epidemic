@@ -21,13 +21,12 @@ __version__ = "0.8"
 # TODO undo
 # TODO fr, en
 # TODO parse YML import for empty file or wrong colors
-# TODO better tk update method calls
 # TODO disable textboxes on game launch
-# TODO make game selection dialog receive focus on launch
-# TODO For V2 : Make buttons into labels with hover color
+# TODO allow cancel on app start
 
 from PySide2.QtWidgets import QApplication
-from qt import MainWindow, DialogNewGame, DialogHelp
+from qt import MainWindow
+from qtdialogs import DialogHelp, DialogNewGame
 from game import Game
 from webbrowser import open as webopen
 

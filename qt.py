@@ -1,6 +1,5 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QDialog
-
+    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox
 from PySide2.QtCore import Qt, QSize
 
 # TODO center dialog boxes
@@ -42,12 +41,19 @@ class MainWindow(QWidget):
         self.initialise_ui()
 
     def initialise_ui(self):
-        # self.setGeometry(100, 100, 400, 300)
         self.setWindowTitle('Epidemic')
 
         # Main Box
-        title = QLabel('Epidemic')
-        self.vbox_app.addWidget(title)
+        # title = QLabel('Epidemic')
+        # title.setStyleSheet('font-weight: bold; font-size: 28px;')
+        # subtitle = QLabel('A card tracker for Pandemic')
+        # subtitle.setStyleSheet('font-weight: bold; font-size: 16px;')
+        #
+        # hbox_title = QHBoxLayout()
+        # hbox_title.addWidget(title)
+        # hbox_title.addWidget(subtitle)
+        # hbox_title.addStretch()
+        # self.vbox_app.addLayout(hbox_title)
 
         hbox_main = QHBoxLayout()
         self.vbox_app.addLayout(hbox_main)
@@ -55,6 +61,7 @@ class MainWindow(QWidget):
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
         label = QLabel('CARD POOL')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_cardpool.addWidget(label)
@@ -64,6 +71,7 @@ class MainWindow(QWidget):
 
         # Draw Deck Box
         label = QLabel('DRAW DECK')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['drawdeck'].addWidget(label)
@@ -72,6 +80,7 @@ class MainWindow(QWidget):
 
         # Draw Card Box
         label = QLabel('DRAW CARD')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['draw'].addWidget(label)
@@ -80,6 +89,7 @@ class MainWindow(QWidget):
 
         # Discard Box
         label = QLabel('DISCARD')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['discard'].addWidget(label)
@@ -88,6 +98,7 @@ class MainWindow(QWidget):
 
         # exclude Box
         label = QLabel('EXCLUDE')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         self.vbox_deck['exclude'].addWidget(label)
@@ -97,6 +108,7 @@ class MainWindow(QWidget):
         # Options Box
         vbox_menu = QVBoxLayout()
         label = QLabel('OPTIONS')
+        label.setStyleSheet('font-weight: bold')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
         vbox_menu.addWidget(label)
@@ -246,57 +258,8 @@ class MainWindow(QWidget):
         self.text_stats.repaint()
         # TODO make stats a function
 
-
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
 
 # 2: A hack which should be fixed with a better event handling
 # https://stackoverflow.com/questions/4510712/qlabel-settext-not-displaying-text-immediately-before-running-other-method
-
-class DialogNewGame(QDialog):
-    def __init__(self, games):
-        super().__init__()
-        self.setWindowTitle('Start New Game')
-        vbox_dialog = QVBoxLayout()
-        label = QLabel('Select the game you wish to track:')
-        vbox_dialog.addWidget(label)
-        self.combo = QComboBox()
-        self.combo.addItems(games)
-        vbox_dialog.addWidget(self.combo)
-        hbox_buttons = QHBoxLayout()
-        b_cancel = QPushButton('Cancel')
-        b_cancel.clicked.connect(self.cancel)
-        hbox_buttons.addWidget(b_cancel)
-        b_start = QPushButton('Start New Game')
-        b_start.clicked.connect(self.start)
-        b_start.setDefault(True)
-        hbox_buttons.addWidget(b_start)
-        vbox_dialog.addLayout(hbox_buttons)
-        self.setLayout(vbox_dialog)
-
-    def start(self):
-        self.accept()
-        return self.combo.currentText()
-
-    def cancel(self):
-        self.reject()
-
-
-class DialogHelp(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Open Help Page')
-        vbox = QVBoxLayout()
-        label = QLabel('Help is available on the application\'s GitHub page.')
-        vbox.addWidget(label)
-        hbox_buttons = QHBoxLayout()
-        b_cancel = QPushButton('Close')
-        b_cancel.clicked.connect(self.reject)
-        hbox_buttons.addWidget(b_cancel)
-        b_start = QPushButton('View in browser')
-        b_start.clicked.connect(self.accept)
-        b_start.setDefault(True)
-        hbox_buttons.addWidget(b_start)
-        vbox.addLayout(hbox_buttons)
-        self.setLayout(vbox)
-
