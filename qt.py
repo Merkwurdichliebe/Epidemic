@@ -14,11 +14,10 @@ COLORS = {'blue': '#3333ff',
 
 class MainWindow(QWidget):
     def __init__(self, app):
-        super().__init__()  # QWidget defaults
+        super().__init__()
         self.app = app
         self.cardpool_index = 0
 
-        self.drawdeck_btns = []
         self.vbox_app = QVBoxLayout()
         self.vbox_deck = {'drawdeck': QVBoxLayout(),
                           'draw': QVBoxLayout(),
@@ -209,10 +208,7 @@ class MainWindow(QWidget):
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
     def buttons_to_display(deck):
-        if deck.name == 'drawdeck':
-            return reversed(deck.cards[-16:])
-        else:
-            return deck.sorted()
+        return reversed(deck.cards[-16:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
         if self.destination_draw.isChecked():

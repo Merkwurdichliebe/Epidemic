@@ -3,7 +3,7 @@
 # Each cards should have a name, a count (the number of copies of that card
 # in the draw deck) and a color. You can add more cards or delete existing ones.
 #
-# Only use blue, black, yellow and green. Edit with care.
+# Only use blue, black, yellow, red and green. Edit with care.
 
 Legacy Season 2:
   - name: Atlanta

@@ -8,6 +8,9 @@ from copy import deepcopy
 import yaml
 
 
+CARDS_FILE = 'data/cards.yml'
+# TODO add epidemic counter and identifier
+
 class Game:
     def __init__(self):
         self.games = self.get_all_games()
@@ -82,7 +85,7 @@ class Game:
 
     @staticmethod
     def read_data_file():
-        file = utility.get_path('data/cards.yml')
+        file = utility.get_path(CARDS_FILE)
         try:
             with open(file, encoding='utf-8') as f:
                 data = yaml.load(f, Loader=yaml.FullLoader)
