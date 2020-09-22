@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox
+    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QDialog
 
 from PySide2.QtCore import Qt, QSize
 
@@ -30,9 +30,9 @@ class MainWindow(QWidget):
         self.destination_exclude = QRadioButton('Exclude')
 
         self.buttons_root = {'drawdeck': QWidget(),
-                          'draw': QWidget(),
-                          'discard': QWidget(),
-                          'exclude': QWidget()}
+                             'draw': QWidget(),
+                             'discard': QWidget(),
+                             'exclude': QWidget()}
 
         self.text_cardpool = QLabel()
         self.text_stats = QLabel()
@@ -52,7 +52,7 @@ class MainWindow(QWidget):
         self.vbox_app.addLayout(hbox_main)
 
         # Cardpool Box
-        vbox_cardpool = QVBoxLayout();
+        vbox_cardpool = QVBoxLayout()
         label = QLabel('CARD POOL')
         label.setMinimumWidth(150)
         label.setAlignment(Qt.AlignHCenter)
@@ -105,6 +105,7 @@ class MainWindow(QWidget):
         vbox_game = QVBoxLayout()
         vbox_game.setSpacing(5)
         b_new_game = QPushButton('New Game')
+        b_new_game.clicked.connect(self.app.cb_new_game)
         vbox_game.addWidget(b_new_game)
         b_help = QPushButton('Help')
         vbox_game.addWidget(b_help)
@@ -153,7 +154,6 @@ class MainWindow(QWidget):
         self.setLayout(self.vbox_app)
 
     def show_cardpool(self, drawdeck):
-        print('--> In show_cardpool')
         d = drawdeck.cards[-1 - self.cardpool_index]
         text = ''
         for card in sorted(set(d.cards), key=lambda x: x.name):
@@ -244,8 +244,37 @@ class MainWindow(QWidget):
         self.text_stats.repaint()
         # TODO make stats a function
 
+
 # 1: See SO article for reasons for "ignore" argument:
 # https://stackoverflow.com/questions/18836291/lambda-function-returning-false
 
 # 2: A hack which should be fixed with a better event handling
 # https://stackoverflow.com/questions/4510712/qlabel-settext-not-displaying-text-immediately-before-running-other-method
+
+class DialogNewGame(QDialog):
+    def __init__(self, games):
+        super().__init__()
+
+        vbox_dialog = QVBoxLayout()
+        label = QLabel('Select the game you wish to track:')
+        vbox_dialog.addWidget(label)
+        self.combo = QComboBox()
+        self.combo.addItems(games)
+        vbox_dialog.addWidget(self.combo)
+        hbox_buttons = QHBoxLayout()
+        b_cancel = QPushButton('Cancel')
+        b_cancel.clicked.connect(self.cancel)
+        hbox_buttons.addWidget(b_cancel)
+        b_start = QPushButton('Start New Game')
+        b_start.clicked.connect(self.start)
+        b_start.setDefault(True)
+        hbox_buttons.addWidget(b_start)
+        vbox_dialog.addLayout(hbox_buttons)
+        self.setLayout(vbox_dialog)
+
+    def start(self):
+        self.accept()
+        return self.combo.currentText()
+
+    def cancel(self):
+        self.reject()

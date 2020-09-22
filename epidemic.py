@@ -25,7 +25,7 @@ __version__ = "0.8"
 # TODO For V2 : Make buttons into labels with hover color
 
 from PySide2.QtWidgets import QApplication
-from qt import MainWindow
+from qt import MainWindow, DialogNewGame
 from game import Game
 
 
@@ -76,17 +76,11 @@ class App:
     def cb_new_game(self):
         """Callback from the New Game button.
         Initialises the app for a new game."""
-
-        # We pass the dialog box a list of the games dictionary's keys,
-        # to be displayed in a dropdown menu.
-        dialog = tkdialogs.DialogNewGame(self.view.root,
-                                         list(self.game.games.keys()))
-        self.view.root.wait_window(dialog.top)
-
-        # If the box hasn't been canceled, start a new game.
-        if dialog.game_choice is not None:
-            self.game.initialise(dialog.game_choice.get())
-            self.updateview()
+        games = list(self.game.games.keys())
+        dialog = DialogNewGame(games)
+        if dialog.exec_():
+            self.game.initialise(dialog.combo.currentText())
+        self.update_gui(*self.get_all_decks())
 
     def cb_dialog_help(self):
         """Callback from the Help button.
