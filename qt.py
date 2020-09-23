@@ -12,6 +12,15 @@ COLORS = {'blue': '#3333ff',
           'gray': '#bfbfbf'}
 
 
+class ColumnLabel(QLabel):
+    def __init__(self, text):
+        super().__init__()
+        self.setText(text)
+        self.setStyleSheet('font-weight: bold')
+        self.setMinimumWidth(150)
+        self.setAlignment(Qt.AlignHCenter)
+
+
 class MainWindow(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -59,57 +68,39 @@ class MainWindow(QWidget):
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
-        label = QLabel('CARD POOL')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('CARD POOL')
         vbox_cardpool.addWidget(label)
         vbox_cardpool.addWidget(self.text_cardpool)
         vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
-        label = QLabel('DRAW DECK')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('DRAW DECK')
         self.vbox_deck['drawdeck'].addWidget(label)
         self.vbox_deck['drawdeck'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
-        label = QLabel('DRAW CARD')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('DRAW CARD')
         self.vbox_deck['draw'].addWidget(label)
         self.vbox_deck['draw'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['draw'])
 
         # Discard Box
-        label = QLabel('DISCARD')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('DISCARD PILE')
         self.vbox_deck['discard'].addWidget(label)
         self.vbox_deck['discard'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['discard'])
 
         # exclude Box
-        label = QLabel('EXCLUDE')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('EXCLUDED')
         self.vbox_deck['exclude'].addWidget(label)
         self.vbox_deck['exclude'].setSpacing(5)
         hbox_main.addLayout(self.vbox_deck['exclude'])
 
         # Options Box
         vbox_menu = QVBoxLayout()
-        label = QLabel('OPTIONS')
-        label.setStyleSheet('font-weight: bold')
-        label.setMinimumWidth(150)
-        label.setAlignment(Qt.AlignHCenter)
+        label = ColumnLabel('OPTIONS')
         vbox_menu.addWidget(label)
         hbox_main.addLayout(vbox_menu)
 
