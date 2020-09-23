@@ -2,10 +2,10 @@
 
 """
 EPIDEMIC is designed to assist in evaluating card draw probabilities
-in the board game Pandemic.
+in the board games Pandemic and Pandemic Legacy.
 
 This is my first attempt at a working project
-using the Qt framework with PySide2.
+using the Qt framework and PySide2.
 
 The Application a simplified MVC pattern:
 Model : Game (in game.py)
@@ -16,7 +16,7 @@ Controller : App (in this file)
 __author__ = "Tal Zana"
 __copyright__ = "Copyright 2020"
 __license__ = "GPL"
-__version__ = "0.8"
+__version__ = "1.0"
 
 # TODO undo
 # TODO fr, en
@@ -38,7 +38,6 @@ class App:
 
         # Instantiate the main window (the View in MVC)
         # We pass it the App object so that we can use callbacks
-        # (Better way?)
         self.view = MainWindow(self)
         self.view.show()
         self.show_select_game_dialog()

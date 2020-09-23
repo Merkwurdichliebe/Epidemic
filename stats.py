@@ -22,7 +22,7 @@ class Stats:
     def most_common(self):
         """Get the most common cards in the draw deck"""
         # Use a Counter to sort the cards by the most common ones
-        return Counter(self.deck['draw'].cards[-1].cards).most_common()
+        return Counter(self.deck['draw'].top().cards).most_common()
 
     @property
     def top_freq(self):
@@ -32,7 +32,7 @@ class Stats:
     @property
     def percentage(self):
         """Get the highest frequency card draw probablity as a percentage"""
-        return self.top_freq / len(self.deck['draw'].cards[-1])
+        return self.top_freq / len(self.deck['draw'].top())
 
     @property
     def top_cards(self):
