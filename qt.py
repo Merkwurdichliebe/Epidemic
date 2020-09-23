@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
 from PySide2.QtCore import Qt, QSize
 
 # TODO center dialog boxes
+# TODO Fixed window size
 
 COLORS = {'blue': '#3333ff',
           'black': '#000000',
@@ -11,13 +12,15 @@ COLORS = {'blue': '#3333ff',
           'green': '#009933',
           'gray': '#bfbfbf'}
 
+SPACING = 5  # Vertical spacing of buttons
+WIDTH = 150  # Width of buttons and layout columns
 
 class ColumnLabel(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(text)
         self.setStyleSheet('font-weight: bold')
-        self.setMinimumWidth(150)
+        self.setMinimumWidth(WIDTH)
         self.setAlignment(Qt.AlignHCenter)
 
 
@@ -51,18 +54,7 @@ class MainWindow(QWidget):
     def initialise_ui(self):
         self.setWindowTitle('Epidemic')
 
-        # Main Box
-        # title = QLabel('Epidemic')
-        # title.setStyleSheet('font-weight: bold; font-size: 28px;')
-        # subtitle = QLabel('A card tracker for Pandemic')
-        # subtitle.setStyleSheet('font-weight: bold; font-size: 16px;')
-        #
-        # hbox_title = QHBoxLayout()
-        # hbox_title.addWidget(title)
-        # hbox_title.addWidget(subtitle)
-        # hbox_title.addStretch()
-        # self.vbox_app.addLayout(hbox_title)
-
+        # Global parent layout
         hbox_main = QHBoxLayout()
         self.vbox_app.addLayout(hbox_main)
 
@@ -77,25 +69,25 @@ class MainWindow(QWidget):
         # Draw Deck Box
         label = ColumnLabel('DRAW DECK')
         self.vbox_deck['drawdeck'].addWidget(label)
-        self.vbox_deck['drawdeck'].setSpacing(5)
+        self.vbox_deck['drawdeck'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
         label = ColumnLabel('DRAW CARD')
         self.vbox_deck['draw'].addWidget(label)
-        self.vbox_deck['draw'].setSpacing(5)
+        self.vbox_deck['draw'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['draw'])
 
         # Discard Box
         label = ColumnLabel('DISCARD PILE')
         self.vbox_deck['discard'].addWidget(label)
-        self.vbox_deck['discard'].setSpacing(5)
+        self.vbox_deck['discard'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['discard'])
 
         # exclude Box
         label = ColumnLabel('EXCLUDED')
         self.vbox_deck['exclude'].addWidget(label)
-        self.vbox_deck['exclude'].setSpacing(5)
+        self.vbox_deck['exclude'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['exclude'])
 
         # Options Box
@@ -106,7 +98,7 @@ class MainWindow(QWidget):
 
         # New Game & Help
         vbox_game = QVBoxLayout()
-        vbox_game.setSpacing(5)
+        vbox_game.setSpacing(SPACING)
         b_new_game = QPushButton('New Game')
         b_new_game.clicked.connect(self.app.cb_new_game)
         vbox_game.addWidget(b_new_game)
@@ -118,25 +110,21 @@ class MainWindow(QWidget):
         # Destination Radio Box
         vbox_destination = QVBoxLayout()
         label = QLabel('Card Destination')
-        label.setMinimumWidth(150)
+        label.setMinimumWidth(WIDTH)
         label.setAlignment(Qt.AlignHCenter)
         vbox_destination.addWidget(label)
-
         group_box = QGroupBox()
         group_box.setWindowTitle('Destination')
-
         self.destination_exclude.setChecked(True)
-
         vbox_destination.addWidget(self.destination_draw)
         vbox_destination.addWidget(self.destination_discard)
         vbox_destination.addWidget(self.destination_exclude)
         group_box.setLayout(vbox_destination)
-
         vbox_menu.addWidget(group_box)
 
         # Epidemic dropdown
         vbox_epidemic = QVBoxLayout()
-        vbox_epidemic.setSpacing(5)
+        vbox_epidemic.setSpacing(SPACING)
         label = QLabel('Epidemic')
         label.setAlignment(Qt.AlignHCenter)
         vbox_epidemic.addWidget(label)
@@ -180,7 +168,7 @@ class MainWindow(QWidget):
                 text = f'{len(c)}'
 
             btn = QPushButton(text, self)
-            btn.setFixedSize(QSize(150, 30))
+            btn.setFixedSize(QSize(WIDTH, 30))
             box.addWidget(btn)
             btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
         box.addStretch()
@@ -189,7 +177,7 @@ class MainWindow(QWidget):
         box = self.get_new_deck_vbox(deck.name)
         for card in self.buttons_to_display(deck):
             btn = QPushButton(card.name, self)
-            btn.setFixedSize(QSize(150, 30))
+            btn.setFixedSize(QSize(WIDTH, 30))
             color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
             btn.setStyleSheet(f'color: {color}')
             box.addWidget(btn)
@@ -213,10 +201,10 @@ class MainWindow(QWidget):
         self.buttons_root[deck_name].deleteLater()
         self.buttons_root[deck_name] = QWidget()
         p = self.buttons_root[deck_name]
-        p.setFixedWidth(150)
+        p.setFixedWidth(WIDTH)
         self.vbox_deck[deck_name].addWidget(p)
         button_vbox = QVBoxLayout()
-        button_vbox.setSpacing(5)
+        button_vbox.setSpacing(SPACING)
         p.setLayout(button_vbox)
         return button_vbox
 
