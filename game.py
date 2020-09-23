@@ -11,9 +11,11 @@ import yaml
 CARDS_FILE = 'data/cards.yml'
 # TODO add epidemic counter and identifier
 
+
 class Game:
     def __init__(self):
         self.games = self.get_all_games()
+        self.epidemic_count = 0
         self.deck = None
         self.stats = None
 
@@ -48,9 +50,10 @@ class Game:
         new_card = self.deck['draw'].get_card_by_name(card)
         self.deck['draw'].remove_from_bottom(new_card)
         self.deck['discard'].add(new_card)
+        self.epidemic_count += 1
 
         # Create new card pool
-        new_cards = Deck('epidemic')
+        new_cards = Deck(f'Epidemic #{self.epidemic_count}')
         for card in self.deck['discard'].cards.copy():
             new_cards.add(card)
         self.deck['draw'].add(new_cards)
@@ -72,7 +75,7 @@ class Game:
 
     @staticmethod
     def create_deck(game_title, data):
-        deck = Deck(game_title)
+        deck = Deck('Starter Deck')
         for item in data[game_title]:
             if item['color'] not in Card.valid_colors:
                 raise ValueError(f"Invalid color '{item['color']}' in "

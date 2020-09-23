@@ -11,8 +11,7 @@ class Stats:
         self.deck = deck
 
         # Cards total should only be updated on object creation
-        self.total = len(self.deck['discard']) + \
-                     len(self.deck['draw'].cards[0])
+        self.total = len(self.deck['draw'].bottom())
 
     @property
     def in_discard(self):

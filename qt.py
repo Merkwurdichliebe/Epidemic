@@ -15,6 +15,7 @@ COLORS = {'blue': '#3333ff',
 SPACING = 5  # Vertical spacing of buttons
 WIDTH = 150  # Width of buttons and layout columns
 
+
 class ColumnLabel(QLabel):
     def __init__(self, text):
         super().__init__()
@@ -150,6 +151,7 @@ class MainWindow(QWidget):
         text = ''
         for card in sorted(set(d.cards), key=lambda x: x.name):
             text += f'{card.name} ({d.cards.count(card)})\n'
+        text += f'\n[{d.name}]'
         self.text_cardpool.setText(text)
         self.text_cardpool.repaint()  # 2 TODO Fix repaint
 
@@ -212,7 +214,7 @@ class MainWindow(QWidget):
         deck = self.app.game.deck['draw']
         # Update the epidemic dropdown list
         # based on the available cards in the Draw Deck.
-        cards = sorted([c.name for c in list(set(deck.cards[0].cards))])
+        cards = sorted([c.name for c in list(set(deck.bottom().cards))])
 
         self.combo_epidemic.clear()
         self.combo_epidemic.addItems(cards)

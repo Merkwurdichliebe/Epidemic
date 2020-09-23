@@ -47,7 +47,7 @@ class Deck:
 
     def get_card_by_name(self, name):
         if isinstance(self, DrawDeck):
-            list = self.cards[0].cards
+            list = self.bottom().cards
         else:
             list = self.cards
         found = next((card for card in list if card.name == name), None)
@@ -88,18 +88,17 @@ class DrawDeck(Deck):
 
     def remove(self, card):
         # Override Deck.remove:
-        # Remove the card from the Deck at the last position in the list
-        # (i.e. representing the top card on the deck)
+        # Remove the card from the top of the deck
         # so that it's excluded from future possible draws,
         # then removes the Deck itself from the Draw Deck.
-        self.cards[-1].remove(card)
+        self.top().remove(card)
         self.cards.pop()
 
     def remove_from_bottom(self, card):
         # Remove a card from the bottom of the draw deck,
         # i.e. from list position 0,
         # then remove the list item entirely because the card was drawn.
-        self.cards[0].remove(card)
+        self.bottom().remove(card)
         self.cards.pop(0)
 
     def sorted(self):
@@ -108,3 +107,8 @@ class DrawDeck(Deck):
         # from the Deck at the top (last) position
         return sorted(set(self.cards[-1].cards), key=lambda x: x.name)
 
+    def top(self):
+        return self.cards[-1]
+
+    def bottom(self):
+        return self.cards[0]
