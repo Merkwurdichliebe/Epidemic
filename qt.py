@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox
+    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea
 from PySide2.QtCore import Qt, QSize
 
 # TODO center dialog boxes
@@ -14,6 +14,7 @@ COLORS = {'blue': '#3333ff',
 
 SPACING = 5  # Vertical spacing of buttons
 WIDTH = 150  # Width of buttons and layout columns
+WIDTH_WITH_SCROLL = 165
 
 
 class ColumnLabel(QLabel):
@@ -21,8 +22,17 @@ class ColumnLabel(QLabel):
         super().__init__()
         self.setText(text)
         self.setStyleSheet('font-weight: bold')
-        self.setMinimumWidth(WIDTH)
+        self.setFixedWidth(WIDTH)
         self.setAlignment(Qt.AlignHCenter)
+
+
+class DeckScrollArea(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setWidgetResizable(True)
+        self.setMaximumWidth(WIDTH_WITH_SCROLL)
 
 
 class MainWindow(QWidget):
@@ -37,6 +47,10 @@ class MainWindow(QWidget):
                           'discard': QVBoxLayout(),
                           'exclude': QVBoxLayout()}
 
+        self.scroll_deck = {'draw': DeckScrollArea(),
+                            'discard': DeckScrollArea(),
+                            'exclude': DeckScrollArea()}
+
         self.destination_draw = QRadioButton('Draw')
         self.destination_discard = QRadioButton('Discard')
         self.destination_exclude = QRadioButton('Exclude')
@@ -48,6 +62,7 @@ class MainWindow(QWidget):
 
         self.text_cardpool = QLabel()
         self.text_stats = QLabel()
+        self.text_stats.setMaximumHeight(400)
         self.combo_epidemic = QComboBox()
         self.btn_shuffle_epidemic = QPushButton('Shuffle Epidemic')
 
@@ -76,21 +91,27 @@ class MainWindow(QWidget):
 
         # Draw Card Box
         label = ColumnLabel('DRAW CARD')
-        self.vbox_deck['draw'].addWidget(label)
-        self.vbox_deck['draw'].setSpacing(SPACING)
-        hbox_main.addLayout(self.vbox_deck['draw'])
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.scroll_deck['draw'])
+        # self.vbox_deck['draw'].setSpacing(SPACING)
+        hbox_main.addLayout(layout)
 
         # Discard Box
         label = ColumnLabel('DISCARD PILE')
-        self.vbox_deck['discard'].addWidget(label)
-        self.vbox_deck['discard'].setSpacing(SPACING)
-        hbox_main.addLayout(self.vbox_deck['discard'])
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.scroll_deck['discard'])
+        # self.vbox_deck['draw'].setSpacing(SPACING)
+        hbox_main.addLayout(layout)
 
         # exclude Box
         label = ColumnLabel('EXCLUDED')
-        self.vbox_deck['exclude'].addWidget(label)
-        self.vbox_deck['exclude'].setSpacing(SPACING)
-        hbox_main.addLayout(self.vbox_deck['exclude'])
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.scroll_deck['exclude'])
+        # self.vbox_deck['draw'].setSpacing(SPACING)
+        hbox_main.addLayout(layout)
 
         # Options Box
         vbox_menu = QVBoxLayout()
@@ -177,7 +198,9 @@ class MainWindow(QWidget):
         box.addStretch()
 
     def show_deck(self, deck):
-        box = self.get_new_deck_vbox(deck.name)
+        scroll_widget = QWidget()
+        box = QVBoxLayout()
+        box.setSpacing(SPACING)
         if not deck.is_empty():
             for card in self.buttons_to_display(deck):
                 btn = QPushButton(card.name, self)
@@ -187,6 +210,8 @@ class MainWindow(QWidget):
                 box.addWidget(btn)
                 btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
         box.addStretch()
+        scroll_widget.setLayout(box)
+        self.scroll_deck[deck.name].setWidget(scroll_widget)
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
@@ -202,6 +227,7 @@ class MainWindow(QWidget):
             return self.app.game.deck['exclude']
 
     def get_new_deck_vbox(self, deck_name):
+        # TODO Delete cause only used by draw deck show method
         self.buttons_root[deck_name].deleteLater()
         self.buttons_root[deck_name] = QWidget()
         p = self.buttons_root[deck_name]
