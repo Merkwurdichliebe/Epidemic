@@ -49,6 +49,7 @@ class MainWindow(QWidget):
         self.text_cardpool = QLabel()
         self.text_stats = QLabel()
         self.combo_epidemic = QComboBox()
+        self.btn_shuffle_epidemic = QPushButton('Shuffle Epidemic')
 
         self.initialise_ui()
 
@@ -130,9 +131,8 @@ class MainWindow(QWidget):
         label.setAlignment(Qt.AlignHCenter)
         vbox_epidemic.addWidget(label)
         vbox_epidemic.addWidget(self.combo_epidemic)
-        btn = QPushButton('Shuffle Epidemic')
-        btn.clicked.connect(self.app.cb_epidemic)
-        vbox_epidemic.addWidget(btn)
+        self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
+        vbox_epidemic.addWidget(self.btn_shuffle_epidemic)
         vbox_menu.addLayout(vbox_epidemic)
 
         # Stats
@@ -147,11 +147,12 @@ class MainWindow(QWidget):
         self.setLayout(self.vbox_app)
 
     def show_cardpool(self, drawdeck):
-        d = drawdeck.cards[-1 - self.cardpool_index]
         text = ''
-        for card in sorted(set(d.cards), key=lambda x: x.name):
-            text += f'{card.name} ({d.cards.count(card)})\n'
-        text += f'\n[{d.name}]'
+        if not drawdeck.is_empty():
+            d = drawdeck.cards[-1 - self.cardpool_index]
+            for card in sorted(set(d.cards), key=lambda x: x.name):
+                text += f'{card.name} ({d.cards.count(card)})\n'
+            text += f'\n[{d.name}]'
         self.text_cardpool.setText(text)
         self.text_cardpool.repaint()  # 2 TODO Fix repaint
 
@@ -177,13 +178,14 @@ class MainWindow(QWidget):
 
     def show_deck(self, deck):
         box = self.get_new_deck_vbox(deck.name)
-        for card in self.buttons_to_display(deck):
-            btn = QPushButton(card.name, self)
-            btn.setFixedSize(QSize(WIDTH, 30))
-            color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
-            btn.setStyleSheet(f'color: {color}')
-            box.addWidget(btn)
-            btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+        if not deck.is_empty():
+            for card in self.buttons_to_display(deck):
+                btn = QPushButton(card.name, self)
+                btn.setFixedSize(QSize(WIDTH, 30))
+                color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
+                btn.setStyleSheet(f'color: {color}')
+                box.addWidget(btn)
+                btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
         box.addStretch()
 
     @staticmethod
@@ -214,22 +216,33 @@ class MainWindow(QWidget):
         deck = self.app.game.deck['draw']
         # Update the epidemic dropdown list
         # based on the available cards in the Draw Deck.
-        cards = sorted([c.name for c in list(set(deck.bottom().cards))])
+        if not deck.is_empty():
+            items = sorted([c.name for c in list(set(deck.bottom().cards))])
+            self.combo_epidemic.setDisabled(False)
+            self.btn_shuffle_epidemic.setDisabled(False)
+        else:
+            items = ['(Draw Deck Empty)']
+            self.combo_epidemic.setDisabled(True)
+            self.btn_shuffle_epidemic.setDisabled(True)
+            # TODO Maybe add "became empty" method
 
         self.combo_epidemic.clear()
-        self.combo_epidemic.addItems(cards)
+        self.combo_epidemic.addItems(items)
         self.combo_epidemic.repaint()
         # TODO don't clear this each time, add/remove items individiually
 
     def update_stats(self, stats):
         text = f'Total cards: {stats.total}\n'
         text += f'In discard pile: {stats.in_discard}\n'
-        text += f'\nTop card frequency:\n'
-        text += f'{stats.top_freq} '
-        text += f'({stats.percentage:.2%})'
-        text += '\n\n'
-        for card in stats.top_cards:
-            text += '- ' + card.name + '\n'
+        if not stats.deck['draw'].is_empty():
+            text += f'\nTop card frequency:\n'
+            text += f'{stats.top_freq} '
+            text += f'({stats.percentage:.2%})'
+            text += '\n\n'
+            for card in stats.top_cards:
+                text += '- ' + card.name + '\n'
+        else:
+            text += '\n(Draw Deck is empty)'
 
         self.text_stats.setText(text)
         self.text_stats.repaint()

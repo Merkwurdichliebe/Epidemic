@@ -82,6 +82,7 @@ class App:
             self.game.initialise(dialog.combo.currentText())
         self.update_gui(*self.get_all_decks())
 
+    @staticmethod
     def cb_dialog_help(self):
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""

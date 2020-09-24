@@ -61,6 +61,9 @@ class Deck:
     def sorted(self):
         return sorted(self.cards, key=lambda x: x.name)
 
+    def is_empty(self):
+        return False if self.cards else True
+
     def __len__(self):
         return len(self.cards)
 
@@ -112,3 +115,4 @@ class DrawDeck(Deck):
 
     def bottom(self):
         return self.cards[0]
+
