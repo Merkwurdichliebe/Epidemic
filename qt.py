@@ -15,6 +15,8 @@ COLORS = {'blue': '#3333ff',
 SPACING = 5  # Vertical spacing of buttons
 WIDTH = 150  # Width of buttons and layout columns
 WIDTH_WITH_SCROLL = 165
+MAX_CARDS_IN_CARDPOOL = 20
+MAX_CARDS_IN_STATS = 10
 
 
 class ColumnLabel(QLabel):
@@ -31,7 +33,7 @@ class DeckScrollArea(QScrollArea):
         super().__init__()
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setWidgetResizable(True)
+        self.setWidgetResizable(False)
         self.setMaximumWidth(WIDTH_WITH_SCROLL)
 
 
@@ -40,6 +42,8 @@ class MainWindow(QWidget):
         super().__init__()
         self.app = app
         self.cardpool_index = 0
+
+        self.setFixedSize(1100, 700)
 
         self.vbox_app = QVBoxLayout()
         self.vbox_deck = {'drawdeck': QVBoxLayout(),
@@ -61,8 +65,9 @@ class MainWindow(QWidget):
                              'exclude': QWidget()}
 
         self.text_cardpool = QLabel()
+        self.text_cardpool.setMaximumWidth(WIDTH)
+
         self.text_stats = QLabel()
-        self.text_stats.setMaximumHeight(400)
         self.combo_epidemic = QComboBox()
         self.btn_shuffle_epidemic = QPushButton('Shuffle Epidemic')
 
@@ -171,8 +176,11 @@ class MainWindow(QWidget):
         text = ''
         if not drawdeck.is_empty():
             d = drawdeck.cards[-1 - self.cardpool_index]
-            for card in sorted(set(d.cards), key=lambda x: x.name):
-                text += f'{card.name} ({d.cards.count(card)})\n'
+            if len(d) < MAX_CARDS_IN_CARDPOOL:
+                for card in sorted(set(d.cards), key=lambda x: x.name):
+                    text += f'{card.name} ({d.cards.count(card)})\n'
+            else:
+                text += f'{MAX_CARDS_IN_CARDPOOL}+ cards'
             text += f'\n[{d.name}]'
         self.text_cardpool.setText(text)
         self.text_cardpool.repaint()  # 2 TODO Fix repaint
@@ -198,7 +206,7 @@ class MainWindow(QWidget):
         box.addStretch()
 
     def show_deck(self, deck):
-        scroll_widget = QWidget()
+        scroll_widget = QWidget()  # Redraw from scratch
         box = QVBoxLayout()
         box.setSpacing(SPACING)
         if not deck.is_empty():
@@ -239,9 +247,9 @@ class MainWindow(QWidget):
         return button_vbox
 
     def update_epidemic_combo(self):
+        """Update the epidemic dropdown list
+        based on the available cards in the Draw Deck."""
         deck = self.app.game.deck['draw']
-        # Update the epidemic dropdown list
-        # based on the available cards in the Draw Deck.
         if not deck.is_empty():
             items = sorted([c.name for c in list(set(deck.bottom().cards))])
             self.combo_epidemic.setDisabled(False)
@@ -265,8 +273,11 @@ class MainWindow(QWidget):
             text += f'{stats.top_freq} '
             text += f'({stats.percentage:.2%})'
             text += '\n\n'
-            for card in stats.top_cards:
-                text += '- ' + card.name + '\n'
+            if len(stats.top_cards) < MAX_CARDS_IN_STATS:
+                for card in stats.top_cards:
+                    text += '- ' + card.name + '\n'
+            else:
+                text += f'({MAX_CARDS_IN_STATS}+ cards)'
         else:
             text += '\n(Draw Deck is empty)'
 
