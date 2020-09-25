@@ -238,7 +238,7 @@ Pandemic Classic:
   - name: Washington
     count: 1
     color: blue
-Debug Deck:
+Small Debug Deck:
   - name: Mercury
     count: 1
     color: red
@@ -251,3 +251,94 @@ Debug Deck:
   - name: Earth
     count: 2
     color: blue
+Large Debug Deck:
+  - name: Button 01
+    count: 1
+    color: black
+  - name: Button 02
+    count: 1
+    color: black
+  - name: Button 03
+    count: 1
+    color: black
+  - name: Button 04
+    count: 1
+    color: black
+  - name: Button 05
+    count: 1
+    color: black
+  - name: Button 06
+    count: 1
+    color: black
+  - name: Button 07
+    count: 1
+    color: black
+  - name: Button 08
+    count: 1
+    color: black
+  - name: Button 09
+    count: 1
+    color: black
+  - name: Button 10
+    count: 1
+    color: black
+  - name: Button 11
+    count: 1
+    color: black
+  - name: Button 12
+    count: 1
+    color: black
+  - name: Button 13
+    count: 1
+    color: black
+  - name: Button 14
+    count: 1
+    color: black
+  - name: Button 15
+    count: 1
+    color: black
+  - name: Button 16
+    count: 1
+    color: black
+  - name: Button 17
+    count: 1
+    color: black
+  - name: Button 18
+    count: 1
+    color: black
+  - name: Button 19
+    count: 1
+    color: black
+  - name: Button 20
+    count: 1
+    color: black
+  - name: Button 21
+    count: 1
+    color: black
+  - name: Button 22
+    count: 1
+    color: black
+  - name: Button 23
+    count: 1
+    color: black
+  - name: Button 24
+    count: 1
+    color: black
+  - name: Button 25
+    count: 1
+    color: black
+  - name: Button 26
+    count: 1
+    color: black
+  - name: Button 27
+    count: 1
+    color: black
+  - name: Button 28
+    count: 1
+    color: black
+  - name: Button 29
+    count: 1
+    color: black
+  - name: Button 30
+    count: 1
+    color: black    
