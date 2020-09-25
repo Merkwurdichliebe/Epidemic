@@ -19,7 +19,7 @@ MAX_CARDS_IN_CARDPOOL = 20
 MAX_CARDS_IN_STATS = 10
 
 
-class ColumnLabel(QLabel):
+class DeckLabel(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(text)
@@ -34,7 +34,7 @@ class DeckScrollArea(QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setWidgetResizable(False)
-        self.setMaximumWidth(WIDTH_WITH_SCROLL)
+        self.setFixedWidth(WIDTH_WITH_SCROLL)
 
 
 class MainWindow(QWidget):
@@ -43,7 +43,7 @@ class MainWindow(QWidget):
         self.app = app
         self.cardpool_index = 0
 
-        self.setFixedSize(1100, 700)
+        self.setMinimumHeight(700)
 
         self.vbox_app = QVBoxLayout()
         self.vbox_deck = {'drawdeck': QVBoxLayout(),
@@ -69,7 +69,9 @@ class MainWindow(QWidget):
 
         self.text_stats = QLabel()
         self.combo_epidemic = QComboBox()
+        self.combo_epidemic.setFixedWidth(WIDTH_WITH_SCROLL)
         self.btn_shuffle_epidemic = QPushButton('Shuffle Epidemic')
+        self.btn_shuffle_epidemic.setFixedWidth(WIDTH_WITH_SCROLL)
 
         self.initialise_ui()
 
@@ -82,20 +84,20 @@ class MainWindow(QWidget):
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
-        label = ColumnLabel('CARD POOL')
+        label = DeckLabel('CARD POOL')
         vbox_cardpool.addWidget(label)
         vbox_cardpool.addWidget(self.text_cardpool)
         vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
-        label = ColumnLabel('DRAW DECK')
+        label = DeckLabel('DRAW DECK')
         self.vbox_deck['drawdeck'].addWidget(label)
         self.vbox_deck['drawdeck'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
-        label = ColumnLabel('DRAW CARD')
+        label = DeckLabel('DRAW CARD')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['draw'])
@@ -103,7 +105,7 @@ class MainWindow(QWidget):
         hbox_main.addLayout(layout)
 
         # Discard Box
-        label = ColumnLabel('DISCARD PILE')
+        label = DeckLabel('DISCARD PILE')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['discard'])
@@ -111,7 +113,7 @@ class MainWindow(QWidget):
         hbox_main.addLayout(layout)
 
         # exclude Box
-        label = ColumnLabel('EXCLUDED')
+        label = DeckLabel('EXCLUDED')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['exclude'])
@@ -120,7 +122,7 @@ class MainWindow(QWidget):
 
         # Options Box
         vbox_menu = QVBoxLayout()
-        label = ColumnLabel('OPTIONS')
+        label = DeckLabel('OPTIONS')
         vbox_menu.addWidget(label)
         hbox_main.addLayout(vbox_menu)
 
@@ -128,9 +130,11 @@ class MainWindow(QWidget):
         vbox_game = QVBoxLayout()
         vbox_game.setSpacing(SPACING)
         b_new_game = QPushButton('New Game')
+        b_new_game.setMaximumWidth(WIDTH_WITH_SCROLL)
         b_new_game.clicked.connect(self.app.cb_new_game)
         vbox_game.addWidget(b_new_game)
         b_help = QPushButton('Help')
+        b_help.setMaximumWidth(WIDTH_WITH_SCROLL)
         b_help.clicked.connect(self.app.cb_dialog_help)
         vbox_game.addWidget(b_help)
         vbox_menu.addLayout(vbox_game)
@@ -143,6 +147,7 @@ class MainWindow(QWidget):
         vbox_destination.addWidget(label)
         group_box = QGroupBox()
         group_box.setWindowTitle('Destination')
+        group_box.setMaximumWidth(WIDTH_WITH_SCROLL)
         self.destination_exclude.setChecked(True)
         vbox_destination.addWidget(self.destination_draw)
         vbox_destination.addWidget(self.destination_discard)
@@ -155,6 +160,7 @@ class MainWindow(QWidget):
         vbox_epidemic.setSpacing(SPACING)
         label = QLabel('Epidemic')
         label.setAlignment(Qt.AlignHCenter)
+        label.setFixedWidth(WIDTH_WITH_SCROLL)
         vbox_epidemic.addWidget(label)
         vbox_epidemic.addWidget(self.combo_epidemic)
         self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
@@ -163,6 +169,7 @@ class MainWindow(QWidget):
 
         # Stats
         label = QLabel('Stats')
+        label.setFixedWidth(WIDTH_WITH_SCROLL)
         label.setAlignment(Qt.AlignHCenter)
         vbox_menu.addWidget(label)
         vbox_menu.addWidget(self.text_stats)
@@ -206,6 +213,7 @@ class MainWindow(QWidget):
         box.addStretch()
 
     def show_deck(self, deck):
+        # self.scroll_deck[deck.name] = DeckScrollArea()
         scroll_widget = QWidget()  # Redraw from scratch
         box = QVBoxLayout()
         box.setSpacing(SPACING)
