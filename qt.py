@@ -213,7 +213,6 @@ class MainWindow(QWidget):
         box.addStretch()
 
     def show_deck(self, deck):
-        # self.scroll_deck[deck.name] = DeckScrollArea()
         scroll_widget = QWidget()  # Redraw from scratch
         box = QVBoxLayout()
         box.setSpacing(SPACING)
@@ -228,6 +227,7 @@ class MainWindow(QWidget):
         box.addStretch()
         scroll_widget.setLayout(box)
         self.scroll_deck[deck.name].setWidget(scroll_widget)
+        self.scroll_deck[deck.name].repaint()
 
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
