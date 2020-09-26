@@ -1,20 +1,20 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
     QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea
-from PySide2.QtCore import Qt, QSize
+from PySide2.QtCore import Qt, QSize, Signal
 
 # TODO center dialog boxes
 # TODO Fixed window size
 
-COLORS = {'blue': '#3333ff',
+COLORS = {'blue': '#0066ff',
           'black': '#000000',
-          'yellow': '#e68019',
+          'yellow': '#f2a60d',
           'red': '#cc0000',
           'green': '#009933',
           'gray': '#bfbfbf'}
 
 SPACING = 5  # Vertical spacing of buttons
 WIDTH = 150  # Width of buttons and layout columns
-WIDTH_WITH_SCROLL = 165
+WIDTH_WITH_SCROLL = 175
 MAX_CARDS_IN_CARDPOOL = 25
 MAX_CARDS_IN_STATS = 10
 
@@ -35,6 +35,25 @@ class DeckScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setWidgetResizable(False)
         self.setFixedWidth(WIDTH_WITH_SCROLL)
+
+
+class CardButton(QLabel):
+    clicked = Signal()
+    
+    def __init__(self, deck, card):
+        super().__init__(card.name)
+        self.deck = deck
+        self.card = card
+        color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
+        self.setAlignment(Qt.AlignCenter)
+        self.setStyleSheet(
+            f'background: {color};'
+            f'color: white;'
+            f'font-weight: bold;')
+        self.setFixedSize(QSize(WIDTH, 30))
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit()
 
 
 class MainWindow(QWidget):
@@ -220,12 +239,12 @@ class MainWindow(QWidget):
         box.setSpacing(SPACING)
         if not deck.is_empty():
             for card in self.buttons_to_display(deck):
-                btn = QPushButton(card.name, self)
-                btn.setFixedSize(QSize(WIDTH, 30))
-                color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
-                btn.setStyleSheet(f'color: {color}')
+                # btn = QPushButton(card.name)
+                # btn.setFlat(True)
+                btn = CardButton(deck, card)
                 box.addWidget(btn)
                 btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
+                # btn.mousePressEvent()
         box.addStretch()
         scroll_widget.setLayout(box)
         self.scroll_deck[deck.name].setWidget(scroll_widget)
