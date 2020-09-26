@@ -15,7 +15,7 @@ COLORS = {'blue': '#3333ff',
 SPACING = 5  # Vertical spacing of buttons
 WIDTH = 150  # Width of buttons and layout columns
 WIDTH_WITH_SCROLL = 165
-MAX_CARDS_IN_CARDPOOL = 20
+MAX_CARDS_IN_CARDPOOL = 25
 MAX_CARDS_IN_STATS = 10
 
 
@@ -185,7 +185,7 @@ class MainWindow(QWidget):
         text = ''
         if not drawdeck.is_empty():
             d = drawdeck.cards[-1 - self.cardpool_index]
-            if len(d) < MAX_CARDS_IN_CARDPOOL:
+            if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
                 for card in sorted(set(d.cards), key=lambda x: x.name):
                     text += f'{card.name} ({d.cards.count(card)})\n'
             else:

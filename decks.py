@@ -67,6 +67,9 @@ class Deck:
     def __len__(self):
         return len(self.cards)
 
+    def __iter__(self):
+        return iter(self.cards)
+
 
 class DrawDeck(Deck):
     """Subclass of Deck used for the Draw Deck only.
