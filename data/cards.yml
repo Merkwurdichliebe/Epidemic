@@ -9,6 +9,9 @@ Legacy Season 2:
   - name: Atlanta
     count: 1
     color: blue
+  - name: Antananarivo
+    count: 2
+    color: black
   - name: Baghdad
     count: 2
     color: black
@@ -21,6 +24,9 @@ Legacy Season 2:
   - name: Chicago
     count: 2
     color: blue
+  - name: Dar Es Salam
+    count: 2
+    color: black
   - name: Denver
     count: 2
     color: blue

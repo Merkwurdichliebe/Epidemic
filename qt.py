@@ -55,7 +55,8 @@ class MainWindow(QWidget):
                             'discard': DeckScrollArea(),
                             'exclude': DeckScrollArea()}
 
-        self.destination_draw = QRadioButton('Draw')
+        self.destination_draw_pool = QRadioButton('Draw (Pool)')
+        self.destination_draw_top = QRadioButton('Draw (Top)')
         self.destination_discard = QRadioButton('Discard')
         self.destination_exclude = QRadioButton('Exclude')
 
@@ -149,7 +150,8 @@ class MainWindow(QWidget):
         group_box.setWindowTitle('Destination')
         group_box.setMaximumWidth(WIDTH_WITH_SCROLL)
         self.destination_exclude.setChecked(True)
-        vbox_destination.addWidget(self.destination_draw)
+        vbox_destination.addWidget(self.destination_draw_pool)
+        vbox_destination.addWidget(self.destination_draw_top)
         vbox_destination.addWidget(self.destination_discard)
         vbox_destination.addWidget(self.destination_exclude)
         group_box.setLayout(vbox_destination)
@@ -235,7 +237,9 @@ class MainWindow(QWidget):
         return reversed(deck.cards[-16:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
-        if self.destination_draw.isChecked():
+        if self.destination_draw_pool.isChecked():
+            return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
+        if self.destination_draw_top.isChecked():
             return self.app.game.deck['draw']
         elif self.destination_discard.isChecked():
             return self.app.game.deck['discard']
