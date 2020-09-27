@@ -5,18 +5,19 @@ from PySide2.QtCore import Qt, QSize, Signal
 # TODO center dialog boxes
 # TODO Fixed window size
 
-COLORS = {'blue': '#266ed9',
-          'black': '#404040',
-          'yellow': '#ec9513',
-          'red': '#df4620',
-          'green': '#009933',
-          'gray': '#bfbfbf'}
-
-SPACING = 5  # Vertical spacing of buttons
-WIDTH = 150  # Width of buttons and layout columns
-WIDTH_WITH_SCROLL = 175
-MAX_CARDS_IN_CARDPOOL = 25
+SPACING = 5                 # Vertical spacing of buttons
+WIDTH = 150                 # Width of buttons and layout columns
+WIDTH_WITH_SCROLL = 176
+MAX_CARDS_IN_CARDPOOL = 35
 MAX_CARDS_IN_STATS = 10
+
+COLORS = {
+    'blue': '#266ed9',
+    'black': '#404040',
+    'yellow': '#ec9513',
+    'red': '#df4620',
+    'green': '#009933',
+    'gray': '#bfbfbf'}
 
 
 class DeckLabel(QLabel):
@@ -31,9 +32,6 @@ class DeckLabel(QLabel):
 class DeckScrollArea(QScrollArea):
     def __init__(self):
         super().__init__()
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setWidgetResizable(False)
         self.setFixedWidth(WIDTH_WITH_SCROLL)
 
 
@@ -50,7 +48,7 @@ class CardButton(QLabel):
             f'background: {self.color};'
             f'color: white;'
             f'font-weight: bold;')
-        self.setFixedSize(QSize(WIDTH, 30))
+        self.setFixedSize(QSize(WIDTH, 24))
 
     def mouseReleaseEvent(self, event):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
@@ -249,12 +247,9 @@ class MainWindow(QWidget):
         box.setSpacing(SPACING)
         if not deck.is_empty():
             for card in self.buttons_to_display(deck):
-                # btn = QPushButton(card.name)
-                # btn.setFlat(True)
                 btn = CardButton(deck, card)
                 box.addWidget(btn)
                 btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-                # btn.mousePressEvent()
         box.addStretch()
         scroll_widget.setLayout(box)
         self.scroll_deck[deck.name].setWidget(scroll_widget)
