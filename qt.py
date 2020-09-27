@@ -5,10 +5,10 @@ from PySide2.QtCore import Qt, QSize, Signal
 # TODO center dialog boxes
 # TODO Fixed window size
 
-COLORS = {'blue': '#0066ff',
-          'black': '#000000',
-          'yellow': '#f2a60d',
-          'red': '#cc0000',
+COLORS = {'blue': '#266ed9',
+          'black': '#404040',
+          'yellow': '#ec9513',
+          'red': '#df4620',
           'green': '#009933',
           'gray': '#bfbfbf'}
 
@@ -38,22 +38,32 @@ class DeckScrollArea(QScrollArea):
 
 
 class CardButton(QLabel):
-    clicked = Signal()
-    
+    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+
     def __init__(self, deck, card):
         super().__init__(card.name)
         self.deck = deck
         self.card = card
-        color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
+        self.color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
         self.setAlignment(Qt.AlignCenter)
         self.setStyleSheet(
-            f'background: {color};'
+            f'background: {self.color};'
             f'color: white;'
             f'font-weight: bold;')
         self.setFixedSize(QSize(WIDTH, 30))
 
     def mouseReleaseEvent(self, event):
-        self.clicked.emit()
+        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+
+    def enterEvent(self, event):
+        self.setStyleSheet(f'background: black;'
+                           f'color: white;'
+                           f'font-weight: bold;')
+
+    def leaveEvent(self, event):
+        self.setStyleSheet(f'background: {self.color};'
+                           f'color: white;'
+                           f'font-weight: bold;')
 
 
 class MainWindow(QWidget):

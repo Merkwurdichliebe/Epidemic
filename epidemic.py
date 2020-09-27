@@ -61,6 +61,7 @@ class App:
             self.game.draw_card(from_deck, to_deck, card)
             # self.update_gui(from_deck, to_deck)
             # TODO we update all the decks because now the 'draw' destination might actually be one of its decks
+            # TOOD Also draw into draw deck doesn't filter properly
             self.update_gui(*self.get_all_decks())
 
     def cb_update_cardpool(self, index):
