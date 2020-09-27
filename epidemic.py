@@ -99,6 +99,10 @@ class App:
 
 def main():
     application = QApplication()
+    # TODO fix call order
+    # window = MainWindow()
+    # window.show()
+    # pass app to window
     app = App()
     application.exec_()
 

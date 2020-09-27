@@ -9,7 +9,6 @@ import yaml
 
 
 CARDS_FILE = 'data/cards.yml'
-# TODO add epidemic counter and identifier
 
 
 class Game:

@@ -12,9 +12,9 @@ MAX_CARDS_IN_CARDPOOL = 35
 MAX_CARDS_IN_STATS = 10
 
 COLORS = {
-    'blue': '#266ed9',
+    'blue': '#4073bf',
     'black': '#404040',
-    'yellow': '#ec9513',
+    'yellow': '#f5993d',
     'red': '#df4620',
     'green': '#009933',
     'gray': '#bfbfbf'}
