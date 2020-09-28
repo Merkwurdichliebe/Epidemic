@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
     QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea
 from PySide2.QtCore import Qt, QSize, Signal
+from enum import Enum
 
 # TODO center dialog boxes
 # TODO Fixed window size
@@ -11,13 +12,19 @@ WIDTH_WITH_SCROLL = 176
 MAX_CARDS_IN_CARDPOOL = 35
 MAX_CARDS_IN_STATS = 10
 
-COLORS = {
+CARD_COLOR = {
     'blue': '#4073bf',
     'black': '#404040',
     'yellow': '#f5993d',
     'red': '#df4620',
     'green': '#009933',
-    'gray': '#bfbfbf'}
+    'gray': '#bfbfbf'
+    }
+
+
+class GUIColor(Enum):
+    BTN_Active = '#999999'
+    BTN_Inactive = '#dddddd'
 
 
 class DeckLabel(QLabel):
@@ -42,7 +49,7 @@ class CardButton(QLabel):
         super().__init__(card.name)
         self.deck = deck
         self.card = card
-        self.color = COLORS['gray'] if deck.name == 'exclude' else COLORS[card.color]
+        self.color = CARD_COLOR['gray'] if deck.name == 'exclude' else CARD_COLOR[card.color]
         self.setAlignment(Qt.AlignCenter)
         self.setStyleSheet(
             f'background: {self.color};'
@@ -70,20 +77,24 @@ class PoolButton(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f'background: gray;'
-            f'color: black;'
-            f'font-weight: bold;')
         self.setFixedSize(QSize(WIDTH, 24))
         self.setText(text)
+        self.set_active(False)
 
-    def set_current(self):
-        self.setStyleSheet(
-            f'background: red;'
-            )
+    def set_active(self, active):
+        if active:
+            self.setStyleSheet(
+                f'background: {GUIColor.BTN_Active.value};'
+                f'color: black;'
+                f'font-weight: bold;')
+        else:
+            self.setStyleSheet(
+                f'background: {GUIColor.BTN_Inactive.value};'
+                f'color: black;'
+                f'font-weight: bold;')
 
     def mouseReleaseEvent(self, event):
-        self.set_current()
+        self.set_active(True)
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
 
 
@@ -246,7 +257,8 @@ class MainWindow(QWidget):
 
     def show_drawdeck(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
-        self.app.cb_update_cardpool(0)
+        # self.app.cb_update_cardpool(self.cardpool_index)
+        self.show_cardpool(deck)
         box = self.get_new_deck_vbox('drawdeck')
 
         # Define new ones
@@ -260,8 +272,7 @@ class MainWindow(QWidget):
 
             btn = PoolButton(text)
             btn.setFixedSize(QSize(WIDTH, 30))
-            if i == self.cardpool_index:
-                btn.set_current()
+            btn.set_active(True if i == self.cardpool_index else False)
             box.addWidget(btn)
             btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
         box.addStretch()

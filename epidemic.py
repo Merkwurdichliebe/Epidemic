@@ -66,13 +66,14 @@ class App:
 
     def cb_update_cardpool(self, index):
         self.view.cardpool_index = index
-        self.view.show_cardpool(self.game.deck['draw'])
+        self.view.show_drawdeck(self.game.deck['draw'])
 
     def cb_epidemic(self):
         """Callback from the Epidemic button.
         Runs the epidemic shuffle function based on the selected card."""
         new_card_name = self.view.combo_epidemic.currentText()
         self.game.epidemic(new_card_name)
+        self.view.cardpool_index = 0
         self.update_gui(self.game.deck['draw'])
         self.update_gui(self.game.deck['discard'])
 
