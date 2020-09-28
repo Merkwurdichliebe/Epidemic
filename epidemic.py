@@ -7,7 +7,7 @@ in the board games Pandemic and Pandemic Legacy.
 This is my first attempt at a working project
 using the Qt framework and PySide2.
 
-The Application a simplified MVC pattern:
+The code attempts to follow a simplified MVC pattern:
 Model : Game (in game.py)
 View : MainWindow (in qt.py)
 Controller : App (in this file)
@@ -61,7 +61,7 @@ class App:
             self.game.draw_card(from_deck, to_deck, card)
             # self.update_gui(from_deck, to_deck)
             # TODO we update all the decks because now the 'draw' destination might actually be one of its decks
-            # TOOD Also draw into draw deck doesn't filter properly
+            # TODO Also draw into draw deck doesn't filter properly
             self.update_gui(*self.get_all_decks())
 
     def cb_update_cardpool(self, index):

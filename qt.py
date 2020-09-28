@@ -64,6 +64,29 @@ class CardButton(QLabel):
                            f'font-weight: bold;')
 
 
+class PoolButton(QLabel):
+    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+
+    def __init__(self, text):
+        super().__init__()
+        self.setAlignment(Qt.AlignCenter)
+        self.setStyleSheet(
+            f'background: gray;'
+            f'color: black;'
+            f'font-weight: bold;')
+        self.setFixedSize(QSize(WIDTH, 24))
+        self.setText(text)
+
+    def set_current(self):
+        self.setStyleSheet(
+            f'background: red;'
+            )
+
+    def mouseReleaseEvent(self, event):
+        self.set_current()
+        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+
+
 class MainWindow(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -235,8 +258,10 @@ class MainWindow(QWidget):
             else:
                 text = f'{len(c)}'
 
-            btn = QPushButton(text, self)
+            btn = PoolButton(text)
             btn.setFixedSize(QSize(WIDTH, 30))
+            if i == self.cardpool_index:
+                btn.set_current()
             box.addWidget(btn)
             btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
         box.addStretch()
