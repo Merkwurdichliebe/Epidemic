@@ -27,18 +27,14 @@ class Game:
                       Deck('discard'),
                       Deck('exclude')]
 
-        # Build the decks dictionary so we can get a Deck object by its name
         self.deck = {deck.name: deck for deck in game_decks}
-
-        # Get a Stats object for calculating draw probabilities
         self.stats = Stats(self.deck)
-
         self.epidemic_count = 0
 
     def initialise_draw_deck(self, game):
-        d = DrawDeck('draw')
-        d.add(deepcopy(self.games[game]))  # games list shouldn't mutate
-        return d
+        deck = DrawDeck('draw')
+        deck.add(deepcopy(self.games[game]))  # games list shouldn't mutate
+        return deck
 
     @staticmethod
     def draw_card(from_deck, to_deck, card):

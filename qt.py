@@ -6,6 +6,7 @@ from enum import Enum
 # TODO center dialog boxes
 # TODO don't reset scroll after click
 
+WINDOW_MINIMUM_HEIGHT = 700
 SPACING = 5                 # Vertical spacing of buttons
 SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
@@ -112,17 +113,11 @@ class PoolButton(QLabel):
 class MainWindow(QWidget):
     def __init__(self, app):
         super().__init__()
+        self.setMinimumHeight(WINDOW_MINIMUM_HEIGHT)
         self.app = app
         self.cardpool_index = 0
 
-        self.setMinimumHeight(700)
-
-        self.vbox_app = QVBoxLayout()
-        self.vbox_deck = {'drawdeck': QVBoxLayout(),
-                          'draw': QVBoxLayout(),
-                          'discard': QVBoxLayout(),
-                          'exclude': QVBoxLayout()}
-
+        self.drawdeck = QVBoxLayout()
         self.scroll_deck = {'draw': DeckScrollArea(),
                             'discard': DeckScrollArea(),
                             'exclude': DeckScrollArea()}
@@ -147,9 +142,11 @@ class MainWindow(QWidget):
     def initialise_ui(self):
         self.setWindowTitle('Epidemic')
 
+        vbox_app = QVBoxLayout()
+
         # Global parent layout
         hbox_main = QHBoxLayout()
-        self.vbox_app.addLayout(hbox_main)
+        vbox_app.addLayout(hbox_main)
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
@@ -162,8 +159,8 @@ class MainWindow(QWidget):
         # Draw Deck Box
         label = Heading('DRAW DECK')
         label.setFixedWidth(WIDTH_WITH_SCROLL)
-        self.vbox_deck['drawdeck'].addWidget(label)
-        hbox_main.addLayout(self.vbox_deck['drawdeck'])
+        self.drawdeck.addWidget(label)
+        hbox_main.addLayout(self.drawdeck)
 
         # Other Deck boxes
         hbox_main.addLayout(DeckLayout('DRAW CARD', self.scroll_deck['draw']))
@@ -230,7 +227,7 @@ class MainWindow(QWidget):
         vbox_menu.addStretch()
 
         # Tell the Main Window to use the outer QVBoxLayout
-        self.setLayout(self.vbox_app)
+        self.setLayout(vbox_app)
 
     def show_cardpool(self, drawdeck):
         text = ''
@@ -255,7 +252,7 @@ class MainWindow(QWidget):
         self.draw_deck_root = QWidget()
         self.draw_deck_root.setFixedWidth(WIDTH_WITH_SCROLL)
 
-        self.vbox_deck['drawdeck'].addWidget(self.draw_deck_root)
+        self.drawdeck.addWidget(self.draw_deck_root)
 
         box = QVBoxLayout()
         box.setSpacing(SPACING)

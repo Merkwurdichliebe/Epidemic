@@ -43,7 +43,6 @@ class App:
         self.show_select_game_dialog()
 
     def show_select_game_dialog(self):
-        # Display select new game dialog
         # (We reuse the callback function for the New Game button)
         self.cb_new_game()
 
@@ -59,7 +58,6 @@ class App:
         to_deck = self.view.get_destination()
         if not from_deck == to_deck:
             self.game.draw_card(from_deck, to_deck, card)
-            # self.update_gui(from_deck, to_deck)
             # TODO we update all the decks because now the 'draw' destination might actually be one of its decks
             # TODO Also draw into draw deck doesn't filter properly
             self.update_gui(*self.get_all_decks())
@@ -69,8 +67,7 @@ class App:
         self.view.show_drawdeck(self.game.deck['draw'])
 
     def cb_epidemic(self):
-        """Callback from the Epidemic button.
-        Runs the epidemic shuffle function based on the selected card."""
+        """Shuffle epidemic card based on the selected card in the combobox."""
         new_card_name = self.view.combo_epidemic.currentText()
         self.game.epidemic(new_card_name)
         self.view.cardpool_index = 0
@@ -78,8 +75,6 @@ class App:
         self.update_gui(self.game.deck['discard'])
 
     def cb_new_game(self):
-        """Callback from the New Game button.
-        Initialises the app for a new game."""
         games = list(self.game.games.keys())
         dialog = DialogNewGame(games)
         if dialog.exec_():
