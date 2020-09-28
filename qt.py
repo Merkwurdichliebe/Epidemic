@@ -297,7 +297,10 @@ class MainWindow(QWidget):
 
     def get_destination(self):
         if self.destination_draw_pool.isChecked():
-            return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
+            if not self.app.game.deck['draw'].is_empty():
+                return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
+            else:
+                return self.app.game.deck['draw']
         if self.destination_draw_top.isChecked():
             return self.app.game.deck['draw']
         elif self.destination_discard.isChecked():
