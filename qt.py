@@ -1,5 +1,6 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
-    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea
+    QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea,\
+    QButtonGroup
 from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 
@@ -110,6 +111,30 @@ class PoolButton(QLabel):
             self.setStyleSheet(ButtonCSS.Inactive.value)
 
 
+class DestinationRadioBox(QGroupBox):
+    def __init__(self, destinations):
+        super().__init__()
+        label = Heading('Card Destination')
+        label.setMinimumWidth(WIDTH)
+        label.setAlignment(Qt.AlignHCenter)
+        box = QVBoxLayout()
+        box.addWidget(label)
+
+        # We are subclassing QGroupBox for the *visual* container
+        self.setWindowTitle('Destination')
+        self.setMaximumWidth(WIDTH_WITH_SCROLL)
+
+        # QButtonGroup is used for the *logical* grouping of buttons
+        self.button_group = QButtonGroup()
+        for button in destinations:
+            self.button_group.addButton(button)
+            box.addWidget(button)
+        self.setLayout(box)
+
+    def get_selection(self):
+        return self.button_group.checkedButton()
+
+
 class MainWindow(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -118,14 +143,19 @@ class MainWindow(QWidget):
         self.cardpool_index = 0
 
         self.drawdeck = QVBoxLayout()
-        self.scroll_deck = {'draw': DeckScrollArea(),
-                            'discard': DeckScrollArea(),
-                            'exclude': DeckScrollArea()}
+        self.scroll_deck = {
+            'draw': DeckScrollArea(),
+            'discard': DeckScrollArea(),
+            'exclude': DeckScrollArea()
+        }
 
-        self.destination_draw_pool = QRadioButton('Draw (Pool)')
-        self.destination_draw_top = QRadioButton('Draw (Top)')
-        self.destination_discard = QRadioButton('Discard')
-        self.destination_exclude = QRadioButton('Exclude')
+        self.destination = {
+            'draw_pool': QRadioButton('Draw (Pool)'),
+            'draw_top': QRadioButton('Draw (Top)'),
+            'discard': QRadioButton('Discard'),
+            'exclude': QRadioButton('Exclude')
+        }
+        self.destination_box = DestinationRadioBox(self.destination.values())
 
         self.draw_deck_root = QWidget()
         self.text_cardpool = QLabel()
@@ -142,13 +172,15 @@ class MainWindow(QWidget):
     def initialise_ui(self):
         self.setWindowTitle('Epidemic')
 
-        vbox_app = QVBoxLayout()
-
         # Global parent layout
+        vbox_app = QVBoxLayout()
         hbox_main = QHBoxLayout()
         vbox_app.addLayout(hbox_main)
 
         # Cardpool Box
+        # hbox_main.addLayout(DeckLayout('CARD POOL', self.text_cardpool)
+        # This doesn't work because it needs addStretch
+
         vbox_cardpool = QVBoxLayout()
         label = Heading('CARD POOL')
         vbox_cardpool.addWidget(label)
@@ -187,21 +219,8 @@ class MainWindow(QWidget):
         vbox_menu.addLayout(vbox_game)
 
         # Destination Radio Box
-        vbox_destination = QVBoxLayout()
-        label = Heading('Card Destination')
-        label.setMinimumWidth(WIDTH)
-        label.setAlignment(Qt.AlignHCenter)
-        vbox_destination.addWidget(label)
-        group_box = QGroupBox()
-        group_box.setWindowTitle('Destination')
-        group_box.setMaximumWidth(WIDTH_WITH_SCROLL)
-        self.destination_exclude.setChecked(True)
-        vbox_destination.addWidget(self.destination_draw_pool)
-        vbox_destination.addWidget(self.destination_draw_top)
-        vbox_destination.addWidget(self.destination_discard)
-        vbox_destination.addWidget(self.destination_exclude)
-        group_box.setLayout(vbox_destination)
-        vbox_menu.addWidget(group_box)
+        vbox_menu.addWidget(self.destination_box)
+        self.destination['exclude'].setChecked(True)
         vbox_menu.addSpacing(SPACER)
 
         # Epidemic dropdown
@@ -293,16 +312,16 @@ class MainWindow(QWidget):
         return reversed(deck.cards[-16:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
-        if self.destination_draw_pool.isChecked():
+        if self.destination_box.get_selection() == self.destination['draw_pool']:
             if not self.app.game.deck['draw'].is_empty():
                 return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
             else:
                 return self.app.game.deck['draw']
-        if self.destination_draw_top.isChecked():
+        elif self.destination_box.get_selection() == self.destination['draw_top']:
             return self.app.game.deck['draw']
-        elif self.destination_discard.isChecked():
+        elif self.destination_box.get_selection() == self.destination['discard']:
             return self.app.game.deck['discard']
-        elif self.destination_exclude.isChecked():
+        elif self.destination_box.get_selection() == self.destination['exclude']:
             return self.app.game.deck['exclude']
 
     def update_epidemic_combo(self):
