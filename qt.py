@@ -245,7 +245,7 @@ class MainWindow(QWidget):
         self.setLayout(v_app)
 
     def show_cardpool(self, drawdeck):
-        text = ''
+        text = f'Possible cards at position {self.cardpool_index+1}:\n\n'
         if not drawdeck.is_empty():
             d = drawdeck.cards[-1 - self.cardpool_index]
             if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
@@ -255,6 +255,7 @@ class MainWindow(QWidget):
                 text += f'{MAX_CARDS_IN_CARDPOOL}+ cards'
             text += f'\n[{d.name}]'
         self.text_cardpool.setText(text)
+        self.text_cardpool.setWordWrap(True)
         self.text_cardpool.repaint()  # 2 TODO Fix repaint
 
     def show_drawdeck(self, deck):
