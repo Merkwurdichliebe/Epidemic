@@ -121,18 +121,18 @@ class DestinationRadioBox(QGroupBox):
         box.addWidget(label)
 
         # We are subclassing QGroupBox for the *visual* container
-        self.setWindowTitle('Destination')
         self.setMaximumWidth(WIDTH_WITH_SCROLL)
 
         # QButtonGroup is used for the *logical* grouping of buttons
-        self.button_group = QButtonGroup()
+        self.b_group = QButtonGroup()
+
         for button in destinations:
-            self.button_group.addButton(button)
+            self.b_group.addButton(button)
             box.addWidget(button)
         self.setLayout(box)
 
     def get_selection(self):
-        return self.button_group.checkedButton()
+        return self.b_group.checkedButton()
 
 
 class MainWindow(QWidget):
@@ -173,80 +173,76 @@ class MainWindow(QWidget):
         self.setWindowTitle('Epidemic')
 
         # Global parent layout
-        vbox_app = QVBoxLayout()
-        hbox_main = QHBoxLayout()
-        vbox_app.addLayout(hbox_main)
+        v_app = QVBoxLayout()
+        h_main = QHBoxLayout()
+        v_app.addLayout(h_main)
 
         # Cardpool Box
         # hbox_main.addLayout(DeckLayout('CARD POOL', self.text_cardpool)
         # This doesn't work because it needs addStretch
 
-        vbox_cardpool = QVBoxLayout()
+        v_cardpool = QVBoxLayout()
         label = Heading('CARD POOL')
-        vbox_cardpool.addWidget(label)
-        vbox_cardpool.addWidget(self.text_cardpool)
-        vbox_cardpool.addStretch()
-        hbox_main.addLayout(vbox_cardpool)
+        v_cardpool.addWidget(label)
+        v_cardpool.addWidget(self.text_cardpool)
+        v_cardpool.addStretch()
+        h_main.addLayout(v_cardpool)
 
         # Draw Deck Box
         label = Heading('DRAW DECK')
-        label.setFixedWidth(WIDTH_WITH_SCROLL)
         self.drawdeck.addWidget(label)
-        hbox_main.addLayout(self.drawdeck)
+        h_main.addLayout(self.drawdeck)
 
         # Other Deck boxes
-        hbox_main.addLayout(DeckLayout('DRAW CARD', self.scroll_deck['draw']))
-        hbox_main.addLayout(DeckLayout('DISCARD PILE', self.scroll_deck['discard']))
-        hbox_main.addLayout(DeckLayout('EXCLUDED', self.scroll_deck['exclude']))
+        h_main.addLayout(DeckLayout('DRAW CARD', self.scroll_deck['draw']))
+        h_main.addLayout(DeckLayout('DISCARD PILE', self.scroll_deck['discard']))
+        h_main.addLayout(DeckLayout('EXCLUDED', self.scroll_deck['exclude']))
 
         # Options Box
-        vbox_menu = QVBoxLayout()
+        v_menu = QVBoxLayout()
         label = Heading(' ')
-        vbox_menu.addWidget(label)
-        hbox_main.addLayout(vbox_menu)
+        v_menu.addWidget(label)
 
         # New Game & Help
-        vbox_game = QVBoxLayout()
-        vbox_game.setSpacing(SPACING)
+        v_game = QVBoxLayout()
+        v_game.setSpacing(SPACING)
         b_new_game = QPushButton('New Game')
         b_new_game.setMaximumWidth(WIDTH_WITH_SCROLL)
         b_new_game.clicked.connect(self.app.cb_new_game)
-        vbox_game.addWidget(b_new_game)
+        v_game.addWidget(b_new_game)
         b_help = QPushButton('Help')
         b_help.setMaximumWidth(WIDTH_WITH_SCROLL)
         b_help.clicked.connect(self.app.cb_dialog_help)
-        vbox_game.addWidget(b_help)
-        vbox_menu.addLayout(vbox_game)
+        v_game.addWidget(b_help)
+        v_menu.addLayout(v_game)
 
         # Destination Radio Box
-        vbox_menu.addWidget(self.destination_box)
+        v_menu.addWidget(self.destination_box)
         self.destination['exclude'].setChecked(True)
-        vbox_menu.addSpacing(SPACER)
+        v_menu.addSpacing(SPACER)
 
         # Epidemic dropdown
-        vbox_epidemic = QVBoxLayout()
-        vbox_epidemic.setSpacing(SPACING)
+        v_epidemic = QVBoxLayout()
+        v_epidemic.setSpacing(SPACING)
         label = Heading('Epidemic')
-        label.setAlignment(Qt.AlignHCenter)
-        label.setFixedWidth(WIDTH_WITH_SCROLL)
-        vbox_epidemic.addWidget(label)
-        vbox_epidemic.addWidget(self.combo_epidemic)
+        v_epidemic.addWidget(label)
+        v_epidemic.addWidget(self.combo_epidemic)
         self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
-        vbox_epidemic.addWidget(self.btn_shuffle_epidemic)
-        vbox_menu.addLayout(vbox_epidemic)
-        vbox_menu.addSpacing(SPACER)
+        v_epidemic.addWidget(self.btn_shuffle_epidemic)
+        v_menu.addLayout(v_epidemic)
+        v_menu.addSpacing(SPACER)
 
         # Stats
         label = Heading('Stats')
-        label.setFixedWidth(WIDTH_WITH_SCROLL)
-        label.setAlignment(Qt.AlignHCenter)
-        vbox_menu.addWidget(label)
-        vbox_menu.addWidget(self.text_stats)
+        v_menu.addWidget(label)
+        v_menu.addWidget(self.text_stats)
 
-        vbox_menu.addStretch()
+        v_menu.addStretch()
+
+        h_main.addLayout(v_menu)
 
         # Tell the Main Window to use the outer QVBoxLayout
-        self.setLayout(vbox_app)
+        self.setLayout(v_app)
 
     def show_cardpool(self, drawdeck):
         text = ''
