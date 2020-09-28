@@ -4,15 +4,15 @@ from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 
 # TODO center dialog boxes
-# TODO Fixed window size
 
 SPACING = 5                 # Vertical spacing of buttons
 WIDTH = 150                 # Width of buttons and layout columns
+HEIGHT = 24                 # Height of buttons
 WIDTH_WITH_SCROLL = 176
 MAX_CARDS_IN_CARDPOOL = 35
 MAX_CARDS_IN_STATS = 10
 
-CARD_COLOR = {
+COLOR = {
     'blue': '#4073bf',
     'black': '#404040',
     'yellow': '#f5993d',
@@ -22,12 +22,14 @@ CARD_COLOR = {
     }
 
 
-class GUIColor(Enum):
-    BTN_Active = '#999999'
-    BTN_Inactive = '#dddddd'
+class ButtonCSS(Enum):
+    """Stylesheets for active and inactive cardpool buttons
+    displayed in the Draw Deck column"""
+    Active = 'background: #999999; color: black; font-weight: bold;'
+    Inactive = 'background: #dddddd; color: black; font-weight: bold;'
 
 
-class DeckLabel(QLabel):
+class ColumnHeading(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(text)
@@ -49,13 +51,13 @@ class CardButton(QLabel):
         super().__init__(card.name)
         self.deck = deck
         self.card = card
-        self.color = CARD_COLOR['gray'] if deck.name == 'exclude' else CARD_COLOR[card.color]
+        self.color = COLOR['gray'] if deck.name == 'exclude' else COLOR[card.color]
         self.setAlignment(Qt.AlignCenter)
         self.setStyleSheet(
             f'background: {self.color};'
             f'color: white;'
             f'font-weight: bold;')
-        self.setFixedSize(QSize(WIDTH, 24))
+        self.setFixedSize(QSize(WIDTH, HEIGHT))
 
     def mouseReleaseEvent(self, event):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
@@ -77,21 +79,12 @@ class PoolButton(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setAlignment(Qt.AlignCenter)
-        self.setFixedSize(QSize(WIDTH, 24))
+        self.setFixedSize(QSize(WIDTH, HEIGHT))
         self.setText(text)
         self.set_active(False)
 
     def set_active(self, active):
-        if active:
-            self.setStyleSheet(
-                f'background: {GUIColor.BTN_Active.value};'
-                f'color: black;'
-                f'font-weight: bold;')
-        else:
-            self.setStyleSheet(
-                f'background: {GUIColor.BTN_Inactive.value};'
-                f'color: black;'
-                f'font-weight: bold;')
+        self.setStyleSheet(ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
 
     def mouseReleaseEvent(self, event):
         self.set_active(True)
@@ -146,45 +139,42 @@ class MainWindow(QWidget):
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
-        label = DeckLabel('CARD POOL')
+        label = ColumnHeading('CARD POOL')
         vbox_cardpool.addWidget(label)
         vbox_cardpool.addWidget(self.text_cardpool)
         vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
-        label = DeckLabel('DRAW DECK')
+        label = ColumnHeading('DRAW DECK')
         self.vbox_deck['drawdeck'].addWidget(label)
         self.vbox_deck['drawdeck'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
-        label = DeckLabel('DRAW CARD')
+        label = ColumnHeading('DRAW CARD')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['draw'])
-        # self.vbox_deck['draw'].setSpacing(SPACING)
         hbox_main.addLayout(layout)
 
         # Discard Box
-        label = DeckLabel('DISCARD PILE')
+        label = ColumnHeading('DISCARD PILE')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['discard'])
-        # self.vbox_deck['draw'].setSpacing(SPACING)
         hbox_main.addLayout(layout)
 
         # exclude Box
-        label = DeckLabel('EXCLUDED')
+        label = ColumnHeading('EXCLUDED')
         layout = QVBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.scroll_deck['exclude'])
-        # self.vbox_deck['draw'].setSpacing(SPACING)
         hbox_main.addLayout(layout)
 
         # Options Box
         vbox_menu = QVBoxLayout()
-        label = DeckLabel('OPTIONS')
+        label = ColumnHeading('OPTIONS')
         vbox_menu.addWidget(label)
         hbox_main.addLayout(vbox_menu)
 
@@ -271,7 +261,7 @@ class MainWindow(QWidget):
                 text = f'{len(c)}'
 
             btn = PoolButton(text)
-            btn.setFixedSize(QSize(WIDTH, 30))
+            btn.setFixedSize(QSize(WIDTH, HEIGHT))
             btn.set_active(True if i == self.cardpool_index else False)
             box.addWidget(btn)
             btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
