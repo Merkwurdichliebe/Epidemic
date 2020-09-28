@@ -27,6 +27,7 @@ class ButtonCSS(Enum):
     displayed in the Draw Deck column"""
     Active = 'background: #999999; color: black; font-weight: bold;'
     Inactive = 'background: #dddddd; color: black; font-weight: bold;'
+    MouseEnter = 'background: black; color: white; font-weight: bold;'
 
 
 class ColumnHeading(QLabel):
@@ -63,9 +64,7 @@ class CardButton(QLabel):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
 
     def enterEvent(self, event):
-        self.setStyleSheet(f'background: black;'
-                           f'color: white;'
-                           f'font-weight: bold;')
+        self.setStyleSheet(ButtonCSS.MouseEnter.value)
 
     def leaveEvent(self, event):
         self.setStyleSheet(f'background: {self.color};'
@@ -79,16 +78,27 @@ class PoolButton(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setAlignment(Qt.AlignCenter)
-        self.setFixedSize(QSize(WIDTH, HEIGHT))
         self.setText(text)
+        self.active = None
         self.set_active(False)
 
     def set_active(self, active):
+        self.active = active
         self.setStyleSheet(ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
 
     def mouseReleaseEvent(self, event):
         self.set_active(True)
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+
+    def enterEvent(self, event):
+        self.setStyleSheet(ButtonCSS.MouseEnter.value)
+
+    def leaveEvent(self, event):
+        if self.active:
+            print('leaving active')
+            self.setStyleSheet(ButtonCSS.Active.value)
+        else:
+            self.setStyleSheet(ButtonCSS.Inactive.value)
 
 
 class MainWindow(QWidget):
@@ -114,11 +124,7 @@ class MainWindow(QWidget):
         self.destination_discard = QRadioButton('Discard')
         self.destination_exclude = QRadioButton('Exclude')
 
-        self.buttons_root = {'drawdeck': QWidget(),
-                             'draw': QWidget(),
-                             'discard': QWidget(),
-                             'exclude': QWidget()}
-
+        self.draw_deck_root = QWidget()
         self.text_cardpool = QLabel()
         self.text_cardpool.setMaximumWidth(WIDTH)
 
@@ -147,8 +153,8 @@ class MainWindow(QWidget):
 
         # Draw Deck Box
         label = ColumnHeading('DRAW DECK')
+        label.setFixedWidth(WIDTH_WITH_SCROLL)
         self.vbox_deck['drawdeck'].addWidget(label)
-        self.vbox_deck['drawdeck'].setSpacing(SPACING)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
         # Draw Card Box
@@ -249,9 +255,18 @@ class MainWindow(QWidget):
         # Reset the cardpool index to point to the top of the Draw Deck
         # self.app.cb_update_cardpool(self.cardpool_index)
         self.show_cardpool(deck)
-        box = self.get_new_deck_vbox('drawdeck')
 
-        # Define new ones
+        # Redraw the parent widhet from scratch
+        self.draw_deck_root.deleteLater()
+        self.draw_deck_root = QWidget()
+        self.draw_deck_root.setFixedWidth(WIDTH_WITH_SCROLL)
+
+        self.vbox_deck['drawdeck'].addWidget(self.draw_deck_root)
+
+        box = QVBoxLayout()
+        box.setSpacing(SPACING)
+        self.draw_deck_root.setLayout(box)
+
         for i, c in enumerate(reversed(deck.cards[-16:])):
             # If the top card is a single card we display its name,
             # otherwise we display the number of possible cards.
@@ -295,18 +310,6 @@ class MainWindow(QWidget):
             return self.app.game.deck['discard']
         elif self.destination_exclude.isChecked():
             return self.app.game.deck['exclude']
-
-    def get_new_deck_vbox(self, deck_name):
-        # TODO Delete cause only used by draw deck show method
-        self.buttons_root[deck_name].deleteLater()
-        self.buttons_root[deck_name] = QWidget()
-        p = self.buttons_root[deck_name]
-        p.setFixedWidth(WIDTH)
-        self.vbox_deck[deck_name].addWidget(p)
-        button_vbox = QVBoxLayout()
-        button_vbox.setSpacing(SPACING)
-        p.setLayout(button_vbox)
-        return button_vbox
 
     def update_epidemic_combo(self):
         """Update the epidemic dropdown list
