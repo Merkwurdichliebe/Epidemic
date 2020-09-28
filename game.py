@@ -14,7 +14,7 @@ CARDS_FILE = 'data/cards.yml'
 class Game:
     def __init__(self):
         self.games = self.get_all_games()
-        self.epidemic_count = 0
+        self.epidemic_count = None
         self.deck = None
         self.stats = None
 
@@ -32,6 +32,8 @@ class Game:
 
         # Get a Stats object for calculating draw probabilities
         self.stats = Stats(self.deck)
+
+        self.epidemic_count = 0
 
     def initialise_draw_deck(self, game):
         d = DrawDeck('draw')

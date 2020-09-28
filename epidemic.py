@@ -23,6 +23,7 @@ __version__ = "1.0"
 # TODO parse YML import for empty file or wrong colors
 # TODO disable textboxes on game launch
 # TODO allow cancel on app start
+# TODO card to draw (pool) with no pool
 
 from PySide2.QtWidgets import QApplication
 from qt import MainWindow

@@ -4,8 +4,10 @@ from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 
 # TODO center dialog boxes
+# TODO don't reset scroll after click
 
 SPACING = 5                 # Vertical spacing of buttons
+SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
 HEIGHT = 24                 # Height of buttons
 WIDTH_WITH_SCROLL = 176
@@ -30,13 +32,20 @@ class ButtonCSS(Enum):
     MouseEnter = 'background: black; color: white; font-weight: bold;'
 
 
-class ColumnHeading(QLabel):
+class Heading(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(text)
         self.setStyleSheet('font-weight: bold')
-        self.setFixedWidth(WIDTH)
+        self.setFixedWidth(WIDTH_WITH_SCROLL)
         self.setAlignment(Qt.AlignHCenter)
+
+
+class DeckLayout(QVBoxLayout):
+    def __init__(self, heading, widget):
+        super().__init__()
+        self.addWidget(Heading(heading))
+        self.addWidget(widget)
 
 
 class DeckScrollArea(QScrollArea):
@@ -95,7 +104,6 @@ class PoolButton(QLabel):
 
     def leaveEvent(self, event):
         if self.active:
-            print('leaving active')
             self.setStyleSheet(ButtonCSS.Active.value)
         else:
             self.setStyleSheet(ButtonCSS.Inactive.value)
@@ -145,42 +153,26 @@ class MainWindow(QWidget):
 
         # Cardpool Box
         vbox_cardpool = QVBoxLayout()
-        label = ColumnHeading('CARD POOL')
+        label = Heading('CARD POOL')
         vbox_cardpool.addWidget(label)
         vbox_cardpool.addWidget(self.text_cardpool)
         vbox_cardpool.addStretch()
         hbox_main.addLayout(vbox_cardpool)
 
         # Draw Deck Box
-        label = ColumnHeading('DRAW DECK')
+        label = Heading('DRAW DECK')
         label.setFixedWidth(WIDTH_WITH_SCROLL)
         self.vbox_deck['drawdeck'].addWidget(label)
         hbox_main.addLayout(self.vbox_deck['drawdeck'])
 
-        # Draw Card Box
-        label = ColumnHeading('DRAW CARD')
-        layout = QVBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(self.scroll_deck['draw'])
-        hbox_main.addLayout(layout)
-
-        # Discard Box
-        label = ColumnHeading('DISCARD PILE')
-        layout = QVBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(self.scroll_deck['discard'])
-        hbox_main.addLayout(layout)
-
-        # exclude Box
-        label = ColumnHeading('EXCLUDED')
-        layout = QVBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(self.scroll_deck['exclude'])
-        hbox_main.addLayout(layout)
+        # Other Deck boxes
+        hbox_main.addLayout(DeckLayout('DRAW CARD', self.scroll_deck['draw']))
+        hbox_main.addLayout(DeckLayout('DISCARD PILE', self.scroll_deck['discard']))
+        hbox_main.addLayout(DeckLayout('EXCLUDED', self.scroll_deck['exclude']))
 
         # Options Box
         vbox_menu = QVBoxLayout()
-        label = ColumnHeading('OPTIONS')
+        label = Heading(' ')
         vbox_menu.addWidget(label)
         hbox_main.addLayout(vbox_menu)
 
@@ -199,7 +191,7 @@ class MainWindow(QWidget):
 
         # Destination Radio Box
         vbox_destination = QVBoxLayout()
-        label = QLabel('Card Destination')
+        label = Heading('Card Destination')
         label.setMinimumWidth(WIDTH)
         label.setAlignment(Qt.AlignHCenter)
         vbox_destination.addWidget(label)
@@ -213,11 +205,12 @@ class MainWindow(QWidget):
         vbox_destination.addWidget(self.destination_exclude)
         group_box.setLayout(vbox_destination)
         vbox_menu.addWidget(group_box)
+        vbox_menu.addSpacing(SPACER)
 
         # Epidemic dropdown
         vbox_epidemic = QVBoxLayout()
         vbox_epidemic.setSpacing(SPACING)
-        label = QLabel('Epidemic')
+        label = Heading('Epidemic')
         label.setAlignment(Qt.AlignHCenter)
         label.setFixedWidth(WIDTH_WITH_SCROLL)
         vbox_epidemic.addWidget(label)
@@ -225,9 +218,10 @@ class MainWindow(QWidget):
         self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
         vbox_epidemic.addWidget(self.btn_shuffle_epidemic)
         vbox_menu.addLayout(vbox_epidemic)
+        vbox_menu.addSpacing(SPACER)
 
         # Stats
-        label = QLabel('Stats')
+        label = Heading('Stats')
         label.setFixedWidth(WIDTH_WITH_SCROLL)
         label.setAlignment(Qt.AlignHCenter)
         vbox_menu.addWidget(label)
@@ -340,7 +334,7 @@ class MainWindow(QWidget):
             text += '\n\n'
             if len(stats.top_cards) < MAX_CARDS_IN_STATS:
                 for card in stats.top_cards:
-                    text += '- ' + card.name + '\n'
+                    text += f'\u2022 {card.name}\n'
             else:
                 text += f'({MAX_CARDS_IN_STATS}+ cards)'
         else:
