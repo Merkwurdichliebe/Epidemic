@@ -7,7 +7,7 @@ from enum import Enum
 # TODO center dialog boxes
 # TODO don't reset scroll after click
 
-WINDOW_MINIMUM_HEIGHT = 700
+WINDOW_MIN_HEIGHT = 700
 SPACING = 5                 # Vertical spacing of buttons
 SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
@@ -15,6 +15,7 @@ HEIGHT = 24                 # Height of buttons
 WIDTH_WITH_SCROLL = 176
 MAX_CARDS_IN_CARDPOOL = 35
 MAX_CARDS_IN_STATS = 10
+TOP_CARDS = 16
 
 COLOR = {
     'blue': '#4073bf',
@@ -138,7 +139,7 @@ class DestinationRadioBox(QGroupBox):
 class MainWindow(QWidget):
     def __init__(self, app):
         super().__init__()
-        self.setMinimumHeight(WINDOW_MINIMUM_HEIGHT)
+        self.setMinimumHeight(WINDOW_MIN_HEIGHT)
         self.app = app
         self.cardpool_index = 0
 
@@ -243,9 +244,10 @@ class MainWindow(QWidget):
 
         # Tell the Main Window to use the outer QVBoxLayout
         self.setLayout(v_app)
+        pass
 
     def show_cardpool(self, drawdeck):
-        text = f'Possible cards at position {self.cardpool_index+1}:\n\n'
+        text = f'Deck position: {self.cardpool_index+1}\n\n'
         if not drawdeck.is_empty():
             d = drawdeck.cards[-1 - self.cardpool_index]
             if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
@@ -263,6 +265,13 @@ class MainWindow(QWidget):
         # self.app.cb_update_cardpool(self.cardpool_index)
         self.show_cardpool(deck)
 
+        # text = f'First {TOP_CARDS} card positions in the deck, top to bottom, ' \
+        #        f''
+        # text += f'with the number of possible cards at each position.'
+        # label = QLabel(text)
+        # label.setWordWrap(True)
+        # self.drawdeck.addWidget(label)
+
         # Redraw the parent widhet from scratch
         self.draw_deck_root.deleteLater()
         self.draw_deck_root = QWidget()
@@ -274,7 +283,7 @@ class MainWindow(QWidget):
         box.setSpacing(SPACING)
         self.draw_deck_root.setLayout(box)
 
-        for i, c in enumerate(reversed(deck.cards[-16:])):
+        for i, c in enumerate(reversed(deck.cards[-TOP_CARDS:])):
             # If the top card is a single card we display its name,
             # otherwise we display the number of possible cards.
             if len(c) == 1:
@@ -306,7 +315,7 @@ class MainWindow(QWidget):
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
     def buttons_to_display(deck):
-        return reversed(deck.cards[-16:]) if deck.name == 'drawdeck' else deck.sorted()
+        return reversed(deck.cards[-TOP_CARDS:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
         if self.destination_box.get_selection() == self.destination['draw_pool']:
