@@ -207,9 +207,6 @@ class MainWindow(QWidget):
     def set_cardpool_text(self, text):
         self._text_cardpool.setText(text)
 
-    def insert_into(self, index, widget):
-        self.v_drawdeck_buttons.insertWidget(index, widget)
-
 
 
 

@@ -79,8 +79,6 @@ class App:
             else:
                 text = f'{len(c)}'
 
-            # btn.set_active(True if i == self.cardpool_index else False)
-            # btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
             btn = self.view.drawdeck.button[i]
             btn.setText(text)
             btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
