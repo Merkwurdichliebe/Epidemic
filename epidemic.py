@@ -31,16 +31,67 @@ from game import Game
 from webbrowser import open as webopen
 
 
-class App:
-    def __init__(self):
-        # Instantiate the game-logic object (the Model in MVC)
-        self.game = Game()
+MAX_CARDS_IN_CARDPOOL = 35
+TOP_CARDS = 16
 
-        # Instantiate the main window (the View in MVC)
-        # We pass it the App object so that we can use callbacks
-        self.view = MainWindow(self)
-        self.view.show()
+from PySide2.QtWidgets import QLabel
+class App:
+    def __init__(self, view, game):
+        self.game = game
+        self.view = view
+
+        self._cardpool_index = 0
+
         self.show_select_game_dialog()
+
+        self.cb_select_cardpool(0)
+        self.update_drawdeck()
+
+    @property
+    def cardpool_index(self):
+        return self._cardpool_index
+
+    @cardpool_index.setter
+    def cardpool_index(self, index):
+        self.view.drawdeck.button[self._cardpool_index].set_active(False)
+        self._cardpool_index = index
+        self.view.drawdeck.button[index].set_active(True)
+
+    def update_cardpool(self):
+        drawdeck = self.game.deck['draw']
+        text = f'Deck position: {self.cardpool_index+1}\n\n'
+        if not drawdeck.is_empty():
+            d = drawdeck.cards[-1 - self.cardpool_index]
+            if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
+                for card in sorted(set(d.cards), key=lambda x: x.name):
+                    text += f'{card.name} ({d.cards.count(card)})\n'
+            else:
+                text += f'{MAX_CARDS_IN_CARDPOOL}+ cards'
+            text += f'\n[{d.name}]'
+        self.view.set_cardpool_text(text)
+
+    def update_drawdeck(self):
+        for i, c in enumerate(reversed(self.game.deck['draw'].cards[-TOP_CARDS:])):
+            # If the top card is a single card we display its name,
+            # otherwise we display the number of possible cards.
+            if len(c) == 1:
+                text = c.cards[0].name
+            else:
+                text = f'{len(c)}'
+
+            # btn.set_active(True if i == self.cardpool_index else False)
+            # btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
+            btn = self.view.drawdeck.button[i]
+            btn.setText(text)
+            btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
+
+    def cb_select_cardpool(self, index):
+        self.cardpool_index = index
+        self.update_cardpool()
+
+
+
+
 
     def show_select_game_dialog(self):
         # (We reuse the callback function for the New Game button)
@@ -49,7 +100,7 @@ class App:
     def update_gui(self, *decks):
         for deck in decks:
             if deck.name == 'draw':
-                self.view.show_drawdeck(self.game.deck['draw'])
+                self.view.show_drawdeck_old(self.game.deck['draw'])
                 self.view.update_epidemic_combo()
                 self.view.update_stats(self.game.stats)
             self.view.show_deck(self.game.deck[deck.name])
@@ -60,9 +111,7 @@ class App:
             self.game.draw_card(from_deck, to_deck, card)
             self.update_gui(*self.get_all_decks())
 
-    def cb_update_cardpool(self, index):
-        self.view.cardpool_index = index
-        self.view.show_drawdeck(self.game.deck['draw'])
+
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
@@ -77,7 +126,7 @@ class App:
         dialog = DialogNewGame(games)
         if dialog.exec_():
             self.game.initialise(dialog.combo.currentText())
-            self.update_gui(*self.get_all_decks())
+            # self.update_gui(*self.get_all_decks())
 
     @staticmethod
     def cb_dialog_help(self):
@@ -93,11 +142,10 @@ class App:
 
 def main():
     application = QApplication()
-    # TODO fix call order
-    # window = MainWindow()
-    # window.show()
-    # pass app to window
-    app = App()
+    window = MainWindow()
+    model = Game()
+    App(window, model)
+    window.show()
     application.exec_()
 
 
