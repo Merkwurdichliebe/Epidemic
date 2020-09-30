@@ -107,8 +107,10 @@ class App:
 
     def cb_draw_card(self, from_deck, card):
         to_deck = self.view.get_destination()
-        if not from_deck == to_deck and not from_deck == to_deck.parent:
+        if not from_deck == to_deck:
             self.game.draw_card(from_deck, to_deck, card)
+            # TODO we update all the decks because now the 'draw' destination might actually be one of its decks
+            # TODO Also draw into draw deck doesn't filter properly
             self.update_gui(*self.get_all_decks())
 
 
@@ -126,7 +128,11 @@ class App:
         dialog = DialogNewGame(games)
         if dialog.exec_():
             self.game.initialise(dialog.combo.currentText())
+<<<<<<< HEAD
             # self.update_gui(*self.get_all_decks())
+=======
+        self.update_gui(*self.get_all_decks())
+>>>>>>> parent of 7d5198d... Deck.parent: Fixed drawing from Draw onto Draw Pool
 
     @staticmethod
     def cb_dialog_help(self):

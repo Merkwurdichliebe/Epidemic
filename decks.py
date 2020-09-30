@@ -34,7 +34,6 @@ class Deck:
     def __init__(self, name):
         self.name = name
         self.cards = []
-        self.parent = None
 
     def add(self, card):
         self.cards.append(card)
@@ -88,12 +87,10 @@ class DrawDeck(Deck):
         if isinstance(item, Deck):
             for i in item.cards:
                 self.cards.append(item)
-            item.parent = self
         else:
             deck = Deck(item.name)
             deck.add(item)
             self.cards.append(deck)
-            deck.parent = self
 
     def remove(self, card):
         # Override Deck.remove:
