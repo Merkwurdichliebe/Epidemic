@@ -7,7 +7,7 @@ from enum import Enum
 # TODO center dialog boxes
 # TODO don't reset scroll after click
 
-WINDOW_MINIMUM_HEIGHT = 700
+WINDOW_MIN_HEIGHT = 700
 SPACING = 5                 # Vertical spacing of buttons
 SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
@@ -138,7 +138,6 @@ class DestinationRadioBox(QGroupBox):
 class DrawDeck(QVBoxLayout):
     def __init__(self):
         super().__init__()
-<<<<<<< HEAD
         self.addWidget(Heading('DRAW DECK'))
         self.v_buttons = QVBoxLayout()
         self.v_buttons.setSpacing(SPACING)
@@ -151,30 +150,6 @@ class DrawDeck(QVBoxLayout):
             self.button.append(btn)
             self.v_buttons.addWidget(btn)
         self.addStretch()
-=======
-        self.setMinimumHeight(WINDOW_MINIMUM_HEIGHT)
-        self.app = app
-        self.cardpool_index = 0
-
-        self.drawdeck = QVBoxLayout()
-        self.scroll_deck = {
-            'draw': DeckScrollArea(),
-            'discard': DeckScrollArea(),
-            'exclude': DeckScrollArea()
-        }
-
-        self.destination = {
-            'draw_pool': QRadioButton('Draw (Pool)'),
-            'draw_top': QRadioButton('Draw (Top)'),
-            'discard': QRadioButton('Discard'),
-            'exclude': QRadioButton('Exclude')
-        }
-        self.destination_box = DestinationRadioBox(self.destination.values())
-
-        self.draw_deck_root = QWidget()
-        self.text_cardpool = QLabel()
-        self.text_cardpool.setMaximumWidth(WIDTH)
->>>>>>> parent of 7d5198d... Deck.parent: Fixed drawing from Draw onto Draw Pool
 
 
 class MainWindow(QWidget):
@@ -228,7 +203,6 @@ class MainWindow(QWidget):
         v_cardpool.addWidget(Heading('CARD POOL'))
         v_cardpool.addWidget(self._text_cardpool)
         v_cardpool.addStretch()
-<<<<<<< HEAD
         self.h_main.addLayout(v_cardpool)
 
     def _create_drawdeck(self):
@@ -249,84 +223,18 @@ class MainWindow(QWidget):
 
 
 
-=======
-        h_main.addLayout(v_cardpool)
-
-        # Draw Deck Box
-        label = Heading('DRAW DECK')
-        self.drawdeck.addWidget(label)
-        h_main.addLayout(self.drawdeck)
-
-        # Other Deck boxes
-        h_main.addLayout(DeckLayout('DRAW CARD', self.scroll_deck['draw']))
-        h_main.addLayout(DeckLayout('DISCARD PILE', self.scroll_deck['discard']))
-        h_main.addLayout(DeckLayout('EXCLUDED', self.scroll_deck['exclude']))
-
-        # Options Box
-        v_menu = QVBoxLayout()
-        label = Heading(' ')
-        v_menu.addWidget(label)
-
-        # New Game & Help
-        v_game = QVBoxLayout()
-        v_game.setSpacing(SPACING)
-        b_new_game = QPushButton('New Game')
-        b_new_game.setMaximumWidth(WIDTH_WITH_SCROLL)
-        b_new_game.clicked.connect(self.app.cb_new_game)
-        v_game.addWidget(b_new_game)
-        b_help = QPushButton('Help')
-        b_help.setMaximumWidth(WIDTH_WITH_SCROLL)
-        b_help.clicked.connect(self.app.cb_dialog_help)
-        v_game.addWidget(b_help)
-        v_menu.addLayout(v_game)
-
-        # Destination Radio Box
-        v_menu.addWidget(self.destination_box)
-        self.destination['exclude'].setChecked(True)
-        v_menu.addSpacing(SPACER)
-
-        # Epidemic dropdown
-        v_epidemic = QVBoxLayout()
-        v_epidemic.setSpacing(SPACING)
-        label = Heading('Epidemic')
-        v_epidemic.addWidget(label)
-        v_epidemic.addWidget(self.combo_epidemic)
-        self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
-        v_epidemic.addWidget(self.btn_shuffle_epidemic)
-        v_menu.addLayout(v_epidemic)
-        v_menu.addSpacing(SPACER)
-
-        # Stats
-        label = Heading('Stats')
-        v_menu.addWidget(label)
-        v_menu.addWidget(self.text_stats)
-
-        v_menu.addStretch()
-
-        h_main.addLayout(v_menu)
-
-        # Tell the Main Window to use the outer QVBoxLayout
-        self.setLayout(v_app)
-
-    def show_cardpool(self, drawdeck):
-        text = f'Possible cards at position {self.cardpool_index+1}:\n\n'
-        if not drawdeck.is_empty():
-            d = drawdeck.cards[-1 - self.cardpool_index]
-            if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
-                for card in sorted(set(d.cards), key=lambda x: x.name):
-                    text += f'{card.name} ({d.cards.count(card)})\n'
-            else:
-                text += f'{MAX_CARDS_IN_CARDPOOL}+ cards'
-            text += f'\n[{d.name}]'
-        self.text_cardpool.setText(text)
-        self.text_cardpool.setWordWrap(True)
-        self.text_cardpool.repaint()  # 2 TODO Fix repaint
->>>>>>> parent of 7d5198d... Deck.parent: Fixed drawing from Draw onto Draw Pool
 
     def show_drawdeck_old(self, deck):
         # Reset the cardpool index to point to the top of the Draw Deck
         # self.app.cb_update_cardpool(self.cardpool_index)
         self.show_cardpool(deck)
+
+        # text = f'First {TOP_CARDS} card positions in the deck, top to bottom, ' \
+        #        f''
+        # text += f'with the number of possible cards at each position.'
+        # label = QLabel(text)
+        # label.setWordWrap(True)
+        # self.drawdeck.addWidget(label)
 
         # Redraw the parent widhet from scratch
         self.draw_deck_root.deleteLater()
@@ -339,7 +247,7 @@ class MainWindow(QWidget):
         box.setSpacing(SPACING)
         self.draw_deck_root.setLayout(box)
 
-        for i, c in enumerate(reversed(deck.cards[-16:])):
+        for i, c in enumerate(reversed(deck.cards[-TOP_CARDS:])):
             # If the top card is a single card we display its name,
             # otherwise we display the number of possible cards.
             if len(c) == 1:
@@ -371,7 +279,7 @@ class MainWindow(QWidget):
     @staticmethod
     # TODO not working for drawdeck, fix later when app is working
     def buttons_to_display(deck):
-        return reversed(deck.cards[-16:]) if deck.name == 'drawdeck' else deck.sorted()
+        return reversed(deck.cards[-TOP_CARDS:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
         if self.destination_box.get_selection() == self.destination['draw_pool']:
