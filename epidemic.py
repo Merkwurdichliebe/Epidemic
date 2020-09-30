@@ -34,7 +34,7 @@ from webbrowser import open as webopen
 MAX_CARDS_IN_CARDPOOL = 35
 TOP_CARDS = 16
 
-from PySide2.QtWidgets import QLabel
+
 class App:
     def __init__(self, view, game):
         self.game = game

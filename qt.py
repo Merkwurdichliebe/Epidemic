@@ -196,7 +196,6 @@ class MainWindow(QWidget):
 
         self._create_cardpool()
         self.h_main.addLayout(self.drawdeck)
-        # self._create_drawdeck()
 
     def _create_cardpool(self):
         v_cardpool = QVBoxLayout()
@@ -204,13 +203,6 @@ class MainWindow(QWidget):
         v_cardpool.addWidget(self._text_cardpool)
         v_cardpool.addStretch()
         self.h_main.addLayout(v_cardpool)
-
-    def _create_drawdeck(self):
-        v_drawdeck = QVBoxLayout()
-        v_drawdeck.addWidget(Heading('DRAW DECK'))
-        v_drawdeck.addLayout(self.v_drawdeck_buttons)
-        v_drawdeck.addStretch()
-        self.h_main.addLayout(v_drawdeck)
 
     def set_cardpool_text(self, text):
         self._text_cardpool.setText(text)
