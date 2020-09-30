@@ -3,7 +3,7 @@ from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
     QButtonGroup, QDialog, QMainWindow
 from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
- 
+
 # TODO center dialog boxes
 # TODO don't reset scroll after click
 
