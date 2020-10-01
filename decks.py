@@ -65,6 +65,9 @@ class Deck:
     def is_empty(self):
         return False if self.cards else True
 
+    def has_parent(self):
+        return True if self.parent else False
+
     def __len__(self):
         return len(self.cards)
 

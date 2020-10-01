@@ -52,7 +52,7 @@ class App:
         deck = self.game.deck['draw']
         deckcards = reversed(deck.sorted())
         for card in deckcards:
-            button = self.view.deck['draw'].create_card_button(card)
+            button = self.view.deck['draw'].add_card(card)
             button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     def cb_draw_card(self, button, from_deck):
@@ -68,7 +68,10 @@ class App:
             else:
                 self.view.deck[from_deck.name].remove_card(button)
 
-            button = self.view.deck[to_deck.name].create_card_button(button.card)
+            if to_deck.has_parent():
+                print('has parent')
+
+            button = self.view.deck[to_deck.name].add_card(button.card)
             button.clicked.connect(lambda b=button, d=to_deck: self.cb_draw_card(b, d))
             self.update_cardpool()
             self.update_drawdeck()
