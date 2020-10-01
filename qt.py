@@ -38,7 +38,7 @@ class Heading(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(f'<h4>{text}</h4>')
-        self.setFixedWidth(WIDTH_WITH_SCROLL)
+        # self.setFixedWidth(WIDTH_WITH_SCROLL)
         self.setAlignment(Qt.AlignHCenter)
 
 
@@ -52,7 +52,7 @@ class DeckLayout(QVBoxLayout):
 class DeckScrollArea(QScrollArea):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(WIDTH_WITH_SCROLL)
+        # self.setFixedWidth(WIDTH_WITH_SCROLL)
 
 
 class CardButton(QLabel):
@@ -68,7 +68,7 @@ class CardButton(QLabel):
             f'background: {self.color};'
             f'color: white;'
             f'font-weight: bold;')
-        self.setFixedSize(QSize(WIDTH, HEIGHT))
+        # self.setFixedSize(QSize(WIDTH, HEIGHT))
 
     def mouseReleaseEvent(self, event):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
@@ -98,7 +98,6 @@ class PoolButton(QLabel):
         self.setStyleSheet(ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
 
     def mouseReleaseEvent(self, event):
-        # self.set_active(True)
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
 
     def enterEvent(self, event):
@@ -135,29 +134,42 @@ class DestinationRadioBox(QGroupBox):
         return self.b_group.checkedButton()
 
 
+class Cardpool(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.addWidget(Heading('CARD POOL'))
+        self._text = QLabel()
+        self._text.setWordWrap(True)
+        self._text.setFixedWidth(WIDTH)
+        self.addWidget(self._text)
+        self.addStretch()
+
+    def set_text(self, text):
+        self._text.setText(text)
+
+
 class DrawDeck(QVBoxLayout):
     def __init__(self):
         super().__init__()
         self.addWidget(Heading('DRAW DECK'))
-        self.v_buttons = QVBoxLayout()
-        self.v_buttons.setSpacing(SPACING)
+        v_buttons = QVBoxLayout()
+        v_buttons.setSpacing(SPACING)
+        self.addLayout(v_buttons)
         self.button = []
-        self.addLayout(self.v_buttons)
         for i in range(16):
             btn = PoolButton('init')
-            btn.setFixedSize(QSize(WIDTH, HEIGHT))
+            # btn.setFixedSize(QSize(WIDTH, HEIGHT))
             btn.set_active(False)
             self.button.append(btn)
-            self.v_buttons.addWidget(btn)
+            v_buttons.addWidget(btn)
         self.addStretch()
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self._text_cardpool = QLabel()
-        self._text_cardpool.setWordWrap(True)
 
+        self.cardpool = Cardpool()
         self.drawdeck = DrawDeck()
 
         # self.drawdeck = QVBoxLayout()
@@ -194,18 +206,10 @@ class MainWindow(QWidget):
         self.h_main = QHBoxLayout()
         v_app.addLayout(self.h_main)
 
-        self._create_cardpool()
+        self.h_main.addLayout(self.cardpool)
         self.h_main.addLayout(self.drawdeck)
+        self.h_main.addStretch()
 
-    def _create_cardpool(self):
-        v_cardpool = QVBoxLayout()
-        v_cardpool.addWidget(Heading('CARD POOL'))
-        v_cardpool.addWidget(self._text_cardpool)
-        v_cardpool.addStretch()
-        self.h_main.addLayout(v_cardpool)
-
-    def set_cardpool_text(self, text):
-        self._text_cardpool.setText(text)
 
 
 

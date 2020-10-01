@@ -31,7 +31,8 @@ from game import Game
 from webbrowser import open as webopen
 
 
-MAX_CARDS_IN_CARDPOOL = 35
+STATS_MAX = 10
+CARDPOOL_MAX = 35
 TOP_CARDS = 16
 
 
@@ -58,17 +59,16 @@ class App:
         self.view.drawdeck.button[index].set_active(True)
 
     def update_cardpool(self):
-        drawdeck = self.game.deck['draw']
         text = f'Deck position: {self.cardpool_index+1}\n\n'
-        if not drawdeck.is_empty():
-            d = drawdeck.cards[-1 - self.cardpool_index]
-            if len(set(d)) < MAX_CARDS_IN_CARDPOOL:
+        if not self.game.deck['draw'].is_empty():
+            d = self.game.deck['draw'].cards[-1-self._cardpool_index]
+            if len(set(d)) < CARDPOOL_MAX:
                 for card in sorted(set(d.cards), key=lambda x: x.name):
                     text += f'{card.name} ({d.cards.count(card)})\n'
             else:
-                text += f'{MAX_CARDS_IN_CARDPOOL}+ cards'
+                text += f'{CARDPOOL_MAX}+ cards'
             text += f'\n[{d.name}]'
-        self.view.set_cardpool_text(text)
+        self.view.cardpool.set_text(text)
 
     def update_drawdeck(self):
         for i, c in enumerate(reversed(self.game.deck['draw'].cards[-TOP_CARDS:])):
@@ -140,10 +140,10 @@ class App:
 
 def main():
     application = QApplication()
-    window = MainWindow()
+    view = MainWindow()
     model = Game()
-    App(window, model)
-    window.show()
+    App(view, model)
+    view.show()
     application.exec_()
 
 
