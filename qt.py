@@ -42,46 +42,6 @@ class Heading(QLabel):
         self.setAlignment(Qt.AlignHCenter)
 
 
-class DeckLayout(QVBoxLayout):
-    def __init__(self, heading, widget):
-        super().__init__()
-        self.addWidget(Heading(heading))
-        self.addWidget(widget)
-
-
-class DeckScrollArea(QScrollArea):
-    def __init__(self):
-        super().__init__()
-        # self.setFixedWidth(WIDTH_WITH_SCROLL)
-
-
-class CardButton(QLabel):
-    clicked = Signal()  # signal to be used in "connect" declared as a class variable
-
-    def __init__(self, deck, card):
-        super().__init__(card.name)
-        self.deck = deck
-        self.card = card
-        self.color = COLOR['gray'] if deck.name == 'exclude' else COLOR[card.color]
-        self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f'background: {self.color};'
-            f'color: white;'
-            f'font-weight: bold;')
-        # self.setFixedSize(QSize(WIDTH, HEIGHT))
-
-    def mouseReleaseEvent(self, event):
-        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
-
-    def enterEvent(self, event):
-        self.setStyleSheet(ButtonCSS.MouseEnter.value)
-
-    def leaveEvent(self, event):
-        self.setStyleSheet(f'background: {self.color};'
-                           f'color: white;'
-                           f'font-weight: bold;')
-
-
 class PoolButton(QLabel):
     clicked = Signal()  # signal to be used in "connect" declared as a class variable
 
@@ -125,13 +85,13 @@ class DestinationRadioBox(QGroupBox):
         # QButtonGroup is used for the *logical* grouping of buttons
         self.b_group = QButtonGroup()
 
-        for button in destinations:
+        for button in destinations.values():
             self.b_group.addButton(button)
             box.addWidget(button)
+
         self.setLayout(box)
 
-    def get_selection(self):
-        return self.b_group.checkedButton()
+        destinations['exclude'].setChecked(True)
 
 
 class Cardpool(QVBoxLayout):
@@ -158,34 +118,100 @@ class DrawDeck(QVBoxLayout):
         self.button = []
         for i in range(16):
             btn = PoolButton('init')
-            # btn.setFixedSize(QSize(WIDTH, HEIGHT))
             btn.set_active(False)
             self.button.append(btn)
             v_buttons.addWidget(btn)
         self.addStretch()
 
 
+class Deck(QVBoxLayout):
+    def __init__(self, heading, color=True):
+        super().__init__()
+        self.addWidget(Heading(heading))
+        self.use_color = color
+        self.cards = []
+
+        self.scroll_widget = QWidget()
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.addWidget(self.scroll_area)
+
+        self.v_scroll = QVBoxLayout()
+        self.v_scroll.setSpacing(SPACING)
+        self.v_scroll.addStretch()
+        self.scroll_widget.setLayout(self.v_scroll)
+
+        self.scroll_area.setFixedWidth(WIDTH_WITH_SCROLL)
+        self.scroll_area.setWidget(self.scroll_widget)
+
+    def create_card_button(self, card):
+        button = CardButton(card)
+        self.v_scroll.insertWidget(0, button)
+        color = COLOR[card.color] if self.use_color else COLOR['gray']
+        button.set_color(color)
+        self.cards.append(button)
+        return button
+
+    def remove_card(self, card):
+        self.removeWidget(card)
+        card.deleteLater()
+
+    def clear(self):
+        for card in self.cards:
+            self.removeWidget(card)
+            card.deleteLater()
+
+
+class CardButton(QLabel):
+    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+
+    def __init__(self, card):
+        super().__init__(card.name)
+        self.card = card
+        self.color = None
+        self.stylesheet = None
+        self.setAlignment(Qt.AlignCenter)
+        self.setFixedSize(QSize(WIDTH, HEIGHT))
+
+    def set_color(self, color):
+        self.color = color
+        self.stylesheet = f'background: {self.color};' \
+                          f'color: white;' \
+                          f'font-weight: bold;'
+        self.setStyleSheet(self.stylesheet)
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+
+    def enterEvent(self, event):
+        self.setStyleSheet(ButtonCSS.MouseEnter.value)
+
+    def leaveEvent(self, event):
+        self.setStyleSheet(self.stylesheet)
+
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.deck = {
+            'draw': Deck('DRAW CARD'),
+            'discard': Deck('DISCARD PILE'),
+            'exclude': Deck('EXCLUDED', color=False)
+        }
+
         self.cardpool = Cardpool()
         self.drawdeck = DrawDeck()
 
-        # self.drawdeck = QVBoxLayout()
-        # self.scroll_deck = {
-        #     'draw': DeckScrollArea(),
-        #     'discard': DeckScrollArea(),
-        #     'exclude': DeckScrollArea()
-        # }
-        #
-        # self.destination = {
-        #     'draw_pool': QRadioButton('Draw (Pool)'),
-        #     'draw_top': QRadioButton('Draw (Top)'),
-        #     'discard': QRadioButton('Discard'),
-        #     'exclude': QRadioButton('Exclude')
-        # }
-        # self.destination_box = DestinationRadioBox(self.destination.values())
+        self.destination = {
+            'draw_pool': QRadioButton('Draw (Pool)'),
+            'draw_top': QRadioButton('Draw (Top)'),
+            'discard': QRadioButton('Discard'),
+            'exclude': QRadioButton('Exclude')
+        }
+        self.destinations = DestinationRadioBox(self.destination)
+
         #
         # self.draw_deck_root = QWidget()
         # self.text_cardpool.setMaximumWidth(WIDTH)
@@ -203,12 +229,22 @@ class MainWindow(QWidget):
         self.setLayout(v_app)
 
         # Main horizontal container
-        self.h_main = QHBoxLayout()
-        v_app.addLayout(self.h_main)
+        h_main = QHBoxLayout()
+        v_app.addLayout(h_main)
 
-        self.h_main.addLayout(self.cardpool)
-        self.h_main.addLayout(self.drawdeck)
-        self.h_main.addStretch()
+        h_main.addLayout(self.cardpool)
+        h_main.addLayout(self.drawdeck)
+        h_main.addLayout(self.deck['draw'])
+        h_main.addLayout(self.deck['discard'])
+        h_main.addLayout(self.deck['exclude'])
+
+        v_options = QVBoxLayout()
+        v_options.addWidget(Heading(' '))
+        v_options.addWidget(self.destinations)
+        v_options.addStretch()
+
+        h_main.addLayout(v_options)
+        h_main.addStretch()
 
 
 
@@ -275,16 +311,16 @@ class MainWindow(QWidget):
         return reversed(deck.cards[-TOP_CARDS:]) if deck.name == 'drawdeck' else deck.sorted()
 
     def get_destination(self):
-        if self.destination_box.get_selection() == self.destination['draw_pool']:
+        if self.destinations.get_selection() == self.destination['draw_pool']:
             if not self.app.game.deck['draw'].is_empty():
                 return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
             else:
                 return self.app.game.deck['draw']
-        elif self.destination_box.get_selection() == self.destination['draw_top']:
+        elif self.destinations.get_selection() == self.destination['draw_top']:
             return self.app.game.deck['draw']
-        elif self.destination_box.get_selection() == self.destination['discard']:
+        elif self.destinations.get_selection() == self.destination['discard']:
             return self.app.game.deck['discard']
-        elif self.destination_box.get_selection() == self.destination['exclude']:
+        elif self.destinations.get_selection() == self.destination['exclude']:
             return self.app.game.deck['exclude']
 
     def update_epidemic_combo(self):

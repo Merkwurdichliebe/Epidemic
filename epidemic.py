@@ -43,10 +43,48 @@ class App:
 
         self._cardpool_index = 0
 
-        self.show_select_game_dialog()
-
+        self.cb_new_game_dialog()
         self.cb_select_cardpool(0)
         self.update_drawdeck()
+        self.populate_draw()
+
+    def populate_draw(self):
+        deck = self.game.deck['draw']
+        deckcards = reversed(deck.sorted())
+        for card in deckcards:
+            button = self.view.deck['draw'].create_card_button(card)
+            button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+
+    def cb_draw_card(self, button, from_deck):
+        to_deck = self.get_destination()
+        if not from_deck == to_deck and not from_deck == to_deck.parent:
+            print(f'{button.card.name} from {from_deck.name} to {to_deck.name}')
+
+            self.game.draw_card(from_deck, to_deck, button.card)
+
+            if from_deck.name == 'draw':
+                if button.card not in from_deck.top():
+                    self.view.deck[from_deck.name].remove_card(button)
+            else:
+                self.view.deck[from_deck.name].remove_card(button)
+
+            button = self.view.deck[to_deck.name].create_card_button(button.card)
+            button.clicked.connect(lambda b=button, d=to_deck: self.cb_draw_card(b, d))
+            self.update_cardpool()
+            self.update_drawdeck()
+
+    def get_destination(self):
+        if self.view.destination['exclude'].isChecked():
+            return self.game.deck['exclude']
+        if self.view.destination['discard'].isChecked():
+            return self.game.deck['discard']
+        if self.view.destination['draw_top'].isChecked():
+            return self.game.deck['draw']
+        if self.view.destination['draw_pool'].isChecked():
+            if not self.game.deck['draw'].is_empty():
+                return self.game.deck['draw'].cards[-1 - self.cardpool_index]
+            else:
+                return self.game.deck['draw']
 
     @property
     def cardpool_index(self):
@@ -72,13 +110,7 @@ class App:
 
     def update_drawdeck(self):
         for i, c in enumerate(reversed(self.game.deck['draw'].cards[-TOP_CARDS:])):
-            # If the top card is a single card we display its name,
-            # otherwise we display the number of possible cards.
-            if len(c) == 1:
-                text = c.cards[0].name
-            else:
-                text = f'{len(c)}'
-
+            text = f'{len(c)}' if len(c) > 1 else c.cards[0].name
             btn = self.view.drawdeck.button[i]
             btn.setText(text)
             btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
@@ -87,13 +119,20 @@ class App:
         self.cardpool_index = index
         self.update_cardpool()
 
+    def cb_new_game_dialog(self):
+        games = list(self.game.games.keys())
+        dialog = DialogNewGame(games)
+        if dialog.exec_():
+            self.game.initialise(dialog.combo.currentText())
+            # self.update_gui(*self.get_all_decks())
 
 
 
 
-    def show_select_game_dialog(self):
-        # (We reuse the callback function for the New Game button)
-        self.cb_new_game()
+
+
+
+
 
     def update_gui(self, *decks):
         for deck in decks:
@@ -103,11 +142,7 @@ class App:
                 self.view.update_stats(self.game.stats)
             self.view.show_deck(self.game.deck[deck.name])
 
-    def cb_draw_card(self, from_deck, card):
-        to_deck = self.view.get_destination()
-        if not from_deck == to_deck and not from_deck == to_deck.parent:
-            self.game.draw_card(from_deck, to_deck, card)
-            self.update_gui(*self.get_all_decks())
+
 
 
 
@@ -119,12 +154,7 @@ class App:
         self.update_gui(self.game.deck['draw'])
         self.update_gui(self.game.deck['discard'])
 
-    def cb_new_game(self):
-        games = list(self.game.games.keys())
-        dialog = DialogNewGame(games)
-        if dialog.exec_():
-            self.game.initialise(dialog.combo.currentText())
-            # self.update_gui(*self.get_all_decks())
+
 
     @staticmethod
     def cb_dialog_help(self):
