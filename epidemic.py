@@ -50,31 +50,45 @@ class App:
 
     def populate_draw(self):
         deck = self.game.deck['draw']
-        deckcards = reversed(deck.sorted())
-        for card in deckcards:
-            button = self.view.deck['draw'].add_card(card)
+        cards = reversed(deck.sorted())
+        for card in cards:
+            button = self.view.deck['draw'].add_card_button(card)
             button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     def cb_draw_card(self, button, from_deck):
+        # Get the deck we're drawing to
         to_deck = self.get_destination()
-        if not from_deck == to_deck and not from_deck == to_deck.parent:
-            print(f'{button.card.name} from {from_deck.name} to {to_deck.name}')
 
+        # Ignore drawing from a deck onto itself
+        if not from_deck == to_deck and not from_deck == to_deck.parent:
+            print(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
+
+            # Move the card and update the game state
             self.game.draw_card(from_deck, to_deck, button.card)
 
+            # Remove the card from the source deck in GUI
             if from_deck.name == 'draw':
                 if button.card not in from_deck.top():
-                    self.view.deck[from_deck.name].remove_card(button)
+                    self.remove_button_from_deck(button, from_deck)
             else:
-                self.view.deck[from_deck.name].remove_card(button)
+                self.remove_button_from_deck(button, from_deck)
 
-            if to_deck.has_parent():
-                print('has parent')
-
-            button = self.view.deck[to_deck.name].add_card(button.card)
-            button.clicked.connect(lambda b=button, d=to_deck: self.cb_draw_card(b, d))
+            # Add the card to the destination deck in GUI
+            if to_deck.has_parent():  # Deck is part of the Draw Deck
+                # Add the button only if it's not already displayed
+                if button.card.name not in self.view.deck[to_deck.parent.name].cards:
+                    self.add_button_to_deck(button, self.game.deck['draw'])
+            else:
+                self.add_button_to_deck(button, to_deck)
             self.update_cardpool()
             self.update_drawdeck()
+
+    def add_button_to_deck(self, button, deck):
+        button = self.view.deck[deck.name].add_card_button(button.card)
+        button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+
+    def remove_button_from_deck(self, button, deck):
+        self.view.deck[deck.name].remove_card_button(button)
 
     def get_destination(self):
         if self.view.destination['exclude'].isChecked():

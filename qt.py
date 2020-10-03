@@ -130,6 +130,7 @@ class Deck(QVBoxLayout):
         self.addWidget(Heading(heading))
         self.use_color = color
         self.cards = []
+        self.heading = heading
 
         self.scroll_widget = QWidget()
 
@@ -145,17 +146,18 @@ class Deck(QVBoxLayout):
         self.scroll_area.setFixedWidth(WIDTH_WITH_SCROLL)
         self.scroll_area.setWidget(self.scroll_widget)
 
-    def add_card(self, card):
+    def add_card_button(self, card):
         button = CardButton(card)
         self.v_scroll.insertWidget(0, button)
         color = COLOR[card.color] if self.use_color else COLOR['gray']
         button.set_color(color)
-        self.cards.append(button)
+        self.cards.append(card.name)
         return button
 
-    def remove_card(self, card):
-        self.removeWidget(card)
-        card.deleteLater()
+    def remove_card_button(self, button):
+        self.cards.remove(button.card.name)
+        self.removeWidget(button)
+        button.deleteLater()
 
     def clear(self):
         for card in self.cards:
@@ -166,7 +168,10 @@ class Deck(QVBoxLayout):
 class DrawCardDeck(Deck):
     def __init__(self, heading):
         super().__init__(heading)
-        pass
+
+    def add_card_button(self, card):
+        if card not in self.cards:
+            return super().add_card_button(card)
 
 
 class CardButton(QLabel):
