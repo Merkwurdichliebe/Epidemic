@@ -43,14 +43,19 @@ class App:
 
         self._cardpool_index = 0
 
-        self.init_main_app_buttons()
+        self.bind_sidebar_buttons()
         self.cb_new_game_dialog()
 
-    def init_main_app_buttons(self):
-        new_game = self.view.app_buttons.button_new_game
-        new_game.clicked.connect(self.cb_new_game_dialog)
+    def bind_sidebar_buttons(self):
+        new_game_button = self.view.app_buttons.button_new_game
+        new_game_button.clicked.connect(self.cb_new_game_dialog)
+        help_button = self.view.app_buttons.button_help
+        help_button.clicked.connect(self.cb_help_dialog)
+        epidemic = self.view.epidemic_menu.button
+        epidemic.clicked.connect(self.cb_epidemic)
 
     def populate_draw(self):
+        self.view.deck['draw'].clear()
         deck = self.game.deck['draw']
         cards = deck.sorted()
         for card in cards:
@@ -84,6 +89,8 @@ class App:
                 self.add_button_to_deck(button, to_deck)
             self.update_cardpool()
             self.update_drawdeck()
+            self.update_stats()
+            self.update_epidemic_menu()
 
     def add_button_to_deck(self, button, deck):
         button = self.view.deck[deck.name].add_card_button(button.card)
@@ -134,6 +141,40 @@ class App:
             btn.setText(text)
             btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
 
+    def update_epidemic_menu(self):
+        """Update the epidemic dropdown list
+        based on the available cards in the Draw Deck."""
+        deck = self.game.deck['draw']
+        if not deck.is_empty():
+            items = sorted([c.name for c in list(set(deck.bottom().cards))])
+            self.view.epidemic_menu.combo_box.setDisabled(False)
+            self.view.epidemic_menu.button.setDisabled(False)
+        else:
+            items = ['(Draw Deck Empty)']
+            self.view.epidemic_menu.combo_box.setDisabled(True)
+            self.view.epidemic_menu.button.setDisabled(True)
+
+        self.view.epidemic_menu.combo_box.clear()
+        self.view.epidemic_menu.combo_box.addItems(items)
+
+    def update_stats(self):
+        stats = self.game.stats
+        text = f'Total cards: {stats.total}\n'
+        text += f'In discard pile: {stats.in_discard}\n'
+        if not stats.deck['draw'].is_empty():
+            text += f'\nTop card frequency:\n'
+            text += f'{stats.top_freq} '
+            text += f'({stats.percentage:.2%})'
+            text += '\n\n'
+            if len(stats.top_cards) < STATS_MAX:
+                for card in stats.top_cards:
+                    text += f'\u2022 {card.name}\n'
+            else:
+                text += f'({STATS_MAX}+ cards)'
+        else:
+            text += '\n(Draw Deck is empty)'
+        self.view.stats.text.setText(text)
+
     def cb_select_cardpool(self, index):
         self.cardpool_index = index
         self.update_cardpool()
@@ -147,47 +188,27 @@ class App:
             self.populate_draw()
             self.cb_select_cardpool(0)
             self.update_drawdeck()
-
-
-
-
-
-
-
-
-
-    def update_gui(self, *decks):
-        for deck in decks:
-            if deck.name == 'draw':
-                self.view.show_drawdeck_old(self.game.deck['draw'])
-                self.view.update_epidemic_combo()
-                self.view.update_stats(self.game.stats)
-            self.view.show_deck(self.game.deck[deck.name])
-
-
-
-
+            self.update_epidemic_menu()
+            self.update_stats()
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
-        new_card_name = self.view.combo_epidemic.currentText()
+        new_card_name = self.view.epidemic_menu.combo_box.currentText()
         self.game.epidemic(new_card_name)
-        self.view.cardpool_index = 0
-        self.update_gui(self.game.deck['draw'])
-        self.update_gui(self.game.deck['discard'])
-
-
+        self.view.deck['discard'].clear()
+        self.populate_draw()
+        self.update_drawdeck()
+        self.update_epidemic_menu()
+        self.update_cardpool()
+        self.cb_select_cardpool(0)
 
     @staticmethod
-    def cb_dialog_help(self):
+    def cb_help_dialog():
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
         dialog = DialogHelp()
         if dialog.exec_():
             webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
-
-    def get_all_decks(self):
-        return list(self.game.deck.values())
 
 
 def main():

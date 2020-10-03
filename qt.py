@@ -6,7 +6,6 @@ from enum import Enum
 import bisect
 
 # TODO center dialog boxes
-# TODO don't reset scroll after click
 
 WINDOW_MIN_HEIGHT = 700
 SPACING = 5                 # Vertical spacing of buttons
@@ -15,7 +14,6 @@ WIDTH = 150                 # Width of buttons and layout columns
 HEIGHT = 24                 # Height of buttons
 WIDTH_WITH_SCROLL = 176
 
-MAX_CARDS_IN_STATS = 10
 
 COLOR = {
     'blue': '#4073bf',
@@ -51,6 +49,18 @@ class AppButtons(QVBoxLayout):
         self.addWidget(self.button_new_game)
         self.button_help = QPushButton('Help')
         self.addWidget(self.button_help)
+
+
+class EpidemicMenu(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.setSpacing(SPACING)
+        self.addWidget(Heading('Epidemic'))
+        self.combo_box = QComboBox()
+        self.addWidget(self.combo_box)
+        # self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
+        self.button = QPushButton('Shuffle Epidemic')
+        self.addWidget(self.button)
 
 
 class PoolButton(QLabel):
@@ -99,9 +109,7 @@ class DestinationRadioBox(QGroupBox):
         for button in destinations.values():
             self.b_group.addButton(button)
             box.addWidget(button)
-
         self.setLayout(box)
-
         destinations['exclude'].setChecked(True)
 
 
@@ -144,8 +152,6 @@ class Deck(QVBoxLayout):
         self.buttons = []
         self.heading = heading
 
-        self.scroll_widget = QWidget()
-
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.addWidget(self.scroll_area)
@@ -153,6 +159,8 @@ class Deck(QVBoxLayout):
         self.v_scroll = QVBoxLayout()
         self.v_scroll.setSpacing(SPACING)
         self.v_scroll.addStretch()
+
+        self.scroll_widget = QWidget()
         self.scroll_widget.setLayout(self.v_scroll)
         self.scroll_area.setFixedWidth(WIDTH_WITH_SCROLL)
         self.scroll_area.setWidget(self.scroll_widget)
@@ -225,6 +233,14 @@ class CardButton(QLabel):
         self.setStyleSheet(self.stylesheet)
 
 
+class Stats(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.addWidget(Heading('Stats'))
+        self.text = QLabel()
+        self.addWidget(self.text)
+
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -247,16 +263,8 @@ class MainWindow(QWidget):
             'exclude': QRadioButton('Exclude')
         }
         self.destinations = DestinationRadioBox(self.destination)
-
-        #
-        # self.draw_deck_root = QWidget()
-        # self.text_cardpool.setMaximumWidth(WIDTH)
-        #
-        # self.text_stats = QLabel()
-        # self.combo_epidemic = QComboBox()
-        # self.combo_epidemic.setFixedWidth(WIDTH_WITH_SCROLL)
-        # self.btn_shuffle_epidemic = QPushButton('Shuffle Epidemic')
-        # self.btn_shuffle_epidemic.setFixedWidth(WIDTH_WITH_SCROLL)
+        self.epidemic_menu = EpidemicMenu()
+        self.stats = Stats()
 
         self.setWindowTitle('Epidemic')
 
@@ -274,135 +282,17 @@ class MainWindow(QWidget):
         h_main.addLayout(self.deck['discard'])
         h_main.addLayout(self.deck['exclude'])
 
-        v_options = QVBoxLayout()
-        v_options.addWidget(Heading(' '))
-        v_options.addLayout(self.app_buttons)
-        v_options.addWidget(self.destinations)
-        v_options.addStretch()
+        v_sidebar = QVBoxLayout()
+        v_sidebar.addWidget(Heading(' '))
+        v_sidebar.addLayout(self.app_buttons)
+        v_sidebar.addWidget(self.destinations)
+        v_sidebar.addLayout(self.epidemic_menu)
+        v_sidebar.addLayout(self.stats)
+        v_sidebar.addStretch()
 
-        h_main.addLayout(v_options)
+        h_main.addLayout(v_sidebar)
         h_main.addStretch()
 
     def initialise(self):
         for k, v in self.deck.items():
             self.deck[k].clear()
-
-
-
-
-
-
-    def show_drawdeck_old(self, deck):
-        # Reset the cardpool index to point to the top of the Draw Deck
-        # self.app.cb_update_cardpool(self.cardpool_index)
-        self.show_cardpool(deck)
-
-        # text = f'First {TOP_CARDS} card positions in the deck, top to bottom, ' \
-        #        f''
-        # text += f'with the number of possible cards at each position.'
-        # label = QLabel(text)
-        # label.setWordWrap(True)
-        # self.drawdeck.addWidget(label)
-
-        # Redraw the parent widhet from scratch
-        self.draw_deck_root.deleteLater()
-        self.draw_deck_root = QWidget()
-        self.draw_deck_root.setFixedWidth(WIDTH_WITH_SCROLL)
-
-        self.drawdeck.addWidget(self.draw_deck_root)
-
-        box = QVBoxLayout()
-        box.setSpacing(SPACING)
-        self.draw_deck_root.setLayout(box)
-
-        for i, c in enumerate(reversed(deck.cards[-TOP_CARDS:])):
-            # If the top card is a single card we display its name,
-            # otherwise we display the number of possible cards.
-            if len(c) == 1:
-                text = c.cards[0].name
-            else:
-                text = f'{len(c)}'
-
-            btn = PoolButton(text)
-            btn.setFixedSize(QSize(WIDTH, HEIGHT))
-            btn.set_active(True if i == self.cardpool_index else False)
-            box.addWidget(btn)
-            btn.clicked.connect(lambda ignore=True, index=i: self.app.cb_update_cardpool(index))  # 1
-        box.addStretch()
-
-    def show_deck(self, deck):
-        scroll_widget = QWidget()  # Redraw from scratch
-        box = QVBoxLayout()
-        box.setSpacing(SPACING)
-        if not deck.is_empty():
-            for card in self.buttons_to_display(deck):
-                btn = CardButton(deck, card)
-                box.addWidget(btn)
-                btn.clicked.connect(lambda d=deck, c=card: self.app.cb_draw_card(d, c))
-        box.addStretch()
-        scroll_widget.setLayout(box)
-        self.scroll_deck[deck.name].setWidget(scroll_widget)
-        self.scroll_deck[deck.name].repaint()
-
-    @staticmethod
-    # TODO not working for drawdeck, fix later when app is working
-    def buttons_to_display(deck):
-        return reversed(deck.cards[-TOP_CARDS:]) if deck.name == 'drawdeck' else deck.sorted()
-
-    def get_destination(self):
-        if self.destinations.get_selection() == self.destination['draw_pool']:
-            if not self.app.game.deck['draw'].is_empty():
-                return self.app.game.deck['draw'].cards[-1 - self.cardpool_index]
-            else:
-                return self.app.game.deck['draw']
-        elif self.destinations.get_selection() == self.destination['draw_top']:
-            return self.app.game.deck['draw']
-        elif self.destinations.get_selection() == self.destination['discard']:
-            return self.app.game.deck['discard']
-        elif self.destinations.get_selection() == self.destination['exclude']:
-            return self.app.game.deck['exclude']
-
-    def update_epidemic_combo(self):
-        """Update the epidemic dropdown list
-        based on the available cards in the Draw Deck."""
-        deck = self.app.game.deck['draw']
-        if not deck.is_empty():
-            items = sorted([c.name for c in list(set(deck.bottom().cards))])
-            self.combo_epidemic.setDisabled(False)
-            self.btn_shuffle_epidemic.setDisabled(False)
-        else:
-            items = ['(Draw Deck Empty)']
-            self.combo_epidemic.setDisabled(True)
-            self.btn_shuffle_epidemic.setDisabled(True)
-            # TODO Maybe add "became empty" method
-
-        self.combo_epidemic.clear()
-        self.combo_epidemic.addItems(items)
-        self.combo_epidemic.repaint()
-        # TODO don't clear this each time, add/remove items individiually
-
-    def update_stats(self, stats):
-        text = f'Total cards: {stats.total}\n'
-        text += f'In discard pile: {stats.in_discard}\n'
-        if not stats.deck['draw'].is_empty():
-            text += f'\nTop card frequency:\n'
-            text += f'{stats.top_freq} '
-            text += f'({stats.percentage:.2%})'
-            text += '\n\n'
-            if len(stats.top_cards) < MAX_CARDS_IN_STATS:
-                for card in stats.top_cards:
-                    text += f'\u2022 {card.name}\n'
-            else:
-                text += f'({MAX_CARDS_IN_STATS}+ cards)'
-        else:
-            text += '\n(Draw Deck is empty)'
-
-        self.text_stats.setText(text)
-        self.text_stats.repaint()
-        # TODO make stats a function
-
-# 1: See SO article for reasons for "ignore" argument:
-# https://stackoverflow.com/questions/18836291/lambda-function-returning-false
-
-# 2: A hack which should be fixed with a better event handling
-# https://stackoverflow.com/questions/4510712/qlabel-settext-not-displaying-text-immediately-before-running-other-method
