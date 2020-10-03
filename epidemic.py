@@ -43,10 +43,12 @@ class App:
 
         self._cardpool_index = 0
 
+        self.init_main_app_buttons()
         self.cb_new_game_dialog()
-        self.cb_select_cardpool(0)
-        self.update_drawdeck()
-        self.populate_draw()
+
+    def init_main_app_buttons(self):
+        new_game = self.view.app_buttons.button_new_game
+        new_game.clicked.connect(self.cb_new_game_dialog)
 
     def populate_draw(self):
         deck = self.game.deck['draw']
@@ -141,7 +143,10 @@ class App:
         dialog = DialogNewGame(games)
         if dialog.exec_():
             self.game.initialise(dialog.combo.currentText())
-            # self.update_gui(*self.get_all_decks())
+            self.view.initialise()
+            self.populate_draw()
+            self.cb_select_cardpool(0)
+            self.update_drawdeck()
 
 
 

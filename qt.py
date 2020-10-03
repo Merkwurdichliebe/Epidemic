@@ -43,6 +43,16 @@ class Heading(QLabel):
         self.setAlignment(Qt.AlignHCenter)
 
 
+class AppButtons(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.setSpacing(SPACING)
+        self.button_new_game = QPushButton('New Game')
+        self.addWidget(self.button_new_game)
+        self.button_help = QPushButton('Help')
+        self.addWidget(self.button_help)
+
+
 class PoolButton(QLabel):
     clicked = Signal()  # signal to be used in "connect" declared as a class variable
 
@@ -131,6 +141,7 @@ class Deck(QVBoxLayout):
         self.addWidget(Heading(heading))
         self.use_color = color
         self.cards = []
+        self.buttons = []
         self.heading = heading
 
         self.scroll_widget = QWidget()
@@ -143,7 +154,6 @@ class Deck(QVBoxLayout):
         self.v_scroll.setSpacing(SPACING)
         self.v_scroll.addStretch()
         self.scroll_widget.setLayout(self.v_scroll)
-
         self.scroll_area.setFixedWidth(WIDTH_WITH_SCROLL)
         self.scroll_area.setWidget(self.scroll_widget)
 
@@ -156,17 +166,21 @@ class Deck(QVBoxLayout):
         color = COLOR[card.color] if self.use_color else COLOR['gray']
         button.set_color(color)
         self.cards.insert(index, card.name)
+        self.buttons.append(button)
         return button
 
     def remove_card_button(self, button):
         self.cards.remove(button.card.name)
+        self.buttons.remove(button)
         self.removeWidget(button)
         button.deleteLater()
 
     def clear(self):
-        for card in self.cards:
-            self.removeWidget(card)
-            card.deleteLater()
+        print(f'Clearing {self.heading}')
+        for button in self.buttons:
+            button.deleteLater()
+        self.cards.clear()
+        self.buttons.clear()
 
 
 class DrawCardDeck(Deck):
@@ -179,6 +193,8 @@ class DrawCardDeck(Deck):
         if card.name not in self.cards:
             index = bisect.bisect_left(self.cards, card.name)
             return super().insert_button_at_index(card, index)
+        else:
+            print('not')
 
 
 class CardButton(QLabel):
@@ -213,14 +229,16 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.cardpool = Cardpool()
+        self.drawdeck = DrawDeck()
+
         self.deck = {
             'draw': DrawCardDeck('DRAW CARD'),
             'discard': Deck('DISCARD PILE'),
             'exclude': Deck('EXCLUDED', color=False)
         }
 
-        self.cardpool = Cardpool()
-        self.drawdeck = DrawDeck()
+        self.app_buttons = AppButtons()
 
         self.destination = {
             'draw_pool': QRadioButton('Draw (Pool)'),
@@ -258,13 +276,16 @@ class MainWindow(QWidget):
 
         v_options = QVBoxLayout()
         v_options.addWidget(Heading(' '))
+        v_options.addLayout(self.app_buttons)
         v_options.addWidget(self.destinations)
         v_options.addStretch()
 
         h_main.addLayout(v_options)
         h_main.addStretch()
 
-
+    def initialise(self):
+        for k, v in self.deck.items():
+            self.deck[k].clear()
 
 
 
