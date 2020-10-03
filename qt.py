@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
     QButtonGroup, QDialog, QMainWindow
 from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
+import bisect
 
 # TODO center dialog boxes
 # TODO don't reset scroll after click
@@ -147,11 +148,14 @@ class Deck(QVBoxLayout):
         self.scroll_area.setWidget(self.scroll_widget)
 
     def add_card_button(self, card):
+        return self.insert_button_at_index(card, 0)
+
+    def insert_button_at_index(self, card, index):
         button = CardButton(card)
-        self.v_scroll.insertWidget(0, button)
+        self.v_scroll.insertWidget(index, button)
         color = COLOR[card.color] if self.use_color else COLOR['gray']
         button.set_color(color)
-        self.cards.append(card.name)
+        self.cards.insert(index, card.name)
         return button
 
     def remove_card_button(self, button):
@@ -170,8 +174,11 @@ class DrawCardDeck(Deck):
         super().__init__(heading)
 
     def add_card_button(self, card):
-        if card not in self.cards:
-            return super().add_card_button(card)
+        # Override base method, use bisect to insert
+        # the card into the Draw Deck in sorted order
+        if card.name not in self.cards:
+            index = bisect.bisect_left(self.cards, card.name)
+            return super().insert_button_at_index(card, index)
 
 
 class CardButton(QLabel):

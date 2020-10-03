@@ -50,7 +50,7 @@ class App:
 
     def populate_draw(self):
         deck = self.game.deck['draw']
-        cards = reversed(deck.sorted())
+        cards = deck.sorted()
         for card in cards:
             button = self.view.deck['draw'].add_card_button(card)
             button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
