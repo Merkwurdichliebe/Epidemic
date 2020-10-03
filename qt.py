@@ -5,6 +5,9 @@ from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 import bisect
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 # TODO center dialog boxes
 
 WINDOW_MIN_HEIGHT = 700
@@ -77,6 +80,7 @@ class PoolButton(QLabel):
     def set_active(self, active):
         self.active = active
         self.setStyleSheet(ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
+        self.repaint()  # Fix Qt bug on macOS
 
     def mouseReleaseEvent(self, event):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
@@ -89,6 +93,10 @@ class PoolButton(QLabel):
             self.setStyleSheet(ButtonCSS.Active.value)
         else:
             self.setStyleSheet(ButtonCSS.Inactive.value)
+
+    def set_text(self, text):
+        self.setText(text)
+        self.repaint()  # Fix Qt bug on macOS
 
 
 class DestinationRadioBox(QGroupBox):
@@ -146,6 +154,7 @@ class DrawDeck(QVBoxLayout):
 class Deck(QVBoxLayout):
     def __init__(self, heading, color=True):
         super().__init__()
+        logging.debug(f'__init__ Deck: {heading}')
         self.addWidget(Heading(heading))
         self.use_color = color
         self.cards = []
@@ -184,7 +193,7 @@ class Deck(QVBoxLayout):
         button.deleteLater()
 
     def clear(self):
-        print(f'Clearing {self.heading}')
+        logging.debug(f'[Deck] Clearing {self.heading}')
         for button in self.buttons:
             button.deleteLater()
         self.cards.clear()
@@ -294,5 +303,6 @@ class MainWindow(QWidget):
         h_main.addStretch()
 
     def initialise(self):
+        logging.debug('[MainWindow] intialise')
         for k, v in self.deck.items():
             self.deck[k].clear()

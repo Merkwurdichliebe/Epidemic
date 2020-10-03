@@ -30,6 +30,8 @@ from qtdialogs import DialogHelp, DialogNewGame
 from game import Game
 from webbrowser import open as webopen
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 STATS_MAX = 10
 CARDPOOL_MAX = 35
@@ -55,7 +57,6 @@ class App:
         epidemic.clicked.connect(self.cb_epidemic)
 
     def populate_draw(self):
-        self.view.deck['draw'].clear()
         deck = self.game.deck['draw']
         cards = deck.sorted()
         for card in cards:
@@ -68,7 +69,7 @@ class App:
 
         # Ignore drawing from a deck onto itself
         if not from_deck == to_deck and not from_deck == to_deck.parent:
-            print(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
+            logging.debug(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
 
             # Move the card and update the game state
             self.game.draw_card(from_deck, to_deck, button.card)
@@ -121,6 +122,7 @@ class App:
         self.view.drawdeck.button[self._cardpool_index].set_active(False)
         self._cardpool_index = index
         self.view.drawdeck.button[index].set_active(True)
+        self.update_cardpool()
 
     def update_cardpool(self):
         text = f'Deck position: {self.cardpool_index+1}\n\n'
@@ -135,10 +137,11 @@ class App:
         self.view.cardpool.set_text(text)
 
     def update_drawdeck(self):
+        logging.debug(f'(def) update_drawdeck')
         for i, c in enumerate(reversed(self.game.deck['draw'].cards[-TOP_CARDS:])):
             text = f'{len(c)}' if len(c) > 1 else c.cards[0].name
             btn = self.view.drawdeck.button[i]
-            btn.setText(text)
+            btn.set_text(text)
             btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
 
     def update_epidemic_menu(self):
@@ -176,15 +179,17 @@ class App:
         self.view.stats.text.setText(text)
 
     def cb_select_cardpool(self, index):
+        logging.debug('Callback: select_cardpool')
         self.cardpool_index = index
-        self.update_cardpool()
 
     def cb_new_game_dialog(self):
+        logging.debug('Callback: new_game')
         games = list(self.game.games.keys())
         dialog = DialogNewGame(games)
         if dialog.exec_():
             self.game.initialise(dialog.combo.currentText())
             self.view.initialise()
+            # self.view.deck['draw'].clear()
             self.populate_draw()
             self.cb_select_cardpool(0)
             self.update_drawdeck()
@@ -193,9 +198,11 @@ class App:
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
+        logging.debug('Callback: epidemic')
         new_card_name = self.view.epidemic_menu.combo_box.currentText()
         self.game.epidemic(new_card_name)
         self.view.deck['discard'].clear()
+        self.view.deck['draw'].clear()
         self.populate_draw()
         self.update_drawdeck()
         self.update_epidemic_menu()
@@ -204,6 +211,7 @@ class App:
 
     @staticmethod
     def cb_help_dialog():
+        logging.debug('Callback: help')
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
         dialog = DialogHelp()
