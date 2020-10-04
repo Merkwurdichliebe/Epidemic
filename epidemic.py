@@ -55,9 +55,9 @@ class App:
 
     @cardpool_index.setter
     def cardpool_index(self, index):
-        self.view.drawdeck.button[self._cardpool_index].set_active(False)
+        self.view.pool_selector.button[self._cardpool_index].set_active(False)
         self._cardpool_index = index
-        self.view.drawdeck.button[index].set_active(True)
+        self.view.pool_selector.button[index].set_active(True)
         self.update_cardpool()
 
     def bind_sidebar_buttons(self):
@@ -113,7 +113,7 @@ class App:
                 self.add_button_to_deck(button, to_deck)
 
             self.update_cardpool()
-            self.update_drawdeck()
+            self.update_pool_selector()
             self.update_stats()
             self.update_epidemic_menu()
 
@@ -130,30 +130,29 @@ class App:
             return self.game.deck['exclude']
         if self.view.destination['discard'].isChecked():
             return self.game.deck['discard']
-        if self.view.destination['draw_top'].isChecked():
-            return self.game.deck['draw']
-        if self.view.destination['draw_pool'].isChecked():
+        if self.view.destination['draw'].isChecked():
             return self.game.deck['draw']
 
     def update_cardpool(self):
-        text = f'Deck position: {self.cardpool_index+1}\n\n'
+        text = f'<p>Deck position: {self.cardpool_index+1}</p>'
+        text += f'<p><strong>Possible cards:</strong></p>'
         if not self.game.deck['draw'].is_empty():
             d = self.game.deck['draw'].cards[-1-self.cardpool_index]
             if len(set(d)) < CARDPOOL_MAX:
                 for card in sorted(set(d.cards), key=lambda x: x.name):
-                    text += f'{card.name} ({d.cards.count(card)})\n'
+                    text += f'{card.name} ({d.cards.count(card)})<br>'
             else:
                 text += f'{CARDPOOL_MAX}+ cards'
-            text += f'\n[{d.name}]'
+            text += f'<p><strong>Pool origin:</strong><p>[{d.name}]'
         self.view.cardpool.set_text(text)
 
-    def update_drawdeck(self):
+    def update_pool_selector(self):
         logging.debug(f'APP: update_drawdeck')
         for i in range(TOP_CARDS):
             if i < len(self.game.deck['draw']):
                 c = self.game.deck['draw'].cards[-1-i]
                 text = f'{len(c)}' if len(c) > 1 else c.cards[0].name
-                btn = self.view.drawdeck.button[i]
+                btn = self.view.pool_selector.button[i]
                 btn.setEnabled(True)
                 btn.set_text(text)
                 # print(f'enabling {i} : {text}')
@@ -162,7 +161,7 @@ class App:
                     btn.set_connected(True)
             else:
                 text = ''
-                btn = self.view.drawdeck.button[i]
+                btn = self.view.pool_selector.button[i]
                 btn.set_text(text)
                 # print(f'disabling {i}')
                 btn.set_connected(False)
@@ -216,7 +215,7 @@ class App:
             # self.view.deck['draw'].clear()
             self.populate_draw()
             self.cb_select_cardpool(0)
-            self.update_drawdeck()
+            self.update_pool_selector()
             self.update_epidemic_menu()
             self.update_stats()
 
@@ -228,7 +227,7 @@ class App:
         self.view.deck['discard'].clear()
         self.view.deck['draw'].clear()
         self.populate_draw()
-        self.update_drawdeck()
+        self.update_pool_selector()
         self.update_epidemic_menu()
         self.update_cardpool()
         self.cb_select_cardpool(0)

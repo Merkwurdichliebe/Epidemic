@@ -133,6 +133,7 @@ class Cardpool(QVBoxLayout):
         super().__init__()
         self.addWidget(Heading('CARD POOL'))
         self._text = QLabel()
+        self._text.setTextFormat(Qt.RichText)
         self._text.setWordWrap(True)
         self._text.setFixedWidth(WIDTH)
         self.addWidget(self._text)
@@ -142,10 +143,10 @@ class Cardpool(QVBoxLayout):
         self._text.setText(text)
 
 
-class DrawDeck(QVBoxLayout):
+class PoolSelector(QVBoxLayout):
     def __init__(self):
         super().__init__()
-        self.addWidget(Heading('DRAW DECK'))
+        self.addWidget(Heading('POOL SELECTOR'))
         v_buttons = QVBoxLayout()
         v_buttons.setSpacing(SPACING)
         self.addLayout(v_buttons)
@@ -207,7 +208,7 @@ class Deck(QVBoxLayout):
         self.buttons.clear()
 
 
-class DrawCardDeck(Deck):
+class DrawDeck(Deck):
     def __init__(self, heading):
         super().__init__(heading)
 
@@ -263,10 +264,10 @@ class MainWindow(QWidget):
         super().__init__()
 
         self.cardpool = Cardpool()
-        self.drawdeck = DrawDeck()
+        self.pool_selector = PoolSelector()
 
         self.deck = {
-            'draw': DrawCardDeck('DRAW CARD'),
+            'draw': DrawDeck('DRAW CARD'),
             'discard': Deck('DISCARD PILE'),
             'exclude': Deck('EXCLUDED', color=False)
         }
@@ -274,8 +275,7 @@ class MainWindow(QWidget):
         self.app_buttons = AppButtons()
 
         self.destination = {
-            'draw_pool': QRadioButton('Draw (Pool)'),
-            'draw_top': QRadioButton('Draw (Top)'),
+            'draw': QRadioButton('Draw'),
             'discard': QRadioButton('Discard'),
             'exclude': QRadioButton('Exclude')
         }
@@ -294,7 +294,7 @@ class MainWindow(QWidget):
         v_app.addLayout(h_main)
 
         h_main.addLayout(self.cardpool)
-        h_main.addLayout(self.drawdeck)
+        h_main.addLayout(self.pool_selector)
         h_main.addLayout(self.deck['draw'])
         h_main.addLayout(self.deck['discard'])
         h_main.addLayout(self.deck['exclude'])
