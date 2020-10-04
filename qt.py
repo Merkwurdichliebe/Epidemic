@@ -211,7 +211,8 @@ class DrawCardDeck(Deck):
             index = bisect.bisect_left(self.cards, card.name)
             return super().insert_button_at_index(card, index)
         else:
-            print('not')
+            print(f'[qt DrawCardDeck] {card.name} already in layout')
+            return None
 
 
 class CardButton(QLabel):

@@ -51,7 +51,7 @@ class App:
 
     @property
     def cardpool_index(self):
-        return self._cardpool_index
+        return min(self._cardpool_index, max(0, len(self.game.deck['draw'].cards) - 1))
 
     @cardpool_index.setter
     def cardpool_index(self, index):
@@ -72,13 +72,14 @@ class App:
         logging.debug(f'APP: populate_draw')
         self.view.deck['draw'].clear()
         deck = self.game.deck['draw']
-        cards = deck.sorted()
-        for card in cards:
-            button = self.view.deck['draw'].add_card_button(card)
-            button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+        if not deck.is_empty():
+            cards = deck.sorted()
+            for card in cards:
+                button = self.view.deck['draw'].add_card_button(card)
+                button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     @staticmethod
-    def last_card(deck):
+    def is_last_card(deck):
         return True if deck.name == 'draw' and len(deck.top()) == 1 else False
 
     def cb_draw_card(self, button, from_deck):
@@ -90,28 +91,27 @@ class App:
         if not from_deck == to_deck and not from_deck == to_deck.parent:
             logging.debug(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
 
-            is_last_card = self.last_card(from_deck)
+            is_last_card = self.is_last_card(from_deck)
 
             # Move the card and update the game state
             self.game.draw_card(from_deck, to_deck, card)
 
             # Remove the card from the source deck in GUI
             if from_deck.name == 'draw':
-                self.cardpool_index = min(self.cardpool_index, len(self.game.deck['draw'].cards) - 1)
-                if card not in from_deck.top():
+                self.cardpool_index = self.cardpool_index  # Clamp the active pool button
+                if from_deck.is_empty() or card not in from_deck.top():
                     self.remove_button_from_deck(button, from_deck)
                 if is_last_card:
                     self.populate_draw()
             else:
                 self.remove_button_from_deck(button, from_deck)
 
-            # Add the card to the destination deck in GUI
-            if to_deck.has_parent():  # Deck is part of the Draw Deck
-                # Add the button only if it's not already displayed
-                if card.name not in self.view.deck['draw'].cards:
+            if to_deck == self.game.deck['draw']:
+                if card in self.game.deck['draw'].top():
                     self.add_button_to_deck(button, self.game.deck['draw'])
             else:
                 self.add_button_to_deck(button, to_deck)
+
             self.update_cardpool()
             self.update_drawdeck()
             self.update_stats()
@@ -119,7 +119,8 @@ class App:
 
     def add_button_to_deck(self, button, deck):
         button = self.view.deck[deck.name].add_card_button(button.card)
-        button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+        if button is not None:
+            button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     def remove_button_from_deck(self, button, deck):
         self.view.deck[deck.name].remove_card_button(button)
@@ -132,10 +133,7 @@ class App:
         if self.view.destination['draw_top'].isChecked():
             return self.game.deck['draw']
         if self.view.destination['draw_pool'].isChecked():
-            if not self.game.deck['draw'].is_empty():
-                return self.game.deck['draw'].cards[-1 - self.cardpool_index]
-            else:
-                return self.game.deck['draw']
+            return self.game.deck['draw']
 
     def update_cardpool(self):
         text = f'Deck position: {self.cardpool_index+1}\n\n'
@@ -158,13 +156,14 @@ class App:
                 btn = self.view.drawdeck.button[i]
                 btn.setEnabled(True)
                 btn.set_text(text)
-                print(f'enabling {i} : {text}')
+                # print(f'enabling {i} : {text}')
                 btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
+                # TODO fix multiple assignments to clicked
             else:
                 text = ''
                 btn = self.view.drawdeck.button[i]
                 btn.set_text(text)
-                print(f'disabling {i}')
+                # print(f'disabling {i}')
                 btn.setEnabled(False)
 
     def update_epidemic_menu(self):

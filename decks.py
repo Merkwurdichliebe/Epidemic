@@ -38,6 +38,7 @@ class Deck:
 
     def add(self, card):
         self.cards.append(card)
+        print(f'[Deck] {self.name}: added {card.name}')
 
     def remove(self, card):
         self.cards.remove(card)
@@ -83,19 +84,29 @@ class DrawDeck(Deck):
     def __init__(self, name):
         Deck.__init__(self, name)
 
-    def add(self, item):
-        # Override Deck.add. This method adds a card to the Draw Deck.
-        # If we're adding a single card to the Draw Deck
-        # we need to make a Deck out of it, containing a single card,
-        # which is why we are checking the item's class.
+    def add(self, item, position=0):
+        print('[DrawDeck] add')
+        # Override Deck.add.
+        # If the added item is a Deck,
+        # add as many copies of it as the number of cards it contains.
         if isinstance(item, Deck):
+            print(f'item is deck : {item.name}')
             for i in item.cards:
                 self.cards.append(item)
+            print(f'added {len(item.cards)} instances')
             item.parent = self
+        # If the added item is a Card,
+        # add it to the Deck at position
+        # and insert an instance of the Deck.
         else:
-            deck = Deck(item.name)
+            print(f'item is card : {item.name}')
+            if self.is_empty():
+                deck = Deck('New Deck')
+            else:
+                deck = self.cards[position]
             deck.add(item)
-            self.cards.append(deck)
+            self.cards.insert(position, deck)
+            print(f'[DrawDeck] inserted {deck.name} at position {position}')
             deck.parent = self
 
     def remove(self, card):
