@@ -37,9 +37,9 @@ class Game:
         return deck
 
     @staticmethod
-    def draw_card(from_deck, to_deck, card):
+    def draw_card(from_deck, to_deck, card, **kwargs):
         if not from_deck == to_deck:
-            from_deck.move(card, to_deck)
+            from_deck.move(card, to_deck, **kwargs)
 
     def epidemic(self, card):
         """Draw a card from the bottom of the Draw Deck, discard it

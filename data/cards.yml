@@ -273,16 +273,16 @@ Pandemic Classic:
     count: 1
     color: blue
 Small Debug Deck:
-  - name: Mercury
+  - name: Mercury[1]
     count: 1
     color: red
-  - name: Venus
-    count: 2
+  - name: Venus[1]
+    count: 1
     color: yellow
-  - name: Mars
-    count: 2
+  - name: Mars[1]
+    count: 1
     color: red
-  - name: Earth
+  - name: Earth[2]
     count: 2
     color: blue
 Large Debug Deck:
