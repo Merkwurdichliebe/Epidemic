@@ -1,28 +1,33 @@
 from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel,\
     QPushButton, QComboBox, QDialog
+from PySide2.QtCore import QSize
 
 
 class DialogNewGame(QDialog):
     def __init__(self, games):
         super().__init__()
         self.setWindowTitle('Start New Game')
-        vbox_dialog = QVBoxLayout()
-        label = QLabel('Select the game you wish to track:')
-        vbox_dialog.addWidget(label)
+        self.setFixedSize(QSize(250, 150))
+        v_main = QVBoxLayout()
+        v_main.addWidget(QLabel('Select the game you wish to track:'))
+
         self.combo = QComboBox()
         self.combo.addItems(games)
         self.combo.setCurrentIndex(3)
-        vbox_dialog.addWidget(self.combo)
-        hbox_buttons = QHBoxLayout()
+        v_main.addWidget(self.combo)
+
+        h_buttons = QHBoxLayout()
         b_cancel = QPushButton('Cancel')
         b_cancel.clicked.connect(self.cancel)
-        hbox_buttons.addWidget(b_cancel)
+        h_buttons.addWidget(b_cancel)
+
         b_start = QPushButton('Start New Game')
         b_start.clicked.connect(self.start)
         b_start.setDefault(True)
-        hbox_buttons.addWidget(b_start)
-        vbox_dialog.addLayout(hbox_buttons)
-        self.setLayout(vbox_dialog)
+        h_buttons.addWidget(b_start)
+
+        v_main.addLayout(h_buttons)
+        self.setLayout(v_main)
 
     def start(self):
         self.accept()
@@ -36,16 +41,20 @@ class DialogHelp(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Open Help Page')
-        vbox = QVBoxLayout()
-        label = QLabel('Help is available on the application\'s GitHub page.')
-        vbox.addWidget(label)
-        hbox_buttons = QHBoxLayout()
+        self.setFixedSize(QSize(350, 100))
+
+        v_main = QVBoxLayout()
+        v_main.addWidget(QLabel('Help is available on the application\'s GitHub page.'))
+
+        h_buttons = QHBoxLayout()
         b_cancel = QPushButton('Close')
         b_cancel.clicked.connect(self.reject)
-        hbox_buttons.addWidget(b_cancel)
+        h_buttons.addWidget(b_cancel)
+
         b_start = QPushButton('View in browser')
         b_start.clicked.connect(self.accept)
         b_start.setDefault(True)
-        hbox_buttons.addWidget(b_start)
-        vbox.addLayout(hbox_buttons)
-        self.setLayout(vbox)
+        h_buttons.addWidget(b_start)
+
+        v_main.addLayout(h_buttons)
+        self.setLayout(v_main)
