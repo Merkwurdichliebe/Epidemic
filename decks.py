@@ -36,16 +36,16 @@ class Deck:
         self.cards = []
         self.parent = None
 
-    def add(self, card):
+    def add(self, card, **kwargs):
         self.cards.append(card)
         print(f'[Deck] {self.name}: added {card.name}')
 
     def remove(self, card):
         self.cards.remove(card)
 
-    def move(self, card, to_deck):
+    def move(self, card, to_deck, **kwargs):
         self.remove(card)
-        to_deck.add(card)
+        to_deck.add(card, **kwargs)
 
     def get_card_by_name(self, name):
         if isinstance(self, DrawDeck):
@@ -84,8 +84,10 @@ class DrawDeck(Deck):
     def __init__(self, name):
         Deck.__init__(self, name)
 
-    def add(self, item, position=0):
+    def add(self, item, **kwargs):
         print('[DrawDeck] add')
+        kwargs.setdefault('position', 0)
+        print(kwargs['position'])
         # Override Deck.add.
         # If the added item is a Deck,
         # add as many copies of it as the number of cards it contains.
@@ -100,6 +102,7 @@ class DrawDeck(Deck):
         # and insert an instance of the Deck.
         else:
             print(f'item is card : {item.name}')
+            position = kwargs['position']
             if self.is_empty():
                 deck = Deck('New Deck')
             else:

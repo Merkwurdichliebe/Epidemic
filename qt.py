@@ -6,7 +6,7 @@ from enum import Enum
 import bisect
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # TODO center dialog boxes
 
@@ -125,7 +125,6 @@ class DestinationRadioBox(QGroupBox):
             self.b_group.addButton(button)
             box.addWidget(button)
         self.setLayout(box)
-        destinations['exclude'].setChecked(True)
 
 
 class Cardpool(QVBoxLayout):
@@ -275,7 +274,8 @@ class MainWindow(QWidget):
         self.app_buttons = AppButtons()
 
         self.destination = {
-            'draw': QRadioButton('Draw'),
+            'draw_top': QRadioButton('Draw (Top)'),
+            'draw_bottom': QRadioButton('Draw (Bottom)'),
             'discard': QRadioButton('Discard'),
             'exclude': QRadioButton('Exclude')
         }
@@ -312,5 +312,6 @@ class MainWindow(QWidget):
 
     def initialise(self):
         logging.debug('qt [MainWindow] initialise')
+        self.destination['exclude'].setChecked(True)
         for k, v in self.deck.items():
             self.deck[k].clear()

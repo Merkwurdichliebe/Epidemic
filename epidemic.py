@@ -31,7 +31,8 @@ from qtdialogs import DialogHelp, DialogNewGame
 from game import Game
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 STATS_MAX = 10
 CARDPOOL_MAX = 35
@@ -69,7 +70,7 @@ class App:
         epidemic.clicked.connect(self.cb_epidemic)
 
     def populate_draw(self):
-        logging.debug(f'APP: populate_draw')
+        logger.debug(f'APP: populate_draw')
         self.view.deck['draw'].clear()
         deck = self.game.deck['draw']
         if not deck.is_empty():
@@ -89,16 +90,17 @@ class App:
 
         # Ignore drawing from a deck onto itself
         if not from_deck == to_deck and not from_deck == to_deck.parent:
-            logging.debug(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
+            logger.debug(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
 
+            # Flag needed to populate draw if last button was removed
             is_last_card = self.is_last_card(from_deck)
 
             # Move the card and update the game state
-            self.game.draw_card(from_deck, to_deck, card)
+            pos = -1 if self.view.destination['draw_top'].isChecked() else 0
+            self.game.draw_card(from_deck, to_deck, card, position=pos)
 
             # Remove the card from the source deck in GUI
             if from_deck.name == 'draw':
-                self.cardpool_index = self.cardpool_index  # Clamp the active pool button
                 if from_deck.is_empty() or card not in from_deck.top():
                     self.remove_button_from_deck(button, from_deck)
                 if is_last_card:
@@ -106,16 +108,16 @@ class App:
             else:
                 self.remove_button_from_deck(button, from_deck)
 
+            # Add the card to the GUI
             if to_deck == self.game.deck['draw']:
                 if card in self.game.deck['draw'].top():
-                    self.add_button_to_deck(button, self.game.deck['draw'])
+                    self.add_button_to_deck(button, to_deck)
             else:
                 self.add_button_to_deck(button, to_deck)
 
-            self.update_cardpool()
-            self.update_pool_selector()
-            self.update_stats()
-            self.update_epidemic_menu()
+            # Clamp the active pool button to allowed range
+            self.cardpool_index = self.cardpool_index
+            self.update_gui()
 
     def add_button_to_deck(self, button, deck):
         button = self.view.deck[deck.name].add_card_button(button.card)
@@ -130,10 +132,12 @@ class App:
             return self.game.deck['exclude']
         if self.view.destination['discard'].isChecked():
             return self.game.deck['discard']
-        if self.view.destination['draw'].isChecked():
+        if self.view.destination['draw_bottom'].isChecked() or \
+                self.view.destination['draw_top'].isChecked():
             return self.game.deck['draw']
 
     def update_cardpool(self):
+        logger.debug(f'APP: cb_update_cardpool')
         text = f'<p>Deck position: {self.cardpool_index+1}</p>'
         text += f'<p><strong>Possible cards:</strong></p>'
         if not self.game.deck['draw'].is_empty():
@@ -147,7 +151,7 @@ class App:
         self.view.cardpool.set_text(text)
 
     def update_pool_selector(self):
-        logging.debug(f'APP: update_drawdeck')
+        logger.debug(f'APP: update_drawdeck')
         for i in range(TOP_CARDS):
             if i < len(self.game.deck['draw']):
                 c = self.game.deck['draw'].cards[-1-i]
@@ -202,44 +206,44 @@ class App:
         self.view.stats.text.setText(text)
 
     def cb_select_cardpool(self, index):
-        logging.debug('APP: cb_select_cardpool')
+        logger.debug('APP: cb_select_cardpool')
         self.cardpool_index = index
 
     def cb_new_game_dialog(self):
-        logging.debug('APP: cb_new_game')
+        logger.debug('APP: cb_new_game')
         games = list(self.game.games.keys())
         dialog = DialogNewGame(games)
         if dialog.exec_():
             self.game.initialise(dialog.combo.currentText())
             self.view.initialise()
-            # self.view.deck['draw'].clear()
             self.populate_draw()
+            self.update_gui()
             self.cb_select_cardpool(0)
-            self.update_pool_selector()
-            self.update_epidemic_menu()
-            self.update_stats()
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
-        logging.debug('APP: cb_epidemic')
+        logger.debug('APP: cb_epidemic')
         new_card_name = self.view.epidemic_menu.combo_box.currentText()
         self.game.epidemic(new_card_name)
         self.view.deck['discard'].clear()
         self.view.deck['draw'].clear()
         self.populate_draw()
-        self.update_pool_selector()
-        self.update_epidemic_menu()
-        self.update_cardpool()
+        self.update_gui()
         self.cb_select_cardpool(0)
 
     @staticmethod
     def cb_help_dialog():
-        logging.debug('APP: cb_help')
+        logger.debug('APP: cb_help')
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
         dialog = DialogHelp()
         if dialog.exec_():
             webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
+
+    def update_gui(self):
+        self.update_pool_selector()
+        self.update_epidemic_menu()
+        self.update_stats()
 
 
 def main():
