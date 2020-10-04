@@ -11,6 +11,7 @@ class DialogNewGame(QDialog):
         vbox_dialog.addWidget(label)
         self.combo = QComboBox()
         self.combo.addItems(games)
+        self.combo.setCurrentIndex(3)
         vbox_dialog.addWidget(self.combo)
         hbox_buttons = QHBoxLayout()
         b_cancel = QPushButton('Cancel')

@@ -69,11 +69,10 @@ class EpidemicMenu(QVBoxLayout):
 class PoolButton(QLabel):
     clicked = Signal()  # signal to be used in "connect" declared as a class variable
 
-    def __init__(self, text):
+    def __init__(self):
         super().__init__()
         self.setFixedSize(QSize(WIDTH, HEIGHT))
         self.setAlignment(Qt.AlignCenter)
-        self.setText(text)
         self.active = None
         self.set_active(False)
 
@@ -86,10 +85,11 @@ class PoolButton(QLabel):
         self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
 
     def enterEvent(self, event):
-        self.setStyleSheet(ButtonCSS.MouseEnter.value)
+        if self.isEnabled():
+            self.setStyleSheet(ButtonCSS.MouseEnter.value)
 
     def leaveEvent(self, event):
-        if self.active:
+        if self.isEnabled() and self.active:
             self.setStyleSheet(ButtonCSS.Active.value)
         else:
             self.setStyleSheet(ButtonCSS.Inactive.value)
@@ -144,7 +144,7 @@ class DrawDeck(QVBoxLayout):
         self.addLayout(v_buttons)
         self.button = []
         for i in range(16):
-            btn = PoolButton('init')
+            btn = PoolButton()
             btn.set_active(False)
             self.button.append(btn)
             v_buttons.addWidget(btn)
@@ -154,7 +154,7 @@ class DrawDeck(QVBoxLayout):
 class Deck(QVBoxLayout):
     def __init__(self, heading, color=True):
         super().__init__()
-        logging.debug(f'__init__ Deck: {heading}')
+        logging.debug(f'qt [Deck]: {heading}')
         self.addWidget(Heading(heading))
         self.use_color = color
         self.cards = []
@@ -193,7 +193,7 @@ class Deck(QVBoxLayout):
         button.deleteLater()
 
     def clear(self):
-        logging.debug(f'[Deck] Clearing {self.heading}')
+        logging.debug(f'qt [Deck] Clearing {self.heading}')
         for button in self.buttons:
             button.deleteLater()
         self.cards.clear()
@@ -303,6 +303,6 @@ class MainWindow(QWidget):
         h_main.addStretch()
 
     def initialise(self):
-        logging.debug('[MainWindow] intialise')
+        logging.debug('qt [MainWindow] initialise')
         for k, v in self.deck.items():
             self.deck[k].clear()
