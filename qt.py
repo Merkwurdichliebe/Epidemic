@@ -75,6 +75,13 @@ class PoolButton(QLabel):
         self.setAlignment(Qt.AlignCenter)
         self.active = None
         self.set_active(False)
+        self.connected = False
+
+    def set_connected(self, connected):
+        self.connected = connected
+
+    def is_connected(self):
+        return self.connected
 
     def set_active(self, active):
         self.active = active

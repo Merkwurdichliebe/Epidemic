@@ -157,13 +157,15 @@ class App:
                 btn.setEnabled(True)
                 btn.set_text(text)
                 # print(f'enabling {i} : {text}')
-                btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
-                # TODO fix multiple assignments to clicked
+                if not btn.is_connected():
+                    btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
+                    btn.set_connected(True)
             else:
                 text = ''
                 btn = self.view.drawdeck.button[i]
                 btn.set_text(text)
                 # print(f'disabling {i}')
+                btn.set_connected(False)
                 btn.setEnabled(False)
 
     def update_epidemic_menu(self):
