@@ -49,7 +49,7 @@ class App:
 
         self._cardpool_index = 0
 
-        self.cb_new_game_dialog()
+        # self.cb_new_game_dialog()
         self.bind_sidebar_buttons()
         # QTimer.singleShot(500, self.cb_new_game_dialog)
 
@@ -242,8 +242,9 @@ def main():
     logging.debug('main() model assigned')
     view.show()
     logging.debug('main() view shown')
-    App(model, view)
+    app = App(model, view)
     logging.debug('main() App called')
+    app.cb_new_game_dialog() ##############
     application.exec_()
     logging.debug('main() end')
 

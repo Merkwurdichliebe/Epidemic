@@ -138,3 +138,4 @@ pyinstaller/
 dist/
 .venv376/
 .venv*/
+.vscode/

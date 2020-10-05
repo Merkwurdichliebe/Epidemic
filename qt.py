@@ -109,7 +109,8 @@ class Stats(QVBoxLayout):
         if stats.deck['draw'].is_empty():
             text += '<p>(Draw Deck is empty)</p>'
         else:
-            text += f'<p><strong>Top frequency: {stats.percentage:.2%}</strong></p>'
+            text += f'<p><strong>Top frequency:'
+            text += f'{stats.percentage:.2%}</strong></p>'
             if len(stats.top_cards) < self._max_cards:
                 text += '<ul>'
                 for card in stats.top_cards:
@@ -127,7 +128,7 @@ class Stats(QVBoxLayout):
 
 
 class PoolButton(QLabel):
-    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+    clicked = Signal()
 
     def __init__(self):
         super().__init__()
@@ -149,7 +150,7 @@ class PoolButton(QLabel):
         self.repaint()  # Fix Qt bug on macOS
 
     def mouseReleaseEvent(self, event):
-        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+        self.clicked.emit()
 
     def enterEvent(self, event):
         if self.isEnabled():
@@ -215,7 +216,7 @@ class Cardpool(QVBoxLayout):
 
 
 class CardButton(QLabel):
-    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+    clicked = Signal()
 
     def __init__(self, card):
         super().__init__(card.name)
@@ -233,7 +234,7 @@ class CardButton(QLabel):
         self.setStyleSheet(self.stylesheet)
 
     def mouseReleaseEvent(self, event):
-        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+        self.clicked.emit()
 
     def enterEvent(self, event):
         self.setStyleSheet(ButtonCSS.MouseEnter.value)
@@ -309,7 +310,6 @@ class DrawDeck(Deck):
 ######################################################################
 # Main window
 ######################################################################
-
 
 class MainWindow(QWidget):
     def __init__(self):

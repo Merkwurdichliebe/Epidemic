@@ -46,7 +46,8 @@ class DialogHelp(QDialog):
         # self.setWindowFlag(PySide2.QtCore.Qt.Sheet)
 
         v_main = QVBoxLayout()
-        v_main.addWidget(QLabel('Help is available on the application\'s GitHub page.'))
+        text = 'Help is available on the application\'s GitHub page.'
+        v_main.addWidget(QLabel(text))
 
         h_buttons = QHBoxLayout()
         b_cancel = QPushButton('Close')
