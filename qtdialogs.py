@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel,\
     QPushButton, QComboBox, QDialog
 from PySide2.QtCore import QSize
+# import PySide2.QtCore.Qt.Sheet
 
 
 class DialogNewGame(QDialog):
@@ -42,6 +43,7 @@ class DialogHelp(QDialog):
         super().__init__()
         self.setWindowTitle('Open Help Page')
         self.setFixedSize(QSize(350, 100))
+        # self.setWindowFlag(PySide2.QtCore.Qt.Sheet)
 
         v_main = QVBoxLayout()
         v_main.addWidget(QLabel('Help is available on the application\'s GitHub page.'))

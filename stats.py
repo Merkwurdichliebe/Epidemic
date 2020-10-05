@@ -5,7 +5,6 @@ class Stats:
     """
     The Stats object calculates and returns statistical information
     about Deck objects.
-    :param deck: a Deck object
     """
     def __init__(self, deck):
         self.deck = deck

@@ -6,11 +6,18 @@ from enum import Enum
 import bisect
 
 import logging
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 # TODO center dialog boxes
 
-WINDOW_MIN_HEIGHT = 700
+######################################################################
+# Interface constants, sizes and colors
+######################################################################
+
+
+WINDOW_H_SIZE = 1100
+WINDOW_V_SIZE = 700
 SPACING = 5                 # Vertical spacing of buttons
 SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
@@ -33,6 +40,11 @@ class ButtonCSS(Enum):
     Active = 'background: #999999; color: black; font-weight: bold;'
     Inactive = 'background: #dddddd; color: black; font-weight: bold;'
     MouseEnter = 'background: black; color: white; font-weight: bold;'
+
+
+######################################################################
+# Various interface elements
+######################################################################
 
 
 class Heading(QLabel):
@@ -63,6 +75,59 @@ class EpidemicMenu(QVBoxLayout):
         # self.btn_shuffle_epidemic.clicked.connect(self.app.cb_epidemic)
         self.button = QPushButton('Shuffle Epidemic')
         self.addWidget(self.button)
+
+
+class DestinationRadioBox(QGroupBox):
+    def __init__(self, destinations):
+        super().__init__()
+        label = Heading('Card Destination')
+        label.setMinimumWidth(WIDTH)
+        label.setAlignment(Qt.AlignHCenter)
+        box = QVBoxLayout()
+        box.addWidget(label)
+
+        # We are subclassing QGroupBox for the *visual* container
+        self.setMaximumWidth(WIDTH_WITH_SCROLL)
+
+        # QButtonGroup is used for the *logical* grouping of buttons
+        self.b_group = QButtonGroup()
+
+        for button in destinations.values():
+            self.b_group.addButton(button)
+            box.addWidget(button)
+        self.setLayout(box)
+
+
+class Stats(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.addWidget(Heading('Stats'))
+        self._text = QLabel()
+        self._text.setTextFormat(Qt.RichText)
+        self.addWidget(self._text)
+        self._max_cards = 10
+
+    def show(self, stats):
+        text = f'<p>Total cards in game: {stats.total}</p>'
+        text += f'<p>In discard pile: {stats.in_discard}</p>'
+        if stats.deck['draw'].is_empty():
+            text += '<p>(Draw Deck is empty)</p>'
+        else:
+            text += f'<p><strong>Top frequency: {stats.percentage:.2%}</strong></p>'
+            if len(stats.top_cards) < self._max_cards:
+                text += '<ul>'
+                for card in stats.top_cards:
+                    text += f'<li>{card.name}</li>'
+                text += '</ul>'
+            else:
+                text += f'<p>({self._max_cards}+ cards)</p>'
+            text += f'<p>({stats.top_freq} of each)</p>'
+        self._text.setText(text)
+
+
+######################################################################
+# Pool selector & card pool
+######################################################################
 
 
 class PoolButton(QLabel):
@@ -105,42 +170,6 @@ class PoolButton(QLabel):
         self.repaint()  # Fix Qt bug on macOS
 
 
-class DestinationRadioBox(QGroupBox):
-    def __init__(self, destinations):
-        super().__init__()
-        label = Heading('Card Destination')
-        label.setMinimumWidth(WIDTH)
-        label.setAlignment(Qt.AlignHCenter)
-        box = QVBoxLayout()
-        box.addWidget(label)
-
-        # We are subclassing QGroupBox for the *visual* container
-        self.setMaximumWidth(WIDTH_WITH_SCROLL)
-
-        # QButtonGroup is used for the *logical* grouping of buttons
-        self.b_group = QButtonGroup()
-
-        for button in destinations.values():
-            self.b_group.addButton(button)
-            box.addWidget(button)
-        self.setLayout(box)
-
-
-class Cardpool(QVBoxLayout):
-    def __init__(self):
-        super().__init__()
-        self.addWidget(Heading('CARD POOL'))
-        self._text = QLabel()
-        self._text.setTextFormat(Qt.RichText)
-        self._text.setWordWrap(True)
-        self._text.setFixedWidth(WIDTH)
-        self.addWidget(self._text)
-        self.addStretch()
-
-    def set_text(self, text):
-        self._text.setText(text)
-
-
 class PoolSelector(QVBoxLayout):
     def __init__(self):
         super().__init__()
@@ -155,6 +184,66 @@ class PoolSelector(QVBoxLayout):
             self.button.append(btn)
             v_buttons.addWidget(btn)
         self.addStretch()
+
+
+class Cardpool(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.addWidget(Heading(''))
+        self._text = QLabel()
+        self._text.setTextFormat(Qt.RichText)
+        self._text.setWordWrap(True)
+        self._text.setFixedWidth(WIDTH)
+        self.addWidget(self._text)
+        self.addStretch()
+        self._max_cards = 35
+
+    def show_empty(self):
+        self._text.setText(f'<p>Draw Deck is empty.</p>')
+
+    def show(self, deck_name, position, deck):
+        text = f'<p><strong>Pool origin:</strong><p>[{deck_name}]'
+        text += f'<p>Deck position: {position}</p>'
+        text += f'<p><strong>Possible cards:</strong></p>'
+        if len(deck) < self._max_cards:
+            for card in sorted(set(deck.cards), key=lambda x: x.name):
+                text += f'{card.name} ({deck.cards.count(card)})<br>'
+        else:
+            text += f'{self._max_cards}+ cards'
+        self._text.setText(text)
+
+
+######################################################################
+# Decks
+######################################################################
+
+
+class CardButton(QLabel):
+    clicked = Signal()  # signal to be used in "connect" declared as a class variable
+
+    def __init__(self, card):
+        super().__init__(card.name)
+        self.card = card
+        self.color = None
+        self.stylesheet = None
+        self.setAlignment(Qt.AlignCenter)
+        self.setFixedSize(QSize(WIDTH, HEIGHT))
+
+    def set_color(self, color):
+        self.color = color
+        self.stylesheet = f'background: {self.color};' \
+                          f'color: white;' \
+                          f'font-weight: bold;'
+        self.setStyleSheet(self.stylesheet)
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
+
+    def enterEvent(self, event):
+        self.setStyleSheet(ButtonCSS.MouseEnter.value)
+
+    def leaveEvent(self, event):
+        self.setStyleSheet(self.stylesheet)
 
 
 class Deck(QVBoxLayout):
@@ -221,40 +310,9 @@ class DrawDeck(Deck):
             return None
 
 
-class CardButton(QLabel):
-    clicked = Signal()  # signal to be used in "connect" declared as a class variable
-
-    def __init__(self, card):
-        super().__init__(card.name)
-        self.card = card
-        self.color = None
-        self.stylesheet = None
-        self.setAlignment(Qt.AlignCenter)
-        self.setFixedSize(QSize(WIDTH, HEIGHT))
-
-    def set_color(self, color):
-        self.color = color
-        self.stylesheet = f'background: {self.color};' \
-                          f'color: white;' \
-                          f'font-weight: bold;'
-        self.setStyleSheet(self.stylesheet)
-
-    def mouseReleaseEvent(self, event):
-        self.clicked.emit()  # emit this signal when receiving the mouseReleaseEvent
-
-    def enterEvent(self, event):
-        self.setStyleSheet(ButtonCSS.MouseEnter.value)
-
-    def leaveEvent(self, event):
-        self.setStyleSheet(self.stylesheet)
-
-
-class Stats(QVBoxLayout):
-    def __init__(self):
-        super().__init__()
-        self.addWidget(Heading('Stats'))
-        self.text = QLabel()
-        self.addWidget(self.text)
+######################################################################
+# Main window
+######################################################################
 
 
 class MainWindow(QWidget):
@@ -263,6 +321,7 @@ class MainWindow(QWidget):
 
         self.cardpool = Cardpool()
         self.pool_selector = PoolSelector()
+        self.setFixedSize(WINDOW_H_SIZE, WINDOW_V_SIZE)
 
         self.deck = {
             'draw': DrawDeck('DRAW CARD'),

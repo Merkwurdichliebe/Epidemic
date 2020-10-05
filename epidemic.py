@@ -23,6 +23,7 @@ __version__ = "1.0"
 # TODO parse YML import for empty file or wrong colors
 # TODO disable textboxes on game launch
 # TODO allow cancel on app start
+# TODO make cards file easily editable on Windows
 
 from PySide2.QtWidgets import QApplication
 from webbrowser import open as webopen
@@ -34,8 +35,6 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-STATS_MAX = 10
-CARDPOOL_MAX = 35
 TOP_CARDS = 16
 
 
@@ -48,7 +47,6 @@ class App:
 
         self.bind_sidebar_buttons()
         self.cb_new_game_dialog()
-        pass
 
     @property
     def cardpool_index(self):
@@ -138,17 +136,11 @@ class App:
 
     def update_cardpool(self):
         logger.debug(f'APP: cb_update_cardpool')
-        text = f'<p>Deck position: {self.cardpool_index+1}</p>'
-        text += f'<p><strong>Possible cards:</strong></p>'
-        if not self.game.deck['draw'].is_empty():
-            d = self.game.deck['draw'].cards[-1-self.cardpool_index]
-            if len(set(d)) < CARDPOOL_MAX:
-                for card in sorted(set(d.cards), key=lambda x: x.name):
-                    text += f'{card.name} ({d.cards.count(card)})<br>'
-            else:
-                text += f'{CARDPOOL_MAX}+ cards'
-            text += f'<p><strong>Pool origin:</strong><p>[{d.name}]'
-        self.view.cardpool.set_text(text)
+        if self.game.deck['draw'].is_empty():
+            self.view.cardpool.show_empty()
+        else:
+            deck = self.game.deck['draw'].cards[-1-self.cardpool_index]
+            self.view.cardpool.show(deck.name, self.cardpool_index+1, deck)
 
     def update_pool_selector(self):
         logger.debug(f'APP: update_drawdeck')
@@ -188,22 +180,7 @@ class App:
         self.view.epidemic_menu.combo_box.addItems(items)
 
     def update_stats(self):
-        stats = self.game.stats
-        text = f'Total cards: {stats.total}\n'
-        text += f'In discard pile: {stats.in_discard}\n'
-        if not stats.deck['draw'].is_empty():
-            text += f'\nTop card frequency:\n'
-            text += f'{stats.top_freq} '
-            text += f'({stats.percentage:.2%})'
-            text += '\n\n'
-            if len(stats.top_cards) < STATS_MAX:
-                for card in stats.top_cards:
-                    text += f'\u2022 {card.name}\n'
-            else:
-                text += f'({STATS_MAX}+ cards)'
-        else:
-            text += '\n(Draw Deck is empty)'
-        self.view.stats.text.setText(text)
+        self.view.stats.show(self.game.stats)
 
     def cb_select_cardpool(self, index):
         logger.debug('APP: cb_select_cardpool')
@@ -232,7 +209,7 @@ class App:
         self.cb_select_cardpool(0)
 
     @staticmethod
-    def cb_help_dialog():
+    def cb_help_dialog(self):
         logger.debug('APP: cb_help')
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
