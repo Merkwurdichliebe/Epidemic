@@ -9,6 +9,9 @@ Each of these Decks represents the possible draws at each position
 in the DrawDeck. The top card is the last Card in the list.
 """
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Card:
     """Basic class to represent a card with a city name and color.

@@ -4,12 +4,8 @@ from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
 from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 import bisect
-
 import logging
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
-# TODO center dialog boxes
 
 ######################################################################
 # Interface constants, sizes and colors
@@ -249,7 +245,7 @@ class CardButton(QLabel):
 class Deck(QVBoxLayout):
     def __init__(self, heading, color=True):
         super().__init__()
-        logging.debug(f'qt [Deck]: {heading}')
+        logging.info(f'[Deck] {heading} init')
         self.addWidget(Heading(heading))
         self.use_color = color
         self.cards = []
@@ -288,7 +284,7 @@ class Deck(QVBoxLayout):
         button.deleteLater()
 
     def clear(self):
-        logging.debug(f'qt [Deck] Clearing {self.heading}')
+        logging.info(f'[Deck] clear {self.heading}')
         for button in self.buttons:
             button.deleteLater()
         self.cards.clear()
@@ -318,6 +314,7 @@ class DrawDeck(Deck):
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        logging.info(f'[MainWindow] init')
 
         self.cardpool = Cardpool()
         self.pool_selector = PoolSelector()
@@ -369,7 +366,7 @@ class MainWindow(QWidget):
         h_main.addStretch()
 
     def initialise(self):
-        logging.debug('qt [MainWindow] initialise')
+        logging.info(f'[Main Window] initialise')
         self.destination['exclude'].setChecked(True)
         for k, v in self.deck.items():
             self.deck[k].clear()
