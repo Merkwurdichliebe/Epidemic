@@ -4,16 +4,15 @@
 Classes used in the Epidemic application
 for representing Card objects and Deck objects.
 
-The DrawDeck object extends Deck and actually holds Decks, not Cards.
+The DrawDeck object extends Deck and holds other Decks, not Cards.
 Each of these Decks represents the possible draws at each position
-in the DrawDeck. The top card is always the last Card in the list.
+in the DrawDeck. The top card is the last Card in the list.
 """
-# TODO replace if isinstance(self, DrawDeck): with property
 
 
 class Card:
     """Basic class to represent a card with a city name and color.
-    Cards are grouped in Decks."""
+    Cards are referenced in Decks."""
 
     valid_colors = ['blue', 'yellow', 'black', 'green', 'red']
 
@@ -24,38 +23,31 @@ class Card:
 
 
 class Deck:
-    """Basic class to define a deck of Card objects,
-    which are held in a simple list.
-    There are three main decks in the game:
-    - Draw Deck
+    """Defines a list Card objects.
+    There are three decks in the game:
     - Discard Deck
-    - Exile Deck"""
+    - Exile Deck
+    - Draw Deck (special case, subclassed below)"""
 
     def __init__(self, name):
         self.name = name
         self.cards = []
-        self.parent = None
+        self.parent = None  # References parent Draw Deck if applicable
 
     def add(self, card, **kwargs):
+        """Add a card to the Deck."""
         self.cards.append(card)
-        print(f'[Deck] {self.name}: added {card.name}')
 
     def remove(self, card):
+        """Remove a card from the Deck."""
         self.cards.remove(card)
 
     def move(self, card, to_deck, **kwargs):
+        """Move a card from one Deck to another.
+        **kwargs are used to denote position in the deck
+        when a card is added to the Draw Deck."""
         self.remove(card)
         to_deck.add(card, **kwargs)
-
-    def get_card_by_name(self, name):
-        if isinstance(self, DrawDeck):
-            list = self.bottom().cards
-        else:
-            list = self.cards
-        found = next((card for card in list if card.name == name), None)
-        assert found is not None,\
-            f'Card with name "{name}" not found in Deck "{self.name}".'
-        return found
 
     def clear(self):
         self.cards.clear()
@@ -82,34 +74,26 @@ class DrawDeck(Deck):
     which represent the potential cards for each draw."""
 
     def __init__(self, name):
-        Deck.__init__(self, name)
+        super().__init__(name)
 
     def add(self, item, **kwargs):
-        print('[DrawDeck] add')
-        kwargs.setdefault('position', 0)
-        print(kwargs['position'])
         # Override Deck.add.
-        # If the added item is a Deck,
+        # If the added item is a Deck (i.e. after an epidemic),
         # add as many copies of it as the number of cards it contains.
         if isinstance(item, Deck):
-            print(f'item is deck : {item.name}')
             for i in item.cards:
                 self.cards.append(item)
-            print(f'added {len(item.cards)} instances')
             item.parent = self
         # If the added item is a Card,
-        # add it to the Deck at position
-        # and insert an instance of the Deck.
+        # add it to the Deck at the required position
+        # and insert an instance of the Deck at that position.
         else:
-            print(f'item is card : {item.name}')
-            position = kwargs['position']
             if self.is_empty():
                 deck = Deck('New Deck')
             else:
-                deck = self.cards[position]
+                deck = self.cards[kwargs['position']]
             deck.add(item)
-            self.cards.insert(position, deck)
-            print(f'[DrawDeck] inserted {deck.name} at position {position}')
+            self.cards.insert(kwargs['position'], deck)
             deck.parent = self
 
     def remove(self, card):
@@ -120,6 +104,13 @@ class DrawDeck(Deck):
         self.top().remove(card)
         self.cards.pop()
 
+    def get_card_from_bottom(self, name):
+        list = self.bottom().cards
+        found = next((card for card in list if card.name == name), None)
+        assert found is not None,\
+            f'Card with name "{name}" not found in Deck "{self.name}".'
+        return found
+
     def remove_from_bottom(self, card):
         # Remove a card from the bottom of the draw deck,
         # i.e. from list position 0,
@@ -128,9 +119,9 @@ class DrawDeck(Deck):
         self.cards.pop(0)
 
     def sorted(self):
-        # We override Deck.sorted because we are only interested
-        # in a sorted list of unique possible cards
-        # from the Deck at the top (last) position
+        # Override Deck.sorted to return
+        # a sorted list of unique possible cards
+        # at the top (last) position in the Deck.
         return sorted(set(self.cards[-1].cards), key=lambda x: x.name)
 
     def top(self):
@@ -138,4 +129,3 @@ class DrawDeck(Deck):
 
     def bottom(self):
         return self.cards[0]
-

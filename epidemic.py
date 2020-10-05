@@ -18,28 +18,31 @@ __copyright__ = "Copyright 2020"
 __license__ = "GPL"
 __version__ = "1.0"
 
-# TODO undo
 # TODO fr, en
-# TODO parse YML import for empty file or wrong colors
-# TODO disable textboxes on game launch
 # TODO allow cancel on app start
 # TODO make cards file easily editable on Windows
 
+# Qt framework
 from PySide2.QtWidgets import QApplication
-from webbrowser import open as webopen
+from PySide2.QtCore import QTimer
+
+# Application modules
+from game import Game
 from qt import MainWindow
 from qtdialogs import DialogHelp, DialogNewGame
-from game import Game
+
+# Other modules
+from webbrowser import open as webopen
 
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-TOP_CARDS = 16
+TOP_CARDS = 16  # Number of Pool Selector buttons to display
 
 
 class App:
-    def __init__(self, view, game):
+    def __init__(self, game, view):
         self.game = game
         self.view = view
 
@@ -47,6 +50,7 @@ class App:
 
         self.bind_sidebar_buttons()
         self.cb_new_game_dialog()
+        # QTimer.singleShot(0, self.cb_new_game_dialog)
 
     @property
     def cardpool_index(self):
@@ -126,6 +130,8 @@ class App:
         self.view.deck[deck.name].remove_card_button(button)
 
     def get_destination(self):
+        for item in self.view.destination:
+            print(self.view.destination[item].isChecked())
         if self.view.destination['exclude'].isChecked():
             return self.game.deck['exclude']
         if self.view.destination['discard'].isChecked():
@@ -151,7 +157,6 @@ class App:
                 btn = self.view.pool_selector.button[i]
                 btn.setEnabled(True)
                 btn.set_text(text)
-                # print(f'enabling {i} : {text}')
                 if not btn.is_connected():
                     btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
                     btn.set_connected(True)
@@ -159,7 +164,6 @@ class App:
                 text = ''
                 btn = self.view.pool_selector.button[i]
                 btn.set_text(text)
-                # print(f'disabling {i}')
                 btn.set_connected(False)
                 btn.setEnabled(False)
 
@@ -196,6 +200,10 @@ class App:
             self.populate_draw()
             self.update_gui()
             self.cb_select_cardpool(0)
+        else:
+            if not self.view.isVisible():
+                print('quitting')
+                QApplication.quit()
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
@@ -227,7 +235,7 @@ def main():
     application = QApplication()
     view = MainWindow()
     model = Game()
-    App(view, model)
+    App(model, view)
     view.show()
     application.exec_()
 

@@ -86,10 +86,10 @@ class DestinationRadioBox(QGroupBox):
         box = QVBoxLayout()
         box.addWidget(label)
 
-        # We are subclassing QGroupBox for the *visual* container
+        # Subclass QGroupBox for the *visual* container
         self.setMaximumWidth(WIDTH_WITH_SCROLL)
 
-        # QButtonGroup is used for the *logical* grouping of buttons
+        # QButtonGroup is used for the *logical* grouping
         self.b_group = QButtonGroup()
 
         for button in destinations.values():

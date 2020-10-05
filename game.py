@@ -44,7 +44,7 @@ class Game:
     def epidemic(self, card):
         """Draw a card from the bottom of the Draw Deck, discard it
         and shuffle the discard pile back onto the top of the Draw Deck."""
-        new_card = self.deck['draw'].get_card_by_name(card)
+        new_card = self.deck['draw'].get_card_from_bottom(card)
         self.deck['draw'].remove_from_bottom(new_card)
         self.deck['discard'].add(new_card)
         self.epidemic_count += 1
