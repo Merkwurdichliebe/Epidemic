@@ -91,24 +91,26 @@ class DrawDeck(Deck):
         # If the added item is a Card,
         # add it to the Deck at the required position
         # and insert an instance of the Deck at that position.
-        #
-        # position parameter:
-        # -1 -> top of deck
-        # 0 -> bottom of deck
-        # None -> single card on top of deck
         else:
             pos = kwargs['position']
-            if self.is_empty():
-                deck = Deck('New Deck')
-            elif pos is None:
+            assert pos != 'deck', f'Invalid Draw Deck destination'
+            deck = None
+
+            if self.is_empty() or pos == 'single':
                 deck = Deck('Single card')
-            else:
-                deck = self.cards[pos]
+            elif pos == 'top':
+                deck = self.top()
+            elif pos == 'bottom':
+                deck = self.bottom()
+
             deck.add(item)
-            if pos == 0:
-                self.cards.insert(pos, deck)
+
+            if pos == 'bottom':
+                self.cards.insert(0, deck)
             else:
                 self.cards.append(deck)
+
+            assert deck is not None, f'Invalid Draw Deck state'
             deck.parent = self
 
     def remove(self, card):

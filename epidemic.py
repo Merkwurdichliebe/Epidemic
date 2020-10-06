@@ -35,19 +35,10 @@ from enum import Enum
 import logging
 logging.basicConfig(
     level='DEBUG', format='%(levelname)s : %(filename)s : %(message)s')
-logging.disable()
+# logging.disable()
 
 
 TOP_CARDS = 16  # Number of Pool Selector buttons to display
-
-# Keys : names of destination radio buttons
-# Values : deck positions used in the Draw Deck
-POSITION = {
-    'top': -1,
-    'bottom': 0,
-    'single': None,
-    'deck': None
-}
 
 
 class App:
@@ -75,10 +66,10 @@ class App:
 
     def bind_sidebar_buttons(self):
         logging.info('bind_sidebar_buttons')
-        new_game_button = self.view.app_buttons.button_new_game
-        new_game_button.clicked.connect(self.cb_new_game_dialog)
-        help_button = self.view.app_buttons.button_help
-        help_button.clicked.connect(self.cb_help_dialog)
+        new_game = self.view.app_buttons.button_new_game
+        new_game.clicked.connect(self.cb_new_game_dialog)
+        help = self.view.app_buttons.button_help
+        help.clicked.connect(self.cb_help_dialog)
         epidemic = self.view.epidemic_menu.button
         epidemic.clicked.connect(self.cb_epidemic)
 
@@ -151,8 +142,8 @@ class App:
         """Return the Game Deck based on the selected radio button."""
         for item in self.view.destination:
             if self.view.destination[item].isChecked():
-                deck, pos = self.splitter(item, '_')
-                return (self.game.deck[deck], POSITION[pos])
+                deck, position = self.splitter(item, '_')
+                return (self.game.deck[deck], position)
 
     @staticmethod
     def splitter(item, delimiter):
