@@ -1,9 +1,20 @@
-# Configuration file for cards used in the Epidemic application
+# This is the configuration file for cards used in the Epidemic application.
 #
-# Each cards should have a name, a count (the number of copies of that card
-# in the draw deck) and a color. You can add more cards or delete existing ones.
+# Each card should have a name, a count (the number of copies of that card
+# in the draw deck) and a color.
+# 
+# Cards, as well as deck configurations, can be renamed,
+# added or deleted freely. The application doesn't validate card or deck names.
+# If playing a Legacy game, start from a basic deck and add new cards
+# as you discover them.
 #
-# Only use blue, black, yellow, red and green. Edit with care.
+# Correct indentation and format should be respected though,
+# or the application will crash.
+#
+# Valid colors are blue, black, yellow, red (the default Pandemic city colors)
+# as well as green (for special cards).
+#
+# Edit with care, and restart the application after saving this file.
 
 Legacy Season 2 (Full):
   - name: Atlanta
