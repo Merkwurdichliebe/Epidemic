@@ -50,9 +50,8 @@ class App:
 
         self._cardpool_index = 0
 
-        # self.cb_new_game_dialog()
         self.bind_sidebar_buttons()
-        # QTimer.singleShot(500, self.cb_new_game_dialog)
+        QTimer.singleShot(0, self.cb_new_game_dialog)
 
     @property
     def cardpool_index(self):
@@ -212,7 +211,12 @@ class App:
             self.update_gui()
             self.cb_select_cardpool(0)
         else:
-            QApplication.quit()
+            logging.debug(f'Quitting {self.view.isVisible()}')
+            if not self.view.has_initialised:
+                # QApplication.quit() doesn't quit immediately
+                # Hide the main window and delay quitting slightly
+                self.view.hide()
+                QTimer.singleShot(100, QApplication.quit)
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
@@ -225,7 +229,7 @@ class App:
         self.update_gui()
         self.cb_select_cardpool(0)
 
-    @staticmethod
+    @ staticmethod
     def cb_help_dialog():
         logging.info('cb_help')
         """Callback from the Help button.
@@ -242,18 +246,11 @@ class App:
 
 def main():
     application = QApplication()
-    logging.debug('main() QApplication assigned')
     view = MainWindow()
-    logging.debug('main() view assigned')
     model = Game()
-    logging.debug('main() model assigned')
-    view.show()
-    logging.debug('main() view shown')
     app = App(model, view)
-    logging.debug('main() App called')
-    app.cb_new_game_dialog()
+    view.show()
     application.exec_()
-    logging.debug('main() end')
 
 
 if __name__ == '__main__':
