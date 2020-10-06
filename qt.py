@@ -23,7 +23,7 @@ WIDTH_WITH_SCROLL = 176
 COLOR = {
     'blue': '#4073bf',
     'black': '#404040',
-    'yellow': '#f5993d',
+    'yellow': '#e6ac00',
     'red': '#df4620',
     'green': '#009933',
     'gray': '#bfbfbf'

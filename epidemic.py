@@ -65,7 +65,7 @@ class App:
         self.update_cardpool()
 
     def bind_sidebar_buttons(self):
-        logging.info('bind_sidebar_buttons')
+        logging.info('Binding sidebar buttons')
         new_game = self.view.app_buttons.button_new_game
         new_game.clicked.connect(self.cb_new_game_dialog)
         help = self.view.app_buttons.button_help
@@ -74,7 +74,7 @@ class App:
         epidemic.clicked.connect(self.cb_epidemic)
 
     def populate_draw(self):
-        logging.info(f'populate_draw')
+        logging.info(f'Populating Draw Deck')
         self.view.deck['draw'].clear()
         deck = self.game.deck['draw']
         if not deck.is_empty():
@@ -89,7 +89,7 @@ class App:
         return True if deck.name == 'draw' and len(deck.top()) == 1 else False
 
     def cb_draw_card(self, button, from_deck):
-        logging.info('cb_draw_card')
+        logging.info('Drawing Card')
         # Get the deck we're drawing to
         to_deck, position = self.get_destination()
 
@@ -130,12 +130,14 @@ class App:
         self.update_gui()
 
     def add_button_to_deck(self, button, deck):
+        logging.info(f'Adding button {button.card.name} to {deck.name}')
         button = self.view.deck[deck.name].add_card_button(button.card)
         if button is not None:
             button.clicked.connect(
                 lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     def remove_button_from_deck(self, button, deck):
+        logging.info(f'Removing button {button.card.name} from {deck.name}')
         self.view.deck[deck.name].remove_card_button(button)
 
     def get_destination(self):
@@ -143,6 +145,7 @@ class App:
         for item in self.view.destination:
             if self.view.destination[item].isChecked():
                 deck, position = self.splitter(item, '_')
+                logging.info(f'Destination: {deck} (Position: {position})')
                 return (self.game.deck[deck], position)
 
     @staticmethod
@@ -153,7 +156,7 @@ class App:
             return (item, 'None')
 
     def update_cardpool(self):
-        logging.info(f'cb_update_cardpool')
+        logging.info(f'Updating cardpool')
         if self.game.deck['draw'].is_empty():
             self.view.cardpool.show_empty()
         else:
@@ -161,7 +164,7 @@ class App:
             self.view.cardpool.show(deck.name, self.cardpool_index+1, deck)
 
     def update_pool_selector(self):
-        logging.info(f'update_pool_selector')
+        logging.info(f'Updating pool selector')
         for i in range(TOP_CARDS):
             if i < len(self.game.deck['draw']):
                 c = self.game.deck['draw'].cards[-1-i]
@@ -183,6 +186,7 @@ class App:
     def update_epidemic_menu(self):
         """Update the epidemic dropdown list
         based on the available cards in the Draw Deck."""
+        logging.info(f'Updating epidemic menu')
         deck = self.game.deck['draw']
         if not deck.is_empty():
             items = sorted([c.name for c in list(set(deck.bottom().cards))])
@@ -197,15 +201,15 @@ class App:
         self.view.epidemic_menu.combo_box.addItems(items)
 
     def update_stats(self):
-        logging.info('update_stats')
+        logging.info('Updating stats')
         self.view.stats.show(self.game.stats)
 
     def cb_select_cardpool(self, index):
-        logging.info('cb_select_cardpool')
+        logging.info(f'Selecting cardpool {index}')
         self.cardpool_index = index
 
     def cb_new_game_dialog(self):
-        logging.info('cb_new_game')
+        logging.info('Displaying new game dialog')
         games = list(self.game.games.keys())
         dialog = DialogNewGame(games)
         if dialog.exec_():
@@ -224,7 +228,7 @@ class App:
 
     def cb_epidemic(self):
         """Shuffle epidemic card based on the selected card in the combobox."""
-        logging.info('cb_epidemic')
+        logging.info('Starting epidemic')
         new_card_name = self.view.epidemic_menu.combo_box.currentText()
         self.game.epidemic(new_card_name)
         self.view.deck['discard'].clear()
@@ -235,7 +239,7 @@ class App:
 
     @ staticmethod
     def cb_help_dialog():
-        logging.info('cb_help')
+        logging.info('Displaying help dialog')
         """Callback from the Help button.
         Displays a dialog with the option to view Help in browser."""
         dialog = DialogHelp()
@@ -243,6 +247,7 @@ class App:
             webopen('https://github.com/Merkwurdichliebe/Epidemic/wiki')
 
     def update_gui(self):
+        logging.info(f'Updating GUI')
         self.update_pool_selector()
         self.update_epidemic_menu()
         self.update_stats()
