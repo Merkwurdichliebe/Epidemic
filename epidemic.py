@@ -35,7 +35,8 @@ from qtdialogs import DialogHelp, DialogNewGame
 from webbrowser import open as webopen
 
 import logging
-logging.basicConfig(level='DEBUG', format='%(levelname)s : %(filename)s : %(message)s')
+logging.basicConfig(
+    level='DEBUG', format='%(levelname)s : %(filename)s : %(message)s')
 
 
 TOP_CARDS = 16  # Number of Pool Selector buttons to display
@@ -55,7 +56,8 @@ class App:
 
     @property
     def cardpool_index(self):
-        return min(self._cardpool_index, max(0, len(self.game.deck['draw'].cards) - 1))
+        return min(self._cardpool_index,
+                   max(0, len(self.game.deck['draw'])-1))
 
     @cardpool_index.setter
     def cardpool_index(self, index):
@@ -81,7 +83,8 @@ class App:
             cards = deck.sorted()
             for card in cards:
                 button = self.view.deck['draw'].add_card_button(card)
-                button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+                button.clicked.connect(
+                    lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     @staticmethod
     def is_last_card(deck):
@@ -91,57 +94,58 @@ class App:
         logging.info('cb_draw_card')
         # Get the deck we're drawing to
         to_deck = self.get_destination()
-        card = button.card
 
         # Ignore drawing from a deck onto itself
         if not from_deck == to_deck and not from_deck == to_deck.parent:
-            logging.info(f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
+            self.draw_card(button, from_deck, to_deck)
 
-            # Flag needed to populate draw if last button was removed
-            is_last_card = self.is_last_card(from_deck)
+    def draw_card(self, button, from_deck, to_deck):
+        logging.info(
+            f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
 
-            # Move the card and update the game state
-            pos = -1 if self.view.destination['draw_top'].isChecked() else 0
-            self.game.draw_card(from_deck, to_deck, card, position=pos)
+        card = button.card
 
-            # Remove the card from the source deck in GUI
-            if from_deck.name == 'draw':
-                if from_deck.is_empty() or card not in from_deck.top():
-                    self.remove_button_from_deck(button, from_deck)
-                if is_last_card:
-                    self.populate_draw()
-            else:
+        # Flag needed to populate draw if last button was removed
+        is_last_card = self.is_last_card(from_deck)
+
+        # Move the card and update the game state
+        pos = -1 if self.view.destination['draw_top'].isChecked() else 0
+        self.game.draw_card(from_deck, to_deck, card, position=pos)
+
+        # Remove the card from the source deck in GUI
+        if from_deck.name == 'draw':
+            if from_deck.is_empty() or card not in from_deck.top():
                 self.remove_button_from_deck(button, from_deck)
+            if is_last_card:
+                self.populate_draw()
+        else:
+            self.remove_button_from_deck(button, from_deck)
 
-            # Add the card to the GUI
-            if to_deck == self.game.deck['draw']:
-                if card in self.game.deck['draw'].top():
-                    self.add_button_to_deck(button, to_deck)
-            else:
+        # Add the card to the GUI
+        if to_deck == self.game.deck['draw']:
+            if card in self.game.deck['draw'].top():
                 self.add_button_to_deck(button, to_deck)
+        else:
+            self.add_button_to_deck(button, to_deck)
 
-            # Clamp the active pool button to allowed range
-            self.cardpool_index = self.cardpool_index
+        # Clamp the active pool button to allowed range
+        self.cardpool_index = self.cardpool_index
+
+        self.update_gui()
 
     def add_button_to_deck(self, button, deck):
         button = self.view.deck[deck.name].add_card_button(button.card)
         if button is not None:
-            button.clicked.connect(lambda b=button, d=deck: self.cb_draw_card(b, d))
+            button.clicked.connect(
+                lambda b=button, d=deck: self.cb_draw_card(b, d))
 
     def remove_button_from_deck(self, button, deck):
         self.view.deck[deck.name].remove_card_button(button)
 
     def get_destination(self):
-        # TODO compact this
         for item in self.view.destination:
-            print(self.view.destination[item].isChecked())
-        if self.view.destination['exclude'].isChecked():
-            return self.game.deck['exclude']
-        if self.view.destination['discard'].isChecked():
-            return self.game.deck['discard']
-        if self.view.destination['draw_bottom'].isChecked() or \
-                self.view.destination['draw_top'].isChecked():
-            return self.game.deck['draw']
+            if self.view.destination[item].isChecked():
+                return self.game.deck[item.split('_')[0]]
 
     def update_cardpool(self):
         logging.info(f'cb_update_cardpool')
@@ -161,7 +165,8 @@ class App:
                 btn.setEnabled(True)
                 btn.set_text(text)
                 if not btn.is_connected():
-                    btn.clicked.connect(lambda index=i: self.cb_select_cardpool(index))
+                    btn.clicked.connect(
+                        lambda index=i: self.cb_select_cardpool(index))
                     btn.set_connected(True)
             else:
                 text = ''
@@ -244,7 +249,7 @@ def main():
     logging.debug('main() view shown')
     app = App(model, view)
     logging.debug('main() App called')
-    app.cb_new_game_dialog() ##############
+    app.cb_new_game_dialog()
     application.exec_()
     logging.debug('main() end')
 
