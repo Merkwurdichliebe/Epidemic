@@ -19,7 +19,6 @@ __license__ = "GPL"
 __version__ = "1.0"
 
 # TODO fr, en
-# TODO allow cancel on app start
 # TODO make cards file easily editable on Windows
 
 # Qt framework
@@ -33,6 +32,7 @@ from qtdialogs import DialogHelp, DialogNewGame
 
 # Other modules
 from webbrowser import open as webopen
+from enum import Enum
 
 import logging
 logging.basicConfig(
@@ -40,6 +40,15 @@ logging.basicConfig(
 
 
 TOP_CARDS = 16  # Number of Pool Selector buttons to display
+
+# Keys : names of destination radio buttons
+# Values : deck positions used in the Draw Deck
+POSITION = {
+    'top': -1,
+    'bottom': 0,
+    'single': None,
+    'deck': None
+}
 
 
 class App:
@@ -92,13 +101,13 @@ class App:
     def cb_draw_card(self, button, from_deck):
         logging.info('cb_draw_card')
         # Get the deck we're drawing to
-        to_deck = self.get_destination()
+        to_deck, position = self.get_destination()
 
         # Ignore drawing from a deck onto itself
         if not from_deck == to_deck and not from_deck == to_deck.parent:
-            self.draw_card(button, from_deck, to_deck)
+            self.draw_card(button, from_deck, to_deck, position)
 
-    def draw_card(self, button, from_deck, to_deck):
+    def draw_card(self, button, from_deck, to_deck, position):
         logging.info(
             f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
 
@@ -108,8 +117,7 @@ class App:
         is_last_card = self.is_last_card(from_deck)
 
         # Move the card and update the game state
-        pos = -1 if self.view.destination['draw_top'].isChecked() else 0
-        self.game.draw_card(from_deck, to_deck, card, position=pos)
+        self.game.draw_card(from_deck, to_deck, card, position=position)
 
         # Remove the card from the source deck in GUI
         if from_deck.name == 'draw':
@@ -122,8 +130,7 @@ class App:
 
         # Add the card to the GUI
         if to_deck == self.game.deck['draw']:
-            if card in self.game.deck['draw'].top():
-                self.add_button_to_deck(button, to_deck)
+            self.populate_draw()
         else:
             self.add_button_to_deck(button, to_deck)
 
@@ -145,8 +152,15 @@ class App:
         """Return the Game Deck based on the selected radio button."""
         for item in self.view.destination:
             if self.view.destination[item].isChecked():
-                # Use 'draw' for both 'draw_top' and 'draw_bottom'
-                return self.game.deck[item.split('_')[0]]
+                deck, pos = self.splitter(item, '_')
+                return (self.game.deck[deck], POSITION[pos])
+
+    @staticmethod
+    def splitter(item, delimiter):
+        if delimiter in item:
+            return tuple(item.split(delimiter))
+        else:
+            return (item, 'None')
 
     def update_cardpool(self):
         logging.info(f'cb_update_cardpool')

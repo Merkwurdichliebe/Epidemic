@@ -335,8 +335,9 @@ class MainWindow(QWidget):
         self.destination = {
             'draw_top': QRadioButton('Draw (Top)'),
             'draw_bottom': QRadioButton('Draw (Bottom)'),
-            'discard': QRadioButton('Discard'),
-            'exclude': QRadioButton('Exclude')
+            'draw_single': QRadioButton('Draw (Single)'),
+            'discard_deck': QRadioButton('Discard'),
+            'exclude_deck': QRadioButton('Exclude')
         }
         self.destinations = DestinationRadioBox(self.destination)
         self.epidemic_menu = EpidemicMenu()
@@ -371,7 +372,7 @@ class MainWindow(QWidget):
 
     def initialise(self):
         logging.info(f'[Main Window] initialise')
-        self.destination['exclude'].setChecked(True)
+        self.destination['exclude_deck'].setChecked(True)
         for k, v in self.deck.items():
             self.deck[k].clear()
         self.has_initialised = True

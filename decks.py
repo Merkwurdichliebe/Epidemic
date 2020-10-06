@@ -43,6 +43,7 @@ class Deck:
 
     def remove(self, card):
         """Remove a card from the Deck."""
+        assert card in self.cards, f'{card.name} not in {self.name}'
         self.cards.remove(card)
 
     def move(self, card, to_deck, **kwargs):
@@ -90,13 +91,24 @@ class DrawDeck(Deck):
         # If the added item is a Card,
         # add it to the Deck at the required position
         # and insert an instance of the Deck at that position.
+        #
+        # position parameter:
+        # -1 -> top of deck
+        # 0 -> bottom of deck
+        # None -> single card on top of deck
         else:
+            pos = kwargs['position']
             if self.is_empty():
                 deck = Deck('New Deck')
+            elif pos is None:
+                deck = Deck('Single card')
             else:
-                deck = self.cards[kwargs['position']]
+                deck = self.cards[pos]
             deck.add(item)
-            self.cards.insert(kwargs['position'], deck)
+            if pos == 0:
+                self.cards.insert(pos, deck)
+            else:
+                self.cards.append(deck)
             deck.parent = self
 
     def remove(self, card):
