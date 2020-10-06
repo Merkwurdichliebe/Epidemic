@@ -14,7 +14,7 @@ class DialogNewGame(QDialog):
 
         self.combo = QComboBox()
         self.combo.addItems(games)
-        self.combo.setCurrentIndex(3)
+        self.combo.setCurrentIndex(0)
         v_main.addWidget(self.combo)
 
         h_buttons = QHBoxLayout()

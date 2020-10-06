@@ -18,8 +18,6 @@ __copyright__ = "Copyright 2020"
 __license__ = "GPL"
 __version__ = "1.0"
 
-# TODO fr, en
-# TODO make cards file easily editable on Windows
 
 # Qt framework
 from PySide2.QtWidgets import QApplication
@@ -109,7 +107,7 @@ class App:
 
     def draw_card(self, button, from_deck, to_deck, position):
         logging.info(
-            f'Drawing {button.card.name} from {from_deck.name} to {to_deck.name}')
+            f'Drawing {button.card.name} ({from_deck.name} -> {to_deck.name})')
 
         card = button.card
 
@@ -225,7 +223,7 @@ class App:
             self.update_gui()
             self.cb_select_cardpool(0)
         else:
-            logging.debug(f'Quitting {self.view.isVisible()}')
+            logging.debug(f'Quitting')
             if not self.view.has_initialised:
                 # QApplication.quit() doesn't quit immediately
                 # Hide the main window and delay quitting slightly

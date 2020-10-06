@@ -99,7 +99,35 @@ Legacy Season 2 (Full):
   - name: Washington
     count: 3
     color: blue
-Legacy Season 2 (Start):
+Legacy Season 2 [English]:
+  - name: Istanbul
+    count: 3
+    color: black
+  - name: Jacksonville
+    count: 3
+    color: yellow
+  - name: Lagos
+    count: 3
+    color: yellow
+  - name: Cairo
+    count: 3
+    color: black
+  - name: London
+    count: 3
+    color: blue
+  - name: New York
+    count: 3
+    color: blue
+  - name: Sao Paolo
+    count: 3
+    color: yellow
+  - name: Tripoli
+    count: 3
+    color: black
+  - name: Washington
+    count: 3
+    color: blue
+Legacy Season 2 [Français]:
   - name: Istanbul
     count: 3
     color: black
@@ -127,7 +155,152 @@ Legacy Season 2 (Start):
   - name: Washington
     count: 3
     color: blue
-Pandemic Classic:
+Pandemic Classic [English]:
+  - name: Algiers
+    count: 1
+    color: black
+  - name: Atlanta
+    count: 1
+    color: blue
+  - name: Baghdad
+    count: 1
+    color: black
+  - name: Bangkok
+    count: 1
+    color: red
+  - name: Bogota
+    count: 1
+    color: yellow
+  - name: Buenos Aires
+    count: 1
+    color: yellow
+  - name: Calcutta
+    count: 1
+    color: black
+  - name: Chennai
+    count: 1
+    color: black
+  - name: Chicago
+    count: 1
+    color: blue
+  - name: Delhi
+    count: 1
+    color: black
+  - name: Essen
+    count: 1
+    color: blue
+  - name: Ho Chi Minh City
+    count: 1
+    color: red
+  - name: Hong Kong
+    count: 1
+    color: red
+  - name: Istanbul
+    count: 1
+    color: black
+  - name: Jakarta
+    count: 1
+    color: red
+  - name: Johannesburg
+    count: 1
+    color: blue
+  - name: Karachi
+    count: 1
+    color: black
+  - name: Khartoum
+    count: 1
+    color: yellow
+  - name: Kinshasa
+    count: 1
+    color: yellow
+  - name: Lagos
+    count: 1
+    color: yellow
+  - name: Cairo
+    count: 1
+    color: black
+  - name: Lima
+    count: 1
+    color: yellow
+  - name: London
+    count: 1
+    color: blue
+  - name: Los Angeles
+    count: 1
+    color: yellow
+  - name: Madrid
+    count: 1
+    color: blue
+  - name: Manilla
+    count: 1
+    color: red
+  - name: Mexico City
+    count: 1
+    color: yellow
+  - name: Miami
+    count: 1
+    color: yellow
+  - name: Milan
+    count: 1
+    color: blue
+  - name: Montreal
+    count: 1
+    color: blue
+  - name: Moscow
+    count: 1
+    color: black
+  - name: Mumbai
+    count: 1
+    color: black
+  - name: New York
+    count: 1
+    color: blue
+  - name: Osaka
+    count: 1
+    color: red
+  - name: Paris
+    count: 1
+    color: blue
+  - name: Riyad
+    count: 1
+    color: black
+  - name: Beijing
+    count: 1
+    color: red
+  - name: Saint-Petersburg
+    count: 1
+    color: blue
+  - name: San Francisco
+    count: 1
+    color: blue
+  - name: Santiago
+    count: 1
+    color: yellow
+  - name: Sao Paolo
+    count: 1
+    color: yellow
+  - name: Seoul
+    count: 1
+    color: red
+  - name: Shanghai
+    count: 1
+    color: red
+  - name: Sydney
+    count: 1
+    color: red
+  - name: Taipei
+    count: 1
+    color: red
+  - name: Tehran
+    count: 1
+    color: black
+  - name: Tokyo
+    count: 1
+    color: red
+  - name: Washington, D.C.
+    count: 1
+    color: blue
+Pandemic Classic [Français]:
   - name: Alger
     count: 1
     color: black
