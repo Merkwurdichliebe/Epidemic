@@ -124,7 +124,7 @@ Legacy Season 2 [English]:
   - name: Tripoli
     count: 3
     color: black
-  - name: Washington
+  - name: Washington, DC
     count: 3
     color: blue
 Legacy Season 2 [Français]:
@@ -297,7 +297,7 @@ Pandemic Classic [English]:
   - name: Tokyo
     count: 1
     color: red
-  - name: Washington, D.C.
+  - name: Washington, DC
     count: 1
     color: blue
 Pandemic Classic [Français]:
