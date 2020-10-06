@@ -232,7 +232,6 @@ class App:
         new_card_name = self.view.epidemic_menu.combo_box.currentText()
         self.game.epidemic(new_card_name)
         self.view.deck['discard'].clear()
-        self.view.deck['draw'].clear()
         self.populate_draw()
         self.update_gui()
         self.cb_select_cardpool(0)

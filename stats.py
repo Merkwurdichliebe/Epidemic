@@ -6,6 +6,7 @@ class Stats:
     The Stats object calculates and returns statistical information
     about Deck objects.
     """
+
     def __init__(self, deck):
         self.deck = deck
 
@@ -36,4 +37,5 @@ class Stats:
     @property
     def top_cards(self):
         """Get a list of all the cards that share the top frequency"""
-        return [card[0] for card in self.most_common if card[1] == self.top_freq]
+        return [card[0] for card in self.most_common
+                if card[1] == self.top_freq]
