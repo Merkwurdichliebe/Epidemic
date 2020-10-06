@@ -27,7 +27,7 @@ COLOR = {
     'red': '#df4620',
     'green': '#009933',
     'gray': '#bfbfbf'
-    }
+}
 
 
 class ButtonCSS(Enum):
@@ -146,7 +146,8 @@ class PoolButton(QLabel):
 
     def set_active(self, active):
         self.active = active
-        self.setStyleSheet(ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
+        self.setStyleSheet(
+            ButtonCSS.Active.value if active else ButtonCSS.Inactive.value)
         self.repaint()  # Fix Qt bug on macOS
 
     def mouseReleaseEvent(self, event):
@@ -320,6 +321,9 @@ class MainWindow(QWidget):
         self.pool_selector = PoolSelector()
         self.setFixedSize(WINDOW_H_SIZE, WINDOW_V_SIZE)
 
+        # To allow quitting when canceling new game dialog at launch
+        self.has_initialised = False
+
         self.deck = {
             'draw': DrawDeck('DRAW CARD'),
             'discard': Deck('DISCARD PILE'),
@@ -370,3 +374,4 @@ class MainWindow(QWidget):
         self.destination['exclude'].setChecked(True)
         for k, v in self.deck.items():
             self.deck[k].clear()
+        self.has_initialised = True
