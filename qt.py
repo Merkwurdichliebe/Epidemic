@@ -109,7 +109,7 @@ class Stats(QVBoxLayout):
         if stats.deck['draw'].is_empty():
             text += '<p>(Draw Deck is empty)</p>'
         else:
-            text += f'<p><strong>Top frequency:'
+            text += f'<p><strong>Top probability:'
             text += f'{stats.percentage:.2%}</strong></p>'
             if len(stats.top_cards) < self._max_cards:
                 text += '<ul>'
