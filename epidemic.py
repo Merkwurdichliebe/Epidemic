@@ -143,8 +143,10 @@ class App:
         self.view.deck[deck.name].remove_card_button(button)
 
     def get_destination(self):
+        """Return the Game Deck based on the selected radio button."""
         for item in self.view.destination:
             if self.view.destination[item].isChecked():
+                # Use 'draw' for both 'draw_top' and 'draw_bottom'
                 return self.game.deck[item.split('_')[0]]
 
     def update_cardpool(self):
