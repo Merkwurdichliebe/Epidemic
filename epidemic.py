@@ -58,11 +58,16 @@ class App:
 
     @cardpool_index.setter
     def cardpool_index(self, index):
-        self.view.pool_selector.button[self._cardpool_index].set_active(False)
-        self._cardpool_index = max(
-            0, min(index, len(self.game.deck['draw'])-1))
-        self.view.pool_selector.button[self.cardpool_index].set_active(True)
-        self.update_cardpool()
+        if isinstance(index, int):
+            self.view.pool_selector.button[self._cardpool_index].set_active(
+                False)
+            self._cardpool_index = max(
+                0, min(index, len(self.game.deck['draw'])-1))
+            self.view.pool_selector.button[self.cardpool_index].set_active(
+                True)
+            self.update_cardpool()
+        else:
+            raise ValueError('Integer expected for cardpool index')
 
     def bind_sidebar_buttons(self):
         logging.info('Binding sidebar buttons')
