@@ -20,9 +20,15 @@ class Card:
     valid_colors = ['blue', 'yellow', 'black', 'green', 'red']
 
     def __init__(self, name, color):
-        self.name = name
-        assert color in Card.valid_colors, f'Invalid color: {color}'
-        self.color = color
+        if isinstance(name, str) and len(name) < 20:
+            self.name = name
+        else:
+            raise ValueError('Card name not a string or string too long')
+
+        if color in Card.valid_colors:
+            self.color = color
+        else:
+            raise ValueError('Card color invalid')
 
 
 class Deck:
@@ -33,7 +39,11 @@ class Deck:
     - Draw Deck (special case, subclassed below)"""
 
     def __init__(self, name):
-        self.name = name
+        if isinstance(name, str):
+            self.name = name
+        else:
+            raise ValueError(f'"{name}" is not a valid deck name')
+
         self.cards = []
         self.parent = None  # References parent Draw Deck if applicable
 
@@ -43,7 +53,7 @@ class Deck:
 
     def remove(self, card):
         """Remove a card from the Deck."""
-        assert card in self.cards, f'{card.name} not in {self.name}'
+        # assert card in self.cards, f'{card.name} not in {self.name}'
         self.cards.remove(card)
 
     def move(self, card, to_deck, **kwargs):

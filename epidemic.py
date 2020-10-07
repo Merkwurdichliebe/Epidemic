@@ -35,7 +35,7 @@ from enum import Enum
 import logging
 logging.basicConfig(
     level='DEBUG', format='%(levelname)s : %(filename)s : %(message)s')
-# logging.disable()
+logging.disable()
 
 
 TOP_CARDS = 16  # Number of Pool Selector buttons to display
