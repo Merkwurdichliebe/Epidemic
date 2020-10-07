@@ -61,10 +61,11 @@ class App:
         if isinstance(index, int):
             self.view.pool_selector.button[self._cardpool_index].set_active(
                 False)
-            self._cardpool_index = max(
-                0, min(index, len(self.game.deck['draw'])-1))
-            self.view.pool_selector.button[self.cardpool_index].set_active(
+            new_index = max(0, min(index, len(self.game.deck['draw'])-1))
+            self.view.pool_selector.button[new_index].set_active(
                 True)
+            self._cardpool_index = new_index
+            self.update_cardpool()
             self.update_cardpool()
         else:
             raise ValueError('Integer expected for cardpool index')
