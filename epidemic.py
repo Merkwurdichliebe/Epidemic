@@ -61,7 +61,8 @@ class App:
         if isinstance(index, int):
             self.view.pool_selector.button[self._cardpool_index].set_active(
                 False)
-            new_index = max(0, min(index, len(self.game.deck['draw'])-1))
+            new_index = max(
+                0, min(index, min(TOP_CARDS-1, len(self.game.deck['draw'])-1)))
             self.view.pool_selector.button[new_index].set_active(
                 True)
             self._cardpool_index = new_index
