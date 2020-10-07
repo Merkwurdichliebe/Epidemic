@@ -59,9 +59,9 @@ class App:
     @cardpool_index.setter
     def cardpool_index(self, index):
         self.view.pool_selector.button[self._cardpool_index].set_active(False)
-        self._cardpool_index = max(
-            0, min(index, len(self.game.deck['draw'])-1))
-        self.view.pool_selector.button[self.cardpool_index].set_active(True)
+        new_index = max(0, min(index, len(self.game.deck['draw'])-1))
+        self.view.pool_selector.button[new_index].set_active(True)
+        self._cardpool_index = new_index
         self.update_cardpool()
 
     def bind_sidebar_buttons(self):
