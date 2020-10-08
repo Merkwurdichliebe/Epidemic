@@ -54,7 +54,10 @@ class Deck:
     def remove(self, card):
         """Remove a card from the Deck."""
         # assert card in self.cards, f'{card.name} not in {self.name}'
-        self.cards.remove(card)
+        if card in self.cards:
+            self.cards.remove(card)
+        else:
+            raise ValueError(f'"{card.name}" is not in Deck {self.name}')
 
     def move(self, card, to_deck, **kwargs):
         """Move a card from one Deck to another.
