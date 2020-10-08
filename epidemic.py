@@ -35,7 +35,7 @@ from enum import Enum
 import logging
 logging.basicConfig(
     level='DEBUG', format='%(levelname)s : %(filename)s : %(message)s')
-logging.disable()
+# logging.disable()
 
 
 TOP_CARDS = 16  # Number of Pool Selector buttons to display
@@ -66,7 +66,6 @@ class App:
             self.view.pool_selector.button[new_index].set_active(
                 True)
             self._cardpool_index = new_index
-            self.update_cardpool()
             self.update_cardpool()
         else:
             raise ValueError('Integer expected for cardpool index')
