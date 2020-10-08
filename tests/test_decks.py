@@ -1,7 +1,9 @@
 import unittest
 from unittest.case import TestCase
+from unittest.mock import patch
 
 from decks import Card, Deck, DrawDeck
+import decks
 
 
 class TestCard(TestCase):
@@ -54,6 +56,8 @@ class TestDeck(TestCase):
         self.assertIn(self.card1, self.deck)
 
     def test_removing_card_from_a_deck(self):
+        with self.assertRaises(ValueError):  # Check removal from empty deck
+            self.deck.remove(self.card1)
         self.deck.add(self.card1)
         self.deck.remove(self.card1)
         self.assertNotIn(self.card1, self.deck)
