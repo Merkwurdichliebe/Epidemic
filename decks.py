@@ -49,7 +49,10 @@ class Deck:
 
     def add(self, card, **kwargs):
         """Add a card to the Deck."""
-        self.cards.append(card)
+        if isinstance(card, Card):
+            self.cards.append(card)
+        else:
+            raise ValueError(f'"{card}" cannot be added to a Deck')
 
     def remove(self, card):
         """Remove a card from the Deck."""
