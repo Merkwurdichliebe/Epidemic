@@ -19,6 +19,7 @@ SPACER = 20                 # Vertical spacer
 WIDTH = 150                 # Width of buttons and layout columns
 HEIGHT = 24                 # Height of buttons
 WIDTH_WITH_SCROLL = 176
+TOP_CARDS = 16              # Number of Pool Selector buttons to display
 
 COLOR = {
     'blue': '#4073bf',
@@ -169,14 +170,14 @@ class PoolButton(QLabel):
 
 
 class PoolSelector(QVBoxLayout):
-    def __init__(self):
+    def __init__(self, count):
         super().__init__()
         self.addWidget(Heading('POOL SELECTOR'))
         v_buttons = QVBoxLayout()
         v_buttons.setSpacing(SPACING)
         self.addLayout(v_buttons)
         self.button = []
-        for i in range(16):
+        for i in range(count):
             btn = PoolButton()
             btn.set_active(False)
             self.button.append(btn)
@@ -317,8 +318,9 @@ class MainWindow(QWidget):
         super().__init__()
         logging.info(f'[MainWindow] init')
 
+        self.top_cards = TOP_CARDS
         self.cardpool = Cardpool()
-        self.pool_selector = PoolSelector()
+        self.pool_selector = PoolSelector(self.top_cards)
         self.setFixedSize(WINDOW_H_SIZE, WINDOW_V_SIZE)
 
         # To allow quitting when canceling new game dialog at launch

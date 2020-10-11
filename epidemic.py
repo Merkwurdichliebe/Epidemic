@@ -38,7 +38,7 @@ logging.basicConfig(
 # logging.disable()
 
 
-TOP_CARDS = 16  # Number of Pool Selector buttons to display
+# TOP_CARDS = 16  # Number of Pool Selector buttons to display
 
 
 class App:
@@ -62,7 +62,7 @@ class App:
             self.view.pool_selector.button[self._cardpool_index].set_active(
                 False)
             new_index = max(
-                0, min(index, min(TOP_CARDS-1, len(self.game.deck['draw'])-1)))
+                0, min(index, min(self.view.top_cards-1, len(self.game.deck['draw'])-1)))
             self.view.pool_selector.button[new_index].set_active(
                 True)
             self._cardpool_index = new_index
@@ -171,7 +171,7 @@ class App:
 
     def update_pool_selector(self):
         logging.info(f'Updating pool selector')
-        for i in range(TOP_CARDS):
+        for i in range(self.view.top_cards):
             if i < len(self.game.deck['draw']):
                 c = self.game.deck['draw'].cards[-1-i]
                 text = f'{len(c)}' if len(c) > 1 else c.cards[0].name
