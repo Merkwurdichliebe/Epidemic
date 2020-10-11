@@ -11,12 +11,25 @@ import yaml
 CARDS_FILE = 'data/cards.yml'
 
 
+class Log:
+    def __init__(self):
+        self.entries = []
+
+    def clear(self):
+        self.entries.clear()
+
+    def log(self, event):
+        self.entries.append(event)
+        pass
+
+
 class Game:
     def __init__(self):
         self.games = self.get_all_games()
         self.epidemic_count = None
         self.deck = None
         self.stats = None
+        self.game_log = Log()
 
     def initialise(self, game):
         """Prepare the initial state for the game. Initialise all decks.
@@ -30,16 +43,19 @@ class Game:
         self.deck = {deck.name: deck for deck in game_decks}
         self.stats = Stats(self.deck)
         self.epidemic_count = 0
+        self.game_log.clear()
+        self.game_log.log('New game')
 
     def initialise_draw_deck(self, game):
         deck = DrawDeck('draw')
         deck.add(deepcopy(self.games[game]))  # games list shouldn't mutate
         return deck
 
-    @staticmethod
-    def draw_card(from_deck, to_deck, card, **kwargs):
+    def draw_card(self, from_deck, to_deck, card, **kwargs):
         if not from_deck == to_deck:
             from_deck.move(card, to_deck, **kwargs)
+            self.game_log.log(
+                f'{card.name} ({from_deck.name} -> {to_deck.name})')
 
     def epidemic(self, card):
         """Draw a card from the bottom of the Draw Deck, discard it
@@ -57,6 +73,7 @@ class Game:
 
         # Clear the discard pile
         self.deck['discard'].clear()
+        self.game_log.log(f'Epidemic with {new_card.name}')
 
     def get_all_games(self):
         # Initialize the initial deck from the card list in cards.yml
@@ -93,3 +110,6 @@ class Game:
             print(f'Missing or damaged cards.yml configuration file\n({e})')
         else:
             return data
+
+    def log(self, event):
+        self.game_log.append(event)
