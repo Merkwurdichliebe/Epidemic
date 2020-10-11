@@ -21,7 +21,7 @@ Legacy Season 2 (Full):
     count: 1
     color: blue
   - name: Antananarivo
-    count: 2
+    count: 1
     color: black
   - name: Baghdad
     count: 2
@@ -45,11 +45,14 @@ Legacy Season 2 (Full):
     count: 2
     color: blue
   - name: Hommes creux
-    count: 4
+    count: 8
     color: green
   - name: Jacksonville
     count: 3
     color: yellow
+  - name: Jakarta
+    count: 3
+    color: red
   - name: Johannesbourg
     count: 2
     color: blue
@@ -81,7 +84,7 @@ Legacy Season 2 (Full):
     count: 1
     color: black
   - name: Navi Mumbai
-    count: 2
+    count: 1
     color: black
   - name: New York
     count: 3
