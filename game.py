@@ -22,6 +22,15 @@ class Log:
         self.entries.append(event)
         pass
 
+    def __len__(self):
+        return len(self.entries)
+
+    def __getitem__(self, i):
+        return self.entries[i]
+
+    def __iter__(self):
+        return iter(self.entries)
+
 
 class Game:
     def __init__(self):
@@ -73,7 +82,7 @@ class Game:
 
         # Clear the discard pile
         self.deck['discard'].clear()
-        self.game_log.log(f'Epidemic with {new_card.name}')
+        self.game_log.log(f'Epidemic ({new_card.name}) shuffled')
 
     def get_all_games(self):
         # Initialize the initial deck from the card list in cards.yml
@@ -110,6 +119,3 @@ class Game:
             print(f'Missing or damaged cards.yml configuration file\n({e})')
         else:
             return data
-
-    def log(self, event):
-        self.game_log.append(event)
