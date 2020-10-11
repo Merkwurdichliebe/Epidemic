@@ -38,25 +38,22 @@ logging.basicConfig(
 # logging.disable()
 
 
-# TOP_CARDS = 16  # Number of Pool Selector buttons to display
-
-
 class App:
     def __init__(self, game, view):
         logging.info('[App] init')
         self.game = game
         self.view = view
-
+        self.game.log.view = self.view.log
         self._cardpool_index = 0
 
         self.bind_sidebar_buttons()
         QTimer.singleShot(0, self.cb_new_game_dialog)
 
-    @property
+    @ property
     def cardpool_index(self):
         return self._cardpool_index
 
-    @cardpool_index.setter
+    @ cardpool_index.setter
     def cardpool_index(self, index):
         if isinstance(index, int):
             self.view.pool_selector.button[self._cardpool_index].set_active(
@@ -90,7 +87,7 @@ class App:
                 button.clicked.connect(
                     lambda b=button, d=deck: self.cb_draw_card(b, d))
 
-    @staticmethod
+    @ staticmethod
     def is_last_card(deck):
         return True if deck.name == 'draw' and len(deck.top()) == 1 else False
 
@@ -154,7 +151,7 @@ class App:
                 logging.info(f'Destination: {deck} (Position: {position})')
                 return (self.game.deck[deck], position)
 
-    @staticmethod
+    @ staticmethod
     def splitter(item, delimiter):
         if delimiter in item:
             return tuple(item.split(delimiter))

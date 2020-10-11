@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout,\
+from PySide2.QtWidgets import QTextEdit, QWidget, QHBoxLayout, QVBoxLayout,\
     QLabel, QPushButton, QGroupBox, QRadioButton, QComboBox, QScrollArea,\
-    QButtonGroup
+    QButtonGroup, QFrame
 from PySide2.QtCore import Qt, QSize, Signal
 from enum import Enum
 import bisect
@@ -48,8 +48,15 @@ class Heading(QLabel):
     def __init__(self, text):
         super().__init__()
         self.setText(f'<h4>{text}</h4>')
-        # self.setFixedWidth(WIDTH_WITH_SCROLL)
         self.setAlignment(Qt.AlignHCenter)
+
+
+class HLine(QFrame):
+    def __init__(self):
+        super(HLine, self).__init__()
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
+        self.setFixedHeight(10)
 
 
 class AppButtons(QVBoxLayout):
@@ -182,7 +189,30 @@ class PoolSelector(QVBoxLayout):
             btn.set_active(False)
             self.button.append(btn)
             v_buttons.addWidget(btn)
-        self.addStretch()
+
+
+class Log(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+
+        frame = QFrame()
+        frame.setFrameShape(QFrame.Box)
+        frame.setLineWidth(0.5)
+        frame.setStyleSheet('background:')
+        self.addWidget(frame)
+
+        self.edit = QTextEdit()
+        self.edit.setStyleSheet('background: transparent')
+        self.edit.setReadOnly(True)
+        self.addWidget(self.edit)
+
+        self.log_entries = []
+
+    def log(self, text):
+        self.edit.append(text)
+
+    def clear(self):
+        self.edit.clear()
 
 
 class Cardpool(QVBoxLayout):
@@ -321,7 +351,8 @@ class MainWindow(QWidget):
         self.top_cards = TOP_CARDS
         self.cardpool = Cardpool()
         self.pool_selector = PoolSelector(self.top_cards)
-        self.setFixedSize(WINDOW_H_SIZE, WINDOW_V_SIZE)
+        self.log = Log()
+        # self.setFixedSize(WINDOW_H_SIZE, WINDOW_V_SIZE)
 
         # To allow quitting when canceling new game dialog at launch
         self.has_initialised = False
@@ -355,12 +386,29 @@ class MainWindow(QWidget):
         h_main = QHBoxLayout()
         v_app.addLayout(h_main)
 
-        h_main.addLayout(self.cardpool)
-        h_main.addLayout(self.pool_selector)
+        # Left layout (cardpool, selector and log)
+        v_left = QVBoxLayout()
+
+        v_left_upper = QHBoxLayout()
+        v_left.addLayout(v_left_upper)
+
+        v_left_upper.addLayout(self.cardpool)
+        v_left_upper.addLayout(self.pool_selector)
+
+        v_left_lower = QHBoxLayout()
+        v_left.addLayout(v_left_lower)
+
+        v_left_lower.addWidget(HLine())
+        v_left_lower.addLayout(self.log)
+
+        h_main.addLayout(v_left)
+
+        # Decks
         h_main.addLayout(self.deck['draw'])
         h_main.addLayout(self.deck['discard'])
         h_main.addLayout(self.deck['exclude'])
 
+        # Right sidebar
         v_sidebar = QVBoxLayout()
         v_sidebar.addWidget(Heading(' '))
         v_sidebar.addLayout(self.app_buttons)

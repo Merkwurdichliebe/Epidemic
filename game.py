@@ -14,13 +14,15 @@ CARDS_FILE = 'data/cards.yml'
 class Log:
     def __init__(self):
         self.entries = []
+        self.view = None
 
     def clear(self):
         self.entries.clear()
+        self.view.clear()
 
     def log(self, event):
         self.entries.append(event)
-        pass
+        self.view.log(event)
 
     def __len__(self):
         return len(self.entries)
@@ -38,7 +40,7 @@ class Game:
         self.epidemic_count = None
         self.deck = None
         self.stats = None
-        self.game_log = Log()
+        self.log = Log()
 
     def initialise(self, game):
         """Prepare the initial state for the game. Initialise all decks.
@@ -52,8 +54,8 @@ class Game:
         self.deck = {deck.name: deck for deck in game_decks}
         self.stats = Stats(self.deck)
         self.epidemic_count = 0
-        self.game_log.clear()
-        self.game_log.log('New game')
+        self.log.clear()
+        self.log.log(f'New game: {game}\n')
 
     def initialise_draw_deck(self, game):
         deck = DrawDeck('draw')
@@ -63,7 +65,7 @@ class Game:
     def draw_card(self, from_deck, to_deck, card, **kwargs):
         if not from_deck == to_deck:
             from_deck.move(card, to_deck, **kwargs)
-            self.game_log.log(
+            self.log.log(
                 f'{card.name} ({from_deck.name} -> {to_deck.name})')
 
     def epidemic(self, card):
@@ -82,7 +84,8 @@ class Game:
 
         # Clear the discard pile
         self.deck['discard'].clear()
-        self.game_log.log(f'Epidemic ({new_card.name}) shuffled')
+        self.log.log(
+            f'\nEpidemic #{self.epidemic_count} ({new_card.name}) shuffled\n')
 
     def get_all_games(self):
         # Initialize the initial deck from the card list in cards.yml
