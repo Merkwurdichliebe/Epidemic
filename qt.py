@@ -179,7 +179,7 @@ class PoolButton(QLabel):
 class PoolSelector(QVBoxLayout):
     def __init__(self, count):
         super().__init__()
-        self.addWidget(Heading('POOL SELECTOR'))
+        self.addWidget(Heading('INFECTION DECK'))
         v_buttons = QVBoxLayout()
         v_buttons.setSpacing(SPACING)
         self.addLayout(v_buttons)
@@ -191,22 +191,18 @@ class PoolSelector(QVBoxLayout):
             v_buttons.addWidget(btn)
 
 
-class Log(QVBoxLayout):
+class Log(QFrame):
     def __init__(self):
         super().__init__()
-
-        frame = QFrame()
-        frame.setFrameShape(QFrame.Box)
-        frame.setLineWidth(0.5)
-        frame.setStyleSheet('background:')
-        self.addWidget(frame)
+        self.setStyleSheet(
+            f'border: 1px solid {COLOR["gray"]}; border-radius: 5px;')
+        layout = QVBoxLayout()
+        self.setLayout(layout)
 
         self.edit = QTextEdit()
-        self.edit.setStyleSheet('background: transparent')
+        self.edit.setStyleSheet('border: none; background: transparent')
         self.edit.setReadOnly(True)
-        self.addWidget(self.edit)
-
-        self.log_entries = []
+        layout.addWidget(self.edit)
 
     def log(self, text):
         self.edit.append(text)
@@ -231,8 +227,8 @@ class Cardpool(QVBoxLayout):
         self._text.setText(f'<p>Draw Deck is empty.</p>')
 
     def show(self, deck_name, position, deck):
-        text = f'<p><strong>Pool origin:</strong><p>[{deck_name}]'
-        text += f'<p>Deck position: {position}</p>'
+        text = f'<p>Card position: {position}</p>'
+        text += f'<p>(from {deck_name})<p>'
         text += f'<p><strong>Possible cards:</strong></p>'
         if len(deck) < self._max_cards:
             for card in sorted(set(deck.cards), key=lambda x: x.name):
@@ -366,9 +362,9 @@ class MainWindow(QWidget):
         self.app_buttons = AppButtons()
 
         self.destination = {
-            'draw_top': QRadioButton('Draw (Top)'),
-            'draw_bottom': QRadioButton('Draw (Bottom)'),
-            'draw_single': QRadioButton('Draw (Single)'),
+            'draw_top': QRadioButton('Infection (Top)'),
+            'draw_bottom': QRadioButton('Infection (Bottom)'),
+            'draw_single': QRadioButton('Infection (Single)'),
             'discard_deck': QRadioButton('Discard'),
             'exclude_deck': QRadioButton('Exclude')
         }
@@ -398,8 +394,7 @@ class MainWindow(QWidget):
         v_left_lower = QHBoxLayout()
         v_left.addLayout(v_left_lower)
 
-        v_left_lower.addWidget(HLine())
-        v_left_lower.addLayout(self.log)
+        v_left_lower.addWidget(self.log)
 
         h_main.addLayout(v_left)
 
