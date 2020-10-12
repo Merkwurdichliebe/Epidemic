@@ -55,7 +55,7 @@ class Game:
         self.stats = Stats(self.deck)
         self.epidemic_count = 0
         self.log.clear()
-        self.log.log(f'New game: {game}\n')
+        self.log.log(f'<b>New game: {game}</b>\n')
 
     def initialise_draw_deck(self, game):
         deck = DrawDeck('draw')
@@ -85,7 +85,8 @@ class Game:
         # Clear the discard pile
         self.deck['discard'].clear()
         self.log.log(
-            f'\nEpidemic #{self.epidemic_count} ({new_card.name}) shuffled\n')
+            f'<b>Epidemic #{self.epidemic_count} ({new_card.name})\
+                shuffled</b>')
 
     def get_all_games(self):
         # Initialize the initial deck from the card list in cards.yml

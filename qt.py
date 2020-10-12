@@ -194,13 +194,18 @@ class PoolSelector(QVBoxLayout):
 class Log(QFrame):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(
-            f'border: 1px solid {COLOR["gray"]}; border-radius: 5px;')
+        # QFrame needs an object name so that its stylesheet border
+        # isn't applied to the QTextEdit child widget
+        self.setObjectName('log-frame')
+        style = f'border: 1px solid {COLOR["gray"]}; border-radius: 5px;'
+        self.setStyleSheet('QFrame#log-frame {' + style + '}')
         layout = QVBoxLayout()
         self.setLayout(layout)
 
+        # CSS selector set specifically to QTextEdit
+        # otherwise scrollbar appearance is modified
         self.edit = QTextEdit()
-        self.edit.setStyleSheet('border: none; background: transparent')
+        self.edit.setStyleSheet('QTextEdit {background-color: transparent}')
         self.edit.setReadOnly(True)
         layout.addWidget(self.edit)
 

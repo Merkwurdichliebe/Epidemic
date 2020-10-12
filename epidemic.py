@@ -49,17 +49,19 @@ class App:
         self.bind_sidebar_buttons()
         QTimer.singleShot(0, self.cb_new_game_dialog)
 
-    @ property
+    @property
     def cardpool_index(self):
         return self._cardpool_index
 
-    @ cardpool_index.setter
+    @cardpool_index.setter
     def cardpool_index(self, index):
         if isinstance(index, int):
             self.view.pool_selector.button[self._cardpool_index].set_active(
                 False)
             new_index = max(
-                0, min(index, min(self.view.top_cards-1, len(self.game.deck['draw'])-1)))
+                0, min(
+                    index, min(
+                        self.view.top_cards-1, len(self.game.deck['draw'])-1)))
             self.view.pool_selector.button[new_index].set_active(
                 True)
             self._cardpool_index = new_index
@@ -87,7 +89,7 @@ class App:
                 button.clicked.connect(
                     lambda b=button, d=deck: self.cb_draw_card(b, d))
 
-    @ staticmethod
+    @staticmethod
     def is_last_card(deck):
         return True if deck.name == 'draw' and len(deck.top()) == 1 else False
 
@@ -151,7 +153,7 @@ class App:
                 logging.info(f'Destination: {deck} (Position: {position})')
                 return (self.game.deck[deck], position)
 
-    @ staticmethod
+    @staticmethod
     def splitter(item, delimiter):
         if delimiter in item:
             return tuple(item.split(delimiter))
@@ -239,7 +241,7 @@ class App:
         self.update_gui()
         self.cb_select_cardpool(0)
 
-    @ staticmethod
+    @staticmethod
     def cb_help_dialog():
         logging.info('Displaying help dialog')
         """Callback from the Help button.
